@@ -30,6 +30,8 @@
   /* Shree Sainath Dental Clinic Brand Palette */
   --color-brand-primary: #123B5D;
   --color-brand-secondary: #EAF4FA;
+  --color-brand-accent: #39A9A5;
+  --color-brand-bg: #FFFFFF;
 }
 
 @layer base {
