@@ -1,0 +1,15 @@
+{
+  "startTime": "07:30 AM",
+  "endTime": "08:30 PM",
+  "lunchStart": "02:30 PM",
+  "lunchEnd": "05:30 PM",
+  "slotDurationMinutes": 45,
+  "consultationType": "BOTH",
+  "weeklyOffDays": [
+    0
+  ],
+  "weeklyOffScope": "BOTH",
+  "allowEmergencyOverride": true,
+  "emergencyNote": "Emergency Dental & Tele-Consultation slots are open by Dr. Ananya Deshmukh.",
+  "closedDates": []
+}

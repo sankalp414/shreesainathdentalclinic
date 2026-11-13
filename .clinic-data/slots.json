@@ -1,0 +1,80 @@
+[
+  {
+    "id": "slot-1",
+    "time": "10:00 AM",
+    "period": "MORNING",
+    "isActive": true
+  },
+  {
+    "id": "slot-2",
+    "time": "10:30 AM",
+    "period": "MORNING",
+    "isActive": true
+  },
+  {
+    "id": "slot-3",
+    "time": "11:00 AM",
+    "period": "MORNING",
+    "isActive": true
+  },
+  {
+    "id": "slot-4",
+    "time": "11:30 AM",
+    "period": "MORNING",
+    "isActive": true
+  },
+  {
+    "id": "slot-5",
+    "time": "12:00 PM",
+    "period": "MORNING",
+    "isActive": true
+  },
+  {
+    "id": "slot-6",
+    "time": "12:30 PM",
+    "period": "MORNING",
+    "isActive": true
+  },
+  {
+    "id": "slot-7",
+    "time": "05:00 PM",
+    "period": "EVENING",
+    "isActive": true
+  },
+  {
+    "id": "slot-8",
+    "time": "05:30 PM",
+    "period": "EVENING",
+    "isActive": true
+  },
+  {
+    "id": "slot-9",
+    "time": "06:00 PM",
+    "period": "EVENING",
+    "isActive": true
+  },
+  {
+    "id": "slot-10",
+    "time": "06:30 PM",
+    "period": "EVENING",
+    "isActive": true
+  },
+  {
+    "id": "slot-11",
+    "time": "07:00 PM",
+    "period": "EVENING",
+    "isActive": true
+  },
+  {
+    "id": "slot-12",
+    "time": "07:30 PM",
+    "period": "EVENING",
+    "isActive": true
+  },
+  {
+    "id": "slot-13",
+    "time": "08:00 PM",
+    "period": "EVENING",
+    "isActive": true
+  }
+]
