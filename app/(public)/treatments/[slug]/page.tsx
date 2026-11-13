@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, use, Suspense } from "react";
+import React, { useState, use, Suspense } from "react";
 import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
 import {
@@ -34,6 +34,7 @@ import {
   VolumeX,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { useLanguage } from "@/components/LanguageContext";
 
 import implant from "@/assets/images/implant_hero_3d_1787659408350.jpg"
 import rct from "@/assets/images/rct_hero_3d_1787659456705.jpg"
@@ -227,872 +228,1023 @@ interface TreatmentData {
   };
 }
 
-const TREATMENTS_MAP: Record<string, TreatmentData> = {
-  "root-canal-treatment": {
-    id: "root-canal-treatment",
-    title: "Root Canal Treatment",
-    category: "Advanced Restorative",
-    subtitle:
-      "Single-visit pain-free rotary endodontics performed under microscopic magnification to preserve your natural tooth structure.",
-    description:
-      "Root canal treatment eliminates bacterial infection from deep within the tooth root pulp chamber, prevents reinfection, and saves your natural tooth from extraction.",
-    details:
-      "Dr. Nitu Rajpoot uses high-precision electronic apex locators, nickel-titanium rotary files, and 3D warm vertical gutta-percha obturation to ensure a completely comfortable, single or double-visit pain-free recovery.",
-    image:rct.src,
-    patientImage:
-      "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=800",
-    duration: "45 - 60 Mins",
-    price: "₹3,500 onwards",
-    procedureVideo: "/images/dental_implant_procedure.mp4",
-    procedureGif: "/images/dental_implant_procedure.gif",
-    successMetric: {
-      value: "99.2%",
-      label: "Tooth Preservation Rate",
-      sublabel: "Micro-endodontic precision",
+function getTreatmentsMap(tr: <T>(en: T, hi: T) => T): Record<string, TreatmentData> {
+  return {
+    "root-canal-treatment": {
+      id: "root-canal-treatment",
+      title: tr("Root Canal Treatment", "रूट कैनाल उपचार (RCT)"),
+      category: tr("Advanced Restorative", "उन्नत रेस्टोरेटिव"),
+      subtitle: tr(
+        "Single-visit pain-free rotary endodontics performed under microscopic magnification to preserve your natural tooth structure.",
+        "आपके प्राकृतिक दांतों की संरचना को सुरक्षित रखने के लिए माइक्रोस्कोपिक मैग्निफिकेशन के तहत किया जाने वाला एकल-विजिट दर्दरहित रोटरी एंडोडोंटिक्स।"
+      ),
+      description: tr(
+        "Root canal treatment eliminates bacterial infection from deep within the tooth root pulp chamber, prevents reinfection, and saves your natural tooth from extraction.",
+        "रूट कैनाल उपचार दांत की जड़ के पल्प चैंबर की गहराई से बैक्टीरियल संक्रमण को खत्म करता है, दोबारा संक्रमण को रोकता है, और आपके प्राकृतिक दांत को निकलने से बचाता है।"
+      ),
+      details: tr(
+        "Dr. Nitu Rajpoot uses high-precision electronic apex locators, nickel-titanium rotary files, and 3D warm vertical gutta-percha obturation to ensure a completely comfortable, single or double-visit pain-free recovery.",
+        "डॉ. नीतू राजपूत एक आरामदायक और दर्दरहित रिकवरी सुनिश्चित करने के लिए उच्च-सटीकता वाले इलेक्ट्रॉनिक एपेक्स लोकेटर, निकल-टाइटेनियम रोटरी फाइलों और 3D गट्टा-पर्चा तकनीक का उपयोग करती हैं।"
+      ),
+      image: rct.src,
+      patientImage:
+        "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=800",
+      duration: tr("45 - 60 Mins", "45 - 60 मिनट"),
+      price: tr("₹3,500 onwards", "₹3,500 से शुरू"),
+      procedureVideo: "/images/dental_implant_procedure.mp4",
+      procedureGif: "/images/dental_implant_procedure.gif",
+      successMetric: {
+        value: "99.2%",
+        label: tr("Tooth Preservation Rate", "दांत संरक्षण दर"),
+        sublabel: tr("Micro-endodontic precision", "माइक्रो-एंडोडोंटिक सटीकता"),
+      },
+      heroBadges: [
+        { iconType: "tooth", label: tr("Single-Sitting Protocol", "सिंगल-सिटिंग प्रोटोकॉल") },
+        { iconType: "shield-star", label: tr("Zero Pain Infiltration", "दर्दरहित एनेस्थीसिया") },
+        { iconType: "sparkles", label: tr("Digital Apex Locator", "डिजिटल एपेक्स लोकेटर") },
+      ],
+      overviewChecklist: [
+        { text: tr("Electronic apex locator for sub-millimeter precision canal measurement", "सटीक कैनाल माप के लिए इलेक्ट्रॉनिक एपेक्स लोकेटर") },
+        { text: tr("Rotary NiTi instrumentation eliminates mechanical vibration & stress", "रोटरी NiTi उपकरण यांत्रिक कंपन और तनाव को खत्म करते हैं") },
+        { text: tr("Thermoplastic 3D hermetic seal prevents bacterial reinfection", "थर्मोप्लास्टिक 3D सील दोबारा बैक्टीरियल संक्रमण को रोकती है") },
+        { text: tr("Preserves your natural chewing strength & jawbone integrity", "आपकी प्राकृतिक चबाने की शक्ति और जबड़े की हड्डी की मजबूती को बनाए रखता है") },
+      ],
+      benefitsCards: [
+        { iconType: "shield-heart", title: tr("Immediate Pain Relief", "दर्द से तुरंत राहत"), description: tr("Instantly relieves severe throbbing toothache and deep nerve inflammation.", "तेज दांत दर्द और नसों की गहरी सूजन से तुरंत राहत दिलाता है।") },
+        { iconType: "tooth", title: tr("Saves Natural Tooth", "प्राकृतिक दांत बचाता है"), description: tr("Preserves natural tooth roots, preventing bone shrinkage and adjacent tooth shift.", "प्राकृतिक दांत की जड़ों को सुरक्षित रखता है और आसपास के दांतों को खिसकने से रोकता है।") },
+        { iconType: "clock", title: tr("Single Visit Available", "एक ही विजिट में उपलब्ध"), description: tr("Advanced rotary files complete standard canal disinfection in one 45-min sitting.", "उन्नत रोटरी फाइलें 45 मिनट की एक सिटिंग में कैनाल की सफाई पूरी करती हैं।") },
+        { iconType: "sparkles", title: tr("Natural Aesthetics", "प्राकृतिक बनावट"), description: tr("Restored with seamless tooth-colored zirconia crowns that blend invisibly.", "दांतों के रंग के ज़िरकोनिया क्राउन के साथ पुनर्स्थापित किया जाता है जो बिल्कुल प्राकृतिक दिखता है।") },
+        { iconType: "shield-star", title: tr("Multi-Year Longevity", "वर्षों तक टिकाऊ"), description: tr("Clinically proven to last decades with regular routine hygiene checkups.", "नियमित दंत स्वच्छता जांच के साथ दशकों तक चलने के लिए प्रमाणित।") },
+      ],
+      procedureSteps: [
+        { stepNumber: 1, title: tr("Digital RVG Scan", "डिजिटल RVG स्कैन"), description: tr("High-definition digital radiograph pinpoints canal morphology and infection depth.", "हाई-डेफिनिशन डिजिटल एक्स-रे से कैनाल की संरचना और संक्रमण की गहराई का पता लगाया जाता है।") },
+        { stepNumber: 2, title: tr("Gentle Anesthesia", "कोमल एनेस्थीसिया"), description: tr("Targeted topical and local computerized numbness ensures absolute zero pain.", "लोकल एनेस्थीसिया यह सुनिश्चित करता है कि इलाज के दौरान बिल्कुल भी दर्द न हो।") },
+        { stepNumber: 3, title: tr("Rotary Cleaning", "रोटरी सफाई"), description: tr("Flexible NiTi files gently clean and irrigate infected pulp tissue under magnification.", "लचीली NiTi फाइलें संक्रमित पल्प टिश्यू को कोमलता से साफ करती हैं।") },
+        { stepNumber: 4, title: tr("3D Bioseal Obturation", "3D बायोसील फिलिंग"), description: tr("Warm gutta-percha seals canal voids hermetically against future reinfection.", "गर्म गट्टा-पर्चा भविष्य के संक्रमण से बचाने के लिए कैनाल को पूरी तरह से सील कर देता है।") },
+        { stepNumber: 5, title: tr("Reinforcing Crown", "मजबूत क्राउन"), description: tr("High-translucency ceramic crown placed to restore full bite force and beauty.", "चबाने की पूरी ताकत और सुंदरता बहाल करने के लिए सिरेमिक क्राउन लगाया जाता है।") },
+      ],
+      candidateChecklist: [
+        { text: tr("Persistent throbbing toothache or intense pain when chewing", "लगातार दांत में दर्द या चबाते समय तेज दर्द होना") },
+        { text: tr("Prolonged sensitivity to hot or cold drinks lasting after removal", "गर्म या ठंडे पेय पदार्थों के प्रति लंबे समय तक रहने वाली झनझनाहट") },
+        { text: tr("Swelling, gum tenderness, or localized pimple near the affected tooth", "प्रभावित दांत के पास मसूड़ों में सूजन या दर्द होना") },
+        { text: tr("Deep cavity or chipped tooth with exposed inner pulp nerve", "गहरी कैविटी या टूटा हुआ दांत जिसकी भीतरी नस खुल गई हो") },
+      ],
+      faqs: [
+        {
+          question: tr("Is root canal treatment really pain-free?", "क्या रूट कैनाल उपचार वास्तव में दर्दरहित है?"),
+          answer: tr(
+            "Yes. With modern localized numbing agents, electronic apex locators, and rotary files, receiving a root canal feels no different than getting a routine composite filling.",
+            "हाँ। आधुनिक लोकल एनेस्थीसिया, इलेक्ट्रॉनिक एपेक्स लोकेटर और रोटरी फाइलों के साथ, रूट कैनाल करवाना एक सामान्य फिलिंग करवाने जैसा ही आरामदायक लगता है।"
+          ),
+        },
+        {
+          question: tr("How long does a root canal procedure take?", "रूट कैनाल प्रक्रिया में कितना समय लगता है?"),
+          answer: tr(
+            "Most uncomplicated root canals are completed in a single 45 to 60-minute appointment. Severe infections may require a second brief visit to ensure complete sterility.",
+            "अधिकांश सामान्य रूट कैनाल 45 से 60 मिनट के एक ही अपॉइंटमेंट में पूरे हो जाते हैं। गंभीर संक्रमणों में पूर्ण स्वच्छता सुनिश्चित करने के लिए दूसरी छोटी विजिट की आवश्यकता हो सकती है।"
+          ),
+        },
+        {
+          question: tr("Do I always need a crown after a root canal?", "क्या रूट कैनाल के बाद हमेशा क्राउन (कैप) की आवश्यकता होती है?"),
+          answer: tr(
+            "For back chewing teeth (molars and premolars), a zirconia or porcelain crown is strongly advised to prevent tooth fracture under heavy bite forces.",
+            "पीछे के चबाने वाले दांतों (दाढ़) के लिए, चबाने के दबाव से दांत को टूटने से बचाने के लिए ज़िरकोनिया या पोर्सिलेन क्राउन लगाने की सलाह दी जाती है।"
+          ),
+        },
+      ],
+      howItWorksHighlights: [
+        { title: tr("Digital Canal Mapping", "डिजिटल कैनाल मैपिंग"), desc: tr("Sub-millimeter apex sensor measures canal depth precisely.", "एपेक्स सेंसर कैनाल की गहराई को पूरी सटीकता से मापता है।") },
+        { title: tr("Sterile Ultrasonic Flush", "स्टेराइल अल्ट्रासोनिक फ्लश"), desc: tr("Antibacterial irrigation eradicates deep-seated pathogens.", "एंटीबैक्टीरियल सफाई गहरे बैक्टीरिया को जड़ से खत्म करती है।") },
+        { title: tr("3D Hermetic Bioseal", "3D हर्मेटिक बायोसील"), desc: tr("Thermally compacted biocompatible material seals canal walls.", "बायोकम्पैटिबल मटेरियल कैनाल की दीवारों को सुरक्षित रूप से सील करता है।") },
+      ],
+      beforeAfter: {
+        beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+        afterImage: "https://images.unsplash.com/photo-1606811841689-23dfddce6395?auto=format&fit=crop&q=80&w=800",
+        label: tr("Molar Endodontic Restoration & Zirconia Crown", "मोलर एंडोडोंटिक रेस्टोरेशन और ज़िरकोनिया क्राउन"),
+        timeline: tr("Single Visit (50 Mins)", "एकल विजिट (50 मिनट)"),
+        notes: tr(
+          "Severe periapical abscess treated under rotary endodontics. Patient experienced complete pain relief within 24 hours.",
+          "रोटरी एंडोडोंटिक्स के तहत गंभीर संक्रमण का इलाज किया गया। मरीज को 24 घंटे के भीतर दर्द से पूर्ण राहत मिली।"
+        ),
+      },
     },
-    heroBadges: [
-      { iconType: "tooth", label: "Single-Sitting Protocol" },
-      { iconType: "shield-star", label: "Zero Pain Infiltration" },
-      { iconType: "sparkles", label: "Digital Apex Locator" },
-    ],
-    overviewChecklist: [
-      { text: "Electronic apex locator for sub-millimeter precision canal measurement" },
-      { text: "Rotary NiTi instrumentation eliminates mechanical vibration & stress" },
-      { text: "Thermoplastic 3D hermetic seal prevents bacterial reinfection" },
-      { text: "Preserves your natural chewing strength & jawbone integrity" },
-    ],
-    benefitsCards: [
-      { iconType: "shield-heart", title: "Immediate Pain Relief", description: "Instantly relieves severe throbbing toothache and deep nerve inflammation." },
-      { iconType: "tooth", title: "Saves Natural Tooth", description: "Preserves natural tooth roots, preventing bone shrinkage and adjacent tooth shift." },
-      { iconType: "clock", title: "Single Visit Available", description: "Advanced rotary files complete standard canal disinfection in one 45-min sitting." },
-      { iconType: "sparkles", title: "Natural Aesthetics", description: "Restored with seamless tooth-colored zirconia crowns that blend invisibly." },
-      { iconType: "shield-star", title: "Multi-Year Longevity", description: "Clinically proven to last decades with regular routine hygiene checkups." },
-    ],
-    procedureSteps: [
-      { stepNumber: 1, title: "Digital RVG Scan", description: "High-definition digital radiograph pinpoints canal morphology and infection depth." },
-      { stepNumber: 2, title: "Gentle Anesthesia", description: "Targeted topical and local computerized numbness ensures absolute zero pain." },
-      { stepNumber: 3, title: "Rotary Cleaning", description: "Flexible NiTi files gently clean and irrigate infected pulp tissue under magnification." },
-      { stepNumber: 4, title: "3D Bioseal Obturation", description: "Warm gutta-percha seals canal voids hermetically against future reinfection." },
-      { stepNumber: 5, title: "Reinforcing Crown", description: "High-translucency ceramic crown placed to restore full bite force and beauty." },
-    ],
-    candidateChecklist: [
-      { text: "Persistent throbbing toothache or intense pain when chewing" },
-      { text: "Prolonged sensitivity to hot or cold drinks lasting after removal" },
-      { text: "Swelling, gum tenderness, or localized pimple near the affected tooth" },
-      { text: "Deep cavity or chipped tooth with exposed inner pulp nerve" },
-    ],
-    faqs: [
-      {
-        question: "Is root canal treatment really pain-free?",
-        answer: "Yes. With modern localized numbing agents, electronic apex locators, and rotary files, receiving a root canal feels no different than getting a routine composite filling.",
-      },
-      {
-        question: "How long does a root canal procedure take?",
-        answer: "Most uncomplicated root canals are completed in a single 45 to 60-minute appointment. Severe infections may require a second brief visit to ensure complete sterility.",
-      },
-      {
-        question: "Do I always need a crown after a root canal?",
-        answer: "For back chewing teeth (molars and premolars), a zirconia or porcelain crown is strongly advised to prevent tooth fracture under heavy bite forces.",
-      },
-    ],
-    howItWorksHighlights: [
-      { title: "Digital Canal Mapping", desc: "Sub-millimeter apex sensor measures canal depth precisely." },
-      { title: "Sterile Ultrasonic Flush", desc: "Antibacterial irrigation eradicates deep-seated pathogens." },
-      { title: "3D Hermetic Bioseal", desc: "Thermally compacted biocompatible material seals canal walls." },
-    ],
-    beforeAfter: {
-      beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
-      afterImage: "https://images.unsplash.com/photo-1606811841689-23dfddce6395?auto=format&fit=crop&q=80&w=800",
-      label: "Molar Endodontic Restoration & Zirconia Crown",
-      timeline: "Single Visit (50 Mins)",
-      notes: "Severe periapical abscess treated under rotary endodontics. Patient experienced complete pain relief within 24 hours.",
-    },
-  },
 
-  "dental-implants": {
-    id: "dental-implants",
-    title: "Dental Implants",
-    category: "Prosthodontics",
-    subtitle:
-      "Permanent medical-grade titanium fixtures topped with hand-crafted porcelain crowns to permanently replace missing teeth.",
-    description:
-      "Dental implants represent the gold standard for missing teeth replacement. They look, feel, and function just like natural teeth, preserving jawbone density and restoring chewing confidence.",
-    details:
-      "Utilizing 3D CBCT guided surgical stents, Dr. Nitu Rajpoot positions German titanium posts into the jawbone with sub-millimeter precision, achieving permanent osseointegration and natural gum emergence.",
-    image:implant.src,
-    patientImage:
-      "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800",
-    duration: "Multi-visit",
-    price: "₹18,000 onwards",
-    procedureVideo: "/images/dental_implant_procedure.mp4",
-    procedureGif: "/images/dental_implant_procedure.gif",
-    successMetric: {
-      value: "98.8%",
-      label: "Clinical Success Rate",
-      sublabel: "German Grade-5 Titanium",
-    },
-    heroBadges: [
-      { iconType: "shield-star", label: "Lifetime Osseointegration" },
-      { iconType: "tooth", label: "100% Chew Confidence" },
-      { iconType: "sparkles", label: "3D CBCT Guided Surgery" },
-    ],
-    overviewChecklist: [
-      { text: "Biocompatible Grade-5 titanium post naturally fuses with jawbone" },
-      { text: "Preserves facial contour by preventing bone resorption after tooth loss" },
-      { text: "No trimming of adjacent healthy teeth required, unlike bridges" },
-      { text: "Custom zirconia crown digitally matched to natural enamel translucency" },
-    ],
-    benefitsCards: [
-      { iconType: "tooth", title: "Natural Tooth Feel", description: "Anchored directly into bone for completely natural bite stability and speech clarity." },
-      { iconType: "shield-star", title: "Preserves Jawbone", description: "Stimulates bone regeneration, stopping premature sunken facial aging." },
-      { iconType: "shield-heart", title: "Protects Healthy Teeth", description: "Leaves neighbouring teeth intact without damaging healthy enamel." },
-      { iconType: "sparkles", title: "Lifelong Solution", description: "Designed to endure a lifetime with ordinary brushing, flossing, and checkups." },
-      { iconType: "smile", title: "Carefree Eating", description: "Enjoy apples, nuts, and your favourite foods with zero slip or discomfort." },
-    ],
-    procedureSteps: [
-      { stepNumber: 1, title: "3D CBCT Imaging", description: "Comprehensive scan assesses bone volume and maps safe nerve pathways." },
-      { stepNumber: 2, title: "Guided Fixture Placement", description: "Keyhole surgical guide seats titanium post in jawbone with zero stitches." },
-      { stepNumber: 3, title: "Osseointegration", description: "Titanium fuses permanently with surrounding natural bone over 8 to 12 weeks." },
-      { stepNumber: 4, title: "Custom Abutment", description: "Titanium connector fitted to provide biological support for your final crown." },
-      { stepNumber: 5, title: "Zirconia Crown Placement", description: "Hand-crafted ceramic crown bonded for seamless natural aesthetics." },
-    ],
-    candidateChecklist: [
-      { text: "Missing one or more teeth due to trauma, decay, or extraction" },
-      { text: "Unhappy with loose, clicking, or uncomfortable removable dentures" },
-      { text: "Adequate bone density or eligible for gentle bone augmentation" },
-      { text: "Healthy gums and good general systemic oral health" },
-    ],
-    faqs: [
-      {
-        question: "How long do dental implants last?",
-        answer: "With routine oral hygiene and professional cleanings every 6 months, dental implants can easily last 25 years to a full lifetime.",
+    "dental-implants": {
+      id: "dental-implants",
+      title: tr("Dental Implants", "डेंटल इम्प्लांट्स"),
+      category: tr("Prosthodontics", "प्रोस्थोडोंटिक्स"),
+      subtitle: tr(
+        "Permanent medical-grade titanium fixtures topped with hand-crafted porcelain crowns to permanently replace missing teeth.",
+        "गायब दांतों को स्थायी रूप से बदलने के लिए प्राकृतिक पोर्सिलेन क्राउन के साथ मेडिकल-ग्रेड टाइटेनियम इम्प्लांट्स।"
+      ),
+      description: tr(
+        "Dental implants represent the gold standard for missing teeth replacement. They look, feel, and function just like natural teeth, preserving jawbone density and restoring chewing confidence.",
+        "डेंटल इम्प्लांट्स गायब दांतों को बदलने के लिए सबसे उत्तम विकल्प हैं। वे प्राकृतिक दांतों की तरह दिखते, महसूस होते और काम करते हैं, जिससे जबड़े की हड्डी मजबूत रहती है।"
+      ),
+      details: tr(
+        "Utilizing 3D CBCT guided surgical stents, Dr. Nitu Rajpoot positions German titanium posts into the jawbone with sub-millimeter precision, achieving permanent osseointegration and natural gum emergence.",
+        "3D CBCT गाइडेड तकनीक का उपयोग करते हुए, डॉ. नीतू राजपूत अत्यधिक सटीकता के साथ जबड़े की हड्डी में टाइटेनियम इम्प्लांट स्थापित करती हैं, जिससे स्थायी मजबूती मिलती है।"
+      ),
+      image: implant.src,
+      patientImage:
+        "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800",
+      duration: tr("Multi-visit", "मल्टी-विजिट"),
+      price: tr("₹18,000 onwards", "₹18,000 से शुरू"),
+      procedureVideo: "/images/dental_implant_procedure.mp4",
+      procedureGif: "/images/dental_implant_procedure.gif",
+      successMetric: {
+        value: "98.8%",
+        label: tr("Clinical Success Rate", "क्लिनिकल सफलता दर"),
+        sublabel: tr("German Grade-5 Titanium", "जर्मन ग्रेड-5 टाइटेनियम"),
       },
-      {
-        question: "Is implant surgery painful?",
-        answer: "No. Keyhole surgical placement is performed under comfortable local anesthesia. Most patients report less discomfort than a routine tooth extraction.",
+      heroBadges: [
+        { iconType: "shield-star", label: tr("Lifetime Osseointegration", "जीवनभर की मजबूती") },
+        { iconType: "tooth", label: tr("100% Chew Confidence", "100% चबाने का आत्मविश्वास") },
+        { iconType: "sparkles", label: tr("3D CBCT Guided Surgery", "3D CBCT गाइडेड सर्जरी") },
+      ],
+      overviewChecklist: [
+        { text: tr("Biocompatible Grade-5 titanium post naturally fuses with jawbone", "बायोकम्पैटिबल ग्रेड-5 टाइटेनियम प्राकृतिक रूप से जबड़े की हड्डी से जुड़ जाता है") },
+        { text: tr("Preserves facial contour by preventing bone resorption after tooth loss", "दांत निकलने के बाद हड्डी के क्षरण को रोककर चेहरे की बनावट को बनाए रखता है") },
+        { text: tr("No trimming of adjacent healthy teeth required, unlike bridges", "ब्रिज के विपरीत, पास के स्वस्थ दांतों को घिसने की कोई आवश्यकता नहीं होती") },
+        { text: tr("Custom zirconia crown digitally matched to natural enamel translucency", "प्राकृतिक दांतों के रंग से मेल खाता हुआ कस्टम ज़िरकोनिया क्राउन") },
+      ],
+      benefitsCards: [
+        { iconType: "tooth", title: tr("Natural Tooth Feel", "प्राकृतिक दांत जैसा एहसास"), description: tr("Anchored directly into bone for completely natural bite stability and speech clarity.", "प्राकृतिक चबाने की स्थिरता और स्पष्ट बोलने के लिए सीधे हड्डी में स्थापित।") },
+        { iconType: "shield-star", title: tr("Preserves Jawbone", "जबड़े की हड्डी को बचाता है"), description: tr("Stimulates bone regeneration, stopping premature sunken facial aging.", "हड्डी के पुनर्जनन को प्रोत्साहित करता है और चेहरे की बनावट को बनाए रखता है।") },
+        { iconType: "shield-heart", title: tr("Protects Healthy Teeth", "स्वस्थ दांतों की सुरक्षा"), description: tr("Leaves neighbouring teeth intact without damaging healthy enamel.", "स्वस्थ इनेमल को नुकसान पहुंचाए बिना पास के दांतों को सुरक्षित रखता है।") },
+        { iconType: "sparkles", title: tr("Lifelong Solution", "आजीवन समाधान"), description: tr("Designed to endure a lifetime with ordinary brushing, flossing, and checkups.", "सामान्य ब्रशिंग, फ्लॉसिंग और नियमित जांच के साथ जीवन भर चलने के लिए डिज़ाइन किया गया।") },
+        { iconType: "smile", title: tr("Carefree Eating", "बेफिक्र होकर खाएं"), description: tr("Enjoy apples, nuts, and your favourite foods with zero slip or discomfort.", "बिना किसी परेशानी के अपने पसंदीदा भोजन का आनंद लें।") },
+      ],
+      procedureSteps: [
+        { stepNumber: 1, title: tr("3D CBCT Imaging", "3D CBCT इमेजिंग"), description: tr("Comprehensive scan assesses bone volume and maps safe nerve pathways.", "व्यापक स्कैन हड्डी के घनत्व का आकलन करता है और सुरक्षित मार्ग तय करता है।") },
+        { stepNumber: 2, title: tr("Guided Fixture Placement", "गाइडेड इम्प्लांट प्लेसमेंट"), description: tr("Keyhole surgical guide seats titanium post in jawbone with zero stitches.", "की-होल सर्जिकल गाइड बिना टांके के जबड़े की हड्डी में टाइटेनियम पोस्ट स्थापित करता है।") },
+        { stepNumber: 3, title: tr("Osseointegration", "ओसियोइंटीग्रेशन (हड्डी से जुड़ाव)"), description: tr("Titanium fuses permanently with surrounding natural bone over 8 to 12 weeks.", "टाइटेनियम 8 से 12 सप्ताह में आसपास की प्राकृतिक हड्डी के साथ स्थायी रूप से जुड़ जाता है।") },
+        { stepNumber: 4, title: tr("Custom Abutment", "कस्टम अबटमेंट"), description: tr("Titanium connector fitted to provide biological support for your final crown.", "आपके अंतिम क्राउन को सहारा देने के लिए टाइटेनियम कनेक्टर लगाया जाता है।") },
+        { stepNumber: 5, title: tr("Zirconia Crown Placement", "ज़िरकोनिया क्राउन प्लेसमेंट"), description: tr("Hand-crafted ceramic crown bonded for seamless natural aesthetics.", "प्राकृतिक सुंदरता के लिए सिरेमिक क्राउन लगाया जाता है।") },
+      ],
+      candidateChecklist: [
+        { text: tr("Missing one or more teeth due to trauma, decay, or extraction", "चोट, सड़न या दांत निकलवाने के कारण एक या अधिक दांतों का न होना") },
+        { text: tr("Unhappy with loose, clicking, or uncomfortable removable dentures", "ढीले या असुविधाजनक नकली दांतों (डेंचर) से परेशान होना") },
+        { text: tr("Adequate bone density or eligible for gentle bone augmentation", "पर्याप्त हड्डी का घनत्व या बोन ग्राफ्टिंग के लिए उपयुक्त") },
+        { text: tr("Healthy gums and good general systemic oral health", "स्वस्थ मसूड़े और अच्छा सामान्य दंत स्वास्थ्य") },
+      ],
+      faqs: [
+        {
+          question: tr("How long do dental implants last?", "डेंटल इम्प्लांट्स कितने समय तक चलते हैं?"),
+          answer: tr(
+            "With routine oral hygiene and professional cleanings every 6 months, dental implants can easily last 25 years to a full lifetime.",
+            "नियमित दंत स्वच्छता और हर 6 महीने में जांच के साथ, डेंटल इम्प्लांट्स आसानी से 25 वर्ष से लेकर पूरे जीवनकाल तक चल सकते हैं।"
+          ),
+        },
+        {
+          question: tr("Is implant surgery painful?", "क्या इम्प्लांट सर्जरी दर्दनाक होती है?"),
+          answer: tr(
+            "No. Keyhole surgical placement is performed under comfortable local anesthesia. Most patients report less discomfort than a routine tooth extraction.",
+            "नहीं। की-होल सर्जिकल प्लेसमेंट आरामदायक लोकल एनेस्थीसिया के तहत किया जाता है। अधिकांश मरीज सामान्य दांत निकलवाने की तुलना में भी कम असुविधा महसूस करते हैं।"
+          ),
+        },
+      ],
+      howItWorksHighlights: [
+        { title: tr("3D Guided Stent", "3D गाइडेड स्टेंट"), desc: tr("Computer-designed guide directs precise implant angulation.", "कंप्यूटर-डिज़ाइन किया गया गाइड सटीक इम्प्लांट कोण निर्देशित करता है।") },
+        { title: tr("Medical Grade Titanium", "मेडिकल ग्रेड टाइटेनियम"), desc: tr("Pure biocompatible metal that naturally fuses with human bone.", "शुद्ध बायोकम्पैटिबल धातु जो प्राकृतिक रूप से मानव हड्डी के साथ जुड़ती है।") },
+        { title: tr("CAD/CAM Zirconia", "CAD/CAM ज़िरकोनिया"), desc: tr("Diamond-milled crown replicates genuine enamel light translucency.", "डायमंड-मिल्ड क्राउन असली दांतों की चमक को दोहराता है।") },
+      ],
+      beforeAfter: {
+        beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+        afterImage: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800",
+        label: tr("Single Anterior Dental Implant Restoration", "सिंगल एंटीरियर डेंटल इम्प्लांट रेस्टोरेशन"),
+        timeline: tr("3 Months Osseointegration", "3 महीने (ओसियोइंटीग्रेशन)"),
+        notes: tr(
+          "Front tooth lost to sports trauma replaced with guided titanium implant and layered zirconia crown.",
+          "खेल में चोट के कारण टूटे सामने के दांत को गाइडेड टाइटेनियम इम्प्लांट और ज़िरकोनिया क्राउन से बदला गया।"
+        ),
       },
-    ],
-    howItWorksHighlights: [
-      { title: "3D Guided Stent", desc: "Computer-designed guide directs precise implant angulation." },
-      { title: "Medical Grade Titanium", desc: "Pure biocompatible metal that naturally fuses with human bone." },
-      { title: "CAD/CAM Zirconia", desc: "Diamond-milled crown replicates genuine enamel light translucency." },
-    ],
-    beforeAfter: {
-      beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
-      afterImage: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800",
-      label: "Single Anterior Dental Implant Restoration",
-      timeline: "3 Months Osseointegration",
-      notes: "Front tooth lost to sports trauma replaced with guided titanium implant and layered zirconia crown.",
     },
-  },
 
-  "clear-aligners-braces": {
-    id: "clear-aligners-braces",
-    title: "Clear Aligners & Braces",
-    category: "Orthodontics",
-    subtitle:
-      "Virtually invisible removable clear aligners and discreet modern braces designed to straighten your smile comfortably.",
-    description:
-      "Achieve the balanced, harmonious smile you have always desired without metal wires. Custom-designed thermoformed aligners gradually reposition teeth with gentle, biological pressure.",
-    details:
-      "3D intraoral digital scanning maps your entire tooth movement timeline before you begin, showing your simulated final smile on screen in your very first appointment.",
-    image:
-      aligners.src,
-    patientImage:
-      "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=800",
-    duration: "Custom plan",
-    price: "₹45,000 onwards",
-    procedureVideo: "/images/dental_implant_procedure.mp4",
-    procedureGif: "/images/dental_implant_procedure.gif",
-    successMetric: {
-      value: "100%",
-      label: "Discreet Aesthetic Fit",
-      sublabel: "BPA-free medical polymer",
-    },
-    heroBadges: [
-      { iconType: "sparkles", label: "Virtually Invisible" },
-      { iconType: "tooth", label: "Removable for Meals" },
-      { iconType: "clock", label: "Predictable 3D Roadmap" },
-    ],
-    overviewChecklist: [
-      { text: "BPA-free medical polymer aligners custom-formed to your gum line" },
-      { text: "Removable whenever you eat, drink, brush, or attend special events" },
-      { text: "Zero emergency visits for snapped wires or loose metal brackets" },
-      { text: "Corrects crowding, gap spacing, overbite, crossbite, and open bite" },
-    ],
-    benefitsCards: [
-      { iconType: "sparkles", title: "Discreet Confidence", description: "So clear that colleagues and friends won't notice you are wearing them." },
-      { iconType: "tooth", title: "Eat Without Limits", description: "Remove aligners before meals to enjoy crunchy, sticky, and hard foods." },
-      { iconType: "shield-star", title: "Superior Hygiene", description: "Brush and floss normally without threading wires between teeth." },
-      { iconType: "clock", title: "Fewer Clinic Visits", description: "Take home multiple trays and visit us only every 6 to 8 weeks for progress checks." },
-      { iconType: "smile", title: "Gentle Force", description: "Smooth edges protect cheeks and lips from painful sores and cuts." },
-    ],
-    procedureSteps: [
-      { stepNumber: 1, title: "3D Intraoral Scan", description: "Digitally captures 100,000 data points of your dental arch in under 3 minutes." },
-      { stepNumber: 2, title: "3D Smile Simulation", description: "Inspect your simulated smile transformation from start to finish on screen." },
-      { stepNumber: 3, title: "Precision Tray Fabrication", description: "Robotic thermoforming mills your custom sequence of clear aligners." },
-      { stepNumber: 4, title: "Progressive Alignment", description: "Switch to a fresh aligner tray every 10 to 14 days as teeth align." },
-      { stepNumber: 5, title: "Vivera Retainer", description: "Custom night retainer locks your beautiful new smile into permanent place." },
-    ],
-    candidateChecklist: [
-      { text: "Mild to complex dental crowding, overlaps, or rotated teeth" },
-      { text: "Visible gaps or unwanted spacing between anterior teeth" },
-      { text: "Bite misalignment such as overjet, deep bite, or underbite" },
-      { text: "Adults and teens seeking a discreet alternative to metal braces" },
-    ],
-    faqs: [
-      {
-        question: "How many hours a day must I wear my aligners?",
-        answer: "Aligners should be worn for 20 to 22 hours per day, removing them only for eating, drinking non-water beverages, and brushing.",
+    "clear-aligners-braces": {
+      id: "clear-aligners-braces",
+      title: tr("Clear Aligners & Braces", "क्लियर एलाइनर्स और ब्रेसेस"),
+      category: tr("Orthodontics", "ऑर्थोडोंटिक्स"),
+      subtitle: tr(
+        "Virtually invisible removable clear aligners and discreet modern braces designed to straighten your smile comfortably.",
+        "आपकी मुस्कान को आराम से सीधा करने के लिए डिज़ाइन किए गए लगभग अदृश्य रिमूवेबल क्लियर एलाइनर्स और आधुनिक ब्रेसेस।"
+      ),
+      description: tr(
+        "Achieve the balanced, harmonious smile you have always desired without metal wires. Custom-designed thermoformed aligners gradually reposition teeth with gentle, biological pressure.",
+        "बिना धातु के तारों के संतुलित और सुंदर मुस्कान पाएं। कस्टम-डिज़ाइन किए गए एलाइनर्स कोमल दबाव के साथ धीरे-धीरे दांतों को सही स्थिति में लाते हैं।"
+      ),
+      details: tr(
+        "3D intraoral digital scanning maps your entire tooth movement timeline before you begin, showing your simulated final smile on screen in your very first appointment.",
+        "3D इंट्राओरल डिजिटल स्कैनिंग इलाज शुरू होने से पहले ही आपके दांतों के संरेखण की पूरी टाइमलाइन तैयार करती है, जिससे आप पहली ही विजिट में अपनी अंतिम मुस्कान स्क्रीन पर देख सकते हैं।"
+      ),
+      image: aligners.src,
+      patientImage:
+        "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=800",
+      duration: tr("Custom plan", "कस्टम प्लान"),
+      price: tr("₹45,000 onwards", "₹45,000 से शुरू"),
+      procedureVideo: "/images/dental_implant_procedure.mp4",
+      procedureGif: "/images/dental_implant_procedure.gif",
+      successMetric: {
+        value: "100%",
+        label: tr("Discreet Aesthetic Fit", "अदृश्य और आरामदायक फिट"),
+        sublabel: tr("BPA-free medical polymer", "BPA-मुक्त मेडिकल पॉलीमर"),
       },
-      {
-        question: "How long does clear aligner treatment take?",
-        answer: "Average treatments take between 6 and 14 months, depending on your initial crowding and whether you wear them consistently.",
+      heroBadges: [
+        { iconType: "sparkles", label: tr("Virtually Invisible", "लगभग अदृश्य") },
+        { iconType: "tooth", label: tr("Removable for Meals", "भोजन के समय निकालने योग्य") },
+        { iconType: "clock", label: tr("Predictable 3D Roadmap", "सटीक 3D रोडमैप") },
+      ],
+      overviewChecklist: [
+        { text: tr("BPA-free medical polymer aligners custom-formed to your gum line", "आपकी मसूड़ों की रेखा के अनुसार विशेष रूप से निर्मित BPA-मुक्त मेडिकल पॉलीमर एलाइनर्स") },
+        { text: tr("Removable whenever you eat, drink, brush, or attend special events", "खाते, पीते, ब्रश करते समय या विशेष अवसरों पर आसानी से निकालने योग्य") },
+        { text: tr("Zero emergency visits for snapped wires or loose metal brackets", "टूटे हुए तारों या ढीले मेटल ब्रैकेट के लिए किसी आपातकालीन विजिट की आवश्यकता नहीं") },
+        { text: tr("Corrects crowding, gap spacing, overbite, crossbite, and open bite", "टेढ़े-मेढ़े दांतों, गैप, ओवरबाइट और क्रॉसबाइट को ठीक करता है") },
+      ],
+      benefitsCards: [
+        { iconType: "sparkles", title: tr("Discreet Confidence", "अदृश्य आत्मविश्वास"), description: tr("So clear that colleagues and friends won't notice you are wearing them.", "इतने पारदर्शी कि किसी को पता भी नहीं चलेगा कि आपने इन्हें पहना है।") },
+        { iconType: "tooth", title: tr("Eat Without Limits", "बिना किसी रोक-टोक के खाएं"), description: tr("Remove aligners before meals to enjoy crunchy, sticky, and hard foods.", "अपने पसंदीदा भोजन का आनंद लेने के लिए खाने से पहले एलाइनर्स को निकाल दें।") },
+        { iconType: "shield-star", title: tr("Superior Hygiene", "बेहतर स्वच्छता"), description: tr("Brush and floss normally without threading wires between teeth.", "दांतों के बीच तारों की रुकावट के बिना सामान्य रूप से ब्रश और फ्लॉस करें।") },
+        { iconType: "clock", title: tr("Fewer Clinic Visits", "कम क्लिनिक विजिट"), description: tr("Take home multiple trays and visit us only every 6 to 8 weeks for progress checks.", "प्रगति की जांच के लिए केवल हर 6 से 8 सप्ताह में क्लिनिक विजिट करें।") },
+        { iconType: "smile", title: tr("Gentle Force", "कोमल दबाव"), description: tr("Smooth edges protect cheeks and lips from painful sores and cuts.", "चिकने किनारे गालों और होंठों को छालों और कटने से बचाते हैं।") },
+      ],
+      procedureSteps: [
+        { stepNumber: 1, title: tr("3D Intraoral Scan", "3D इंट्राओरल स्कैन"), description: tr("Digitally captures 100,000 data points of your dental arch in under 3 minutes.", "3 मिनट से भी कम समय में आपके दांतों का डिजिटल 3D स्कैन लेता है।") },
+        { stepNumber: 2, title: tr("3D Smile Simulation", "3D स्माइल सिमुलेशन"), description: tr("Inspect your simulated smile transformation from start to finish on screen.", "स्क्रीन पर शुरू से अंत तक अपनी मुस्कान में होने वाले बदलाव को देखें।") },
+        { stepNumber: 3, title: tr("Precision Tray Fabrication", "सटीक ट्रे निर्माण"), description: tr("Robotic thermoforming mills your custom sequence of clear aligners.", "रोबोटिक तकनीक से आपके कस्टम क्लियर एलाइनर्स का सेट तैयार किया जाता है।") },
+        { stepNumber: 4, title: tr("Progressive Alignment", "क्रमिक संरेखण"), description: tr("Switch to a fresh aligner tray every 10 to 14 days as teeth align.", "दांतों के सीधा होने के साथ हर 10 से 14 दिनों में नया एलाइनर ट्रे पहनें।") },
+        { stepNumber: 5, title: tr("Vivera Retainer", "रिटेनर सुरक्षा"), description: tr("Custom night retainer locks your beautiful new smile into permanent place.", "कस्टम नाइट रिटेनर आपकी नई मुस्कान को स्थायी रूप से बनाए रखता है।") },
+      ],
+      candidateChecklist: [
+        { text: tr("Mild to complex dental crowding, overlaps, or rotated teeth", "हल्के से लेकर जटिल रूप से टेढ़े-मेढ़े या मुड़े हुए दांत") },
+        { text: tr("Visible gaps or unwanted spacing between anterior teeth", "सामने के दांतों के बीच दिखाई देने वाला गैप") },
+        { text: tr("Bite misalignment such as overjet, deep bite, or underbite", "बाइट का असंतुलन जैसे ओवरजेट, डीप बाइट या अंडरबाइट") },
+        { text: tr("Adults and teens seeking a discreet alternative to metal braces", "मेटल ब्रेसेस का अदृश्य विकल्प चाहने वाले वयस्क और किशोर") },
+      ],
+      faqs: [
+        {
+          question: tr("How many hours a day must I wear my aligners?", "मुझे दिन में कितने घंटे अपने एलाइनर्स पहनने चाहिए?"),
+          answer: tr(
+            "Aligners should be worn for 20 to 22 hours per day, removing them only for eating, drinking non-water beverages, and brushing.",
+            "एलाइनर्स को प्रतिदिन 20 से 22 घंटे पहना जाना चाहिए, उन्हें केवल खाने, पानी के अलावा अन्य पेय पीने और ब्रश करने के लिए ही निकालना चाहिए।"
+          ),
+        },
+        {
+          question: tr("How long does clear aligner treatment take?", "क्लियर एलाइनर उपचार में कितना समय लगता है?"),
+          answer: tr(
+            "Average treatments take between 6 and 14 months, depending on your initial crowding and whether you wear them consistently.",
+            "आपके दांतों की स्थिति और नियमित उपयोग के आधार पर औसत उपचार में 6 से 14 महीने लगते हैं।"
+          ),
+        },
+      ],
+      howItWorksHighlights: [
+        { title: tr("Intraoral Optical Scan", "इंट्राओरल ऑप्टिकल स्कैन"), desc: tr("No messy impression putty; rapid digital optical capture.", "बिना किसी पेस्ट के त्वरित डिजिटल ऑप्टिकल स्कैन।") },
+        { title: tr("SmartTrack Polymer", "स्मार्टट्रैक पॉलीमर"), desc: tr("Engineered for gentle, constant, and controlled tooth movement.", "कोमल, निरंतर और नियंत्रित दांत संरेखण के लिए निर्मित।") },
+        { title: tr("Custom Retention", "कस्टम रिटेंशन"), desc: tr("Protects your investment against post-treatment tooth relapse.", "उपचार के बाद दांतों को वापस खिसकने से बचाता है।") },
+      ],
+      beforeAfter: {
+        beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+        afterImage: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=800",
+        label: tr("Adult Anterior Crowding Correction", "वयस्क एंटीरियर क्राउडिंग सुधार"),
+        timeline: tr("9 Months (18 Aligners)", "9 महीने (18 एलाइनर्स)"),
+        notes: tr(
+          "Severe upper crowding resolved with clear aligners without requiring any premolar tooth extractions.",
+          "बिना कोई दांत निकाले क्लियर एलाइनर्स के साथ ऊपरी दांतों के टेढ़ेपन को पूरी तरह ठीक किया गया।"
+        ),
       },
-    ],
-    howItWorksHighlights: [
-      { title: "Intraoral Optical Scan", desc: "No messy impression putty; rapid digital optical capture." },
-      { title: "SmartTrack Polymer", desc: "Engineered for gentle, constant, and controlled tooth movement." },
-      { title: "Custom Retention", desc: "Protects your investment against post-treatment tooth relapse." },
-    ],
-    beforeAfter: {
-      beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
-      afterImage: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=800",
-      label: "Adult Anterior Crowding Correction",
-      timeline: "9 Months (18 Aligners)",
-      notes: "Severe upper crowding resolved with clear aligners without requiring any premolar tooth extractions.",
     },
-  },
 
-  "laser-teeth-whitening": {
-    id: "laser-teeth-whitening",
-    title: "Laser Teeth Whitening",
-    category: "Aesthetic Dentistry",
-    subtitle:
-      "In-office advanced laser-activated dental bleaching to lift deep organic stains and brighten your smile up to 8 shades.",
-    description:
-      "Reclaim your natural radiant smile in just one clinical session. Our laser whitening safely lifts stubborn discoloration from coffee, tea, wine, and aging without enamel erosion.",
-    details:
-      "Dr. Nitu Rajpoot applies a pH-neutral hydrogen peroxide gel activated by a cold diode laser wavelength, sealing dentinal tubules with remineralizing fluoride to eliminate post-op sensitivity.",
-    image:white.src
-      ,
-    patientImage:
-      "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800",
-    duration: "45 Mins",
-    price: "₹5,000 onwards",
-    procedureVideo: "/images/dental_implant_procedure.mp4",
-    procedureGif: "/images/dental_implant_procedure.gif",
-    successMetric: {
-      value: "Up to 8 Shades",
-      label: "Enamel Brightening",
-      sublabel: "In a single 45-min visit",
-    },
-    heroBadges: [
-      { iconType: "sparkles", label: "Instant Shade Lift" },
-      { iconType: "shield-star", label: "Enamel Safe & Gentle" },
-      { iconType: "clock", label: "Zero Sensitivity Gel" },
-    ],
-    overviewChecklist: [
-      { text: "Medical-grade diode laser lifts stubborn intrinsic and extrinsic stains" },
-      { text: "Protective gingival barrier shields sensitive gum margins completely" },
-      { text: "Enriched with potassium nitrate and fluoride to prevent tooth sensitivity" },
-      { text: "Long-lasting results up to 18-24 months with routine home care" },
-    ],
-    benefitsCards: [
-      { iconType: "sparkles", title: "Immediate Results", description: "Walk out with a noticeably brighter, cleaner smile in under one hour." },
-      { iconType: "shield-star", title: "Enamel Protected", description: "pH-neutral formula targets organic stain molecules without softening enamel." },
-      { iconType: "shield-heart", title: "Anti-Sensitivity Shield", description: "Includes soothing desensitizing post-treatment remineralization paste." },
-      { iconType: "smile", title: "Youthful Appearance", description: "Lifts years of tea, coffee, smoking, and age-related yellowing." },
-      { iconType: "clock", title: "Fast & Convenient", description: "Perfect for upcoming weddings, interviews, photography, and milestones." },
-    ],
-    procedureSteps: [
-      { stepNumber: 1, title: "Shade Analysis", description: "VITA shade guide records baseline enamel color and targets optimal outcome." },
-      { stepNumber: 2, title: "Gingival Barrier", description: "Light-cured protective barrier seals gums securely against bleaching gel." },
-      { stepNumber: 3, title: "Gel Application", description: "Clinical whitening gel smoothly painted onto front upper and lower enamel." },
-      { stepNumber: 4, title: "Laser Activation", description: "Diode laser light pulses activate gel for three 15-minute cycles." },
-      { stepNumber: 5, title: "Fluoride Shield", description: "Remineralizing fluoride varnish applied to ensure zero post-treatment sensitivity." },
-    ],
-    candidateChecklist: [
-      { text: "Teeth yellowed from coffee, tea, red wine, turmeric, or tobacco" },
-      { text: "Natural age-related dullness or enamel staining" },
-      { text: "Upcoming milestone: weddings, graduations, public speaking" },
-      { text: "Healthy teeth free of active untreated cavities or severe gum disease" },
-    ],
-    faqs: [
-      {
-        question: "Does laser whitening harm tooth enamel?",
-        answer: "No. Professional laser whitening releases oxygen ions that break down organic pigment chains without removing or weakening enamel minerals.",
+    "laser-teeth-whitening": {
+      id: "laser-teeth-whitening",
+      title: tr("Laser Teeth Whitening", "लेजर टीथ व्हाइटनिंग"),
+      category: tr("Aesthetic Dentistry", "एस्थेटिक डेंटिस्ट्री"),
+      subtitle: tr(
+        "In-office advanced laser-activated dental bleaching to lift deep organic stains and brighten your smile up to 8 shades.",
+        "गहरे दाग-धब्बों को हटाने और आपकी मुस्कान को 8 शेड्स तक चमकाने के लिए आधुनिक लेजर-सक्रिय डेंटल ब्लीचिंग।"
+      ),
+      description: tr(
+        "Reclaim your natural radiant smile in just one clinical session. Our laser whitening safely lifts stubborn discoloration from coffee, tea, wine, and aging without enamel erosion.",
+        "केवल एक क्लिनिकल सेशन में अपनी प्राकृतिक चमकदार मुस्कान वापस पाएं। हमारी लेजर व्हाइटनिंग बिना इनेमल को नुकसान पहुंचाए कॉफी, चाय और उम्र बढ़ने के जिद्दी दागों को सुरक्षित रूप से हटाती है।"
+      ),
+      details: tr(
+        "Dr. Nitu Rajpoot applies a pH-neutral hydrogen peroxide gel activated by a cold diode laser wavelength, sealing dentinal tubules with remineralizing fluoride to eliminate post-op sensitivity.",
+        "डॉ. नीतू राजपूत कोल्ड डायोड लेजर द्वारा सक्रिय pH-न्यूट्रल जेल का उपयोग करती हैं, और उपचार के बाद झनझनाहट को रोकने के लिए फ्लोराइड सुरक्षा प्रदान करती हैं।"
+      ),
+      image: white.src,
+      patientImage:
+        "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800",
+      duration: tr("45 Mins", "45 मिनट"),
+      price: tr("₹5,000 onwards", "₹5,000 से शुरू"),
+      procedureVideo: "/images/dental_implant_procedure.mp4",
+      procedureGif: "/images/dental_implant_procedure.gif",
+      successMetric: {
+        value: tr("Up to 8 Shades", "8 शेड्स तक"),
+        label: tr("Enamel Brightening", "इनेमल ब्राइटनिंग"),
+        sublabel: tr("In a single 45-min visit", "केवल 45 मिनट की एक विजिट में"),
       },
-    ],
-    howItWorksHighlights: [
-      { title: "Gingival Dam Seal", desc: "Isolates soft tissues to ensure zero gum blanching or stinging." },
-      { title: "Photo-Activated Gel", desc: "Diode laser wavelength accelerates oxygenation of deep pigments." },
-      { title: "Desensitizing Enamel Varnish", desc: "Infuses calcium and fluoride to reinforce enamel luster." },
-    ],
-    beforeAfter: {
-      beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
-      afterImage: "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800",
-      label: "Clinical Laser Whitening Transformation",
-      timeline: "Single Session (45 Mins)",
-      notes: "Enamel brightened 7 VITA shades with zero post-operative dentinal sensitivity reported.",
+      heroBadges: [
+        { iconType: "sparkles", label: tr("Instant Shade Lift", "तुरंत चमकदार परिणाम") },
+        { iconType: "shield-star", label: tr("Enamel Safe & Gentle", "इनेमल के लिए पूरी तरह सुरक्षित") },
+        { iconType: "clock", label: tr("Zero Sensitivity Gel", "जीरो सेंसिटिविटी जेल") },
+      ],
+      overviewChecklist: [
+        { text: tr("Medical-grade diode laser lifts stubborn intrinsic and extrinsic stains", "मेडिकल-ग्रेड डायोड लेजर गहरे और बाहरी दाग-धब्बों को हटाता है") },
+        { text: tr("Protective gingival barrier shields sensitive gum margins completely", "सुरक्षात्मक बैरियर संवेदनशील मसूड़ों को पूरी तरह से सुरक्षित रखता है") },
+        { text: tr("Enriched with potassium nitrate and fluoride to prevent tooth sensitivity", "दांतों की झनझनाहट को रोकने के लिए पोटेशियम नाइट्रेट और फ्लोराइड से भरपूर") },
+        { text: tr("Long-lasting results up to 18-24 months with routine home care", "नियमित घरेलू देखभाल के साथ 18-24 महीने तक स्थायी परिणाम") },
+      ],
+      benefitsCards: [
+        { iconType: "sparkles", title: tr("Immediate Results", "तुरंत परिणाम"), description: tr("Walk out with a noticeably brighter, cleaner smile in under one hour.", "एक घंटे से भी कम समय में स्पष्ट रूप से चमकदार और साफ मुस्कान पाएं।") },
+        { iconType: "shield-star", title: tr("Enamel Protected", "इनेमल सुरक्षित"), description: tr("pH-neutral formula targets organic stain molecules without softening enamel.", "pH-न्यूट्रल फॉर्मूला इनेमल को कमजोर किए बिना केवल दाग के अणुओं को हटाता है।") },
+        { iconType: "shield-heart", title: tr("Anti-Sensitivity Shield", "एंटी-सेंसिटिविटी शील्ड"), description: tr("Includes soothing desensitizing post-treatment remineralization paste.", "इसमें उपचार के बाद आरामदायक डीसेंसिटाइजिंग पेस्ट शामिल है।") },
+        { iconType: "smile", title: tr("Youthful Appearance", "युवा और ताज़ा मुस्कान"), description: tr("Lifts years of tea, coffee, smoking, and age-related yellowing.", "वर्षों के चाय, कॉफी और उम्र से संबंधित पीलेपन को दूर करता है।") },
+        { iconType: "clock", title: tr("Fast & Convenient", "तेज और सुविधाजनक"), description: tr("Perfect for upcoming weddings, interviews, photography, and milestones.", "आगामी शादियों, इंटरव्यू और विशेष अवसरों के लिए बिल्कुल उपयुक्त।") },
+      ],
+      procedureSteps: [
+        { stepNumber: 1, title: tr("Shade Analysis", "शेड विश्लेषण"), description: tr("VITA shade guide records baseline enamel color and targets optimal outcome.", "VITA शेड गाइड वर्तमान रंग को रिकॉर्ड करता है और सर्वोत्तम परिणाम तय करता है।") },
+        { stepNumber: 2, title: tr("Gingival Barrier", "मसूड़ों की सुरक्षा"), description: tr("Light-cured protective barrier seals gums securely against bleaching gel.", "लाइट-क्योर्ड सुरक्षात्मक लेयर मसूड़ों को ब्लीचिंग जेल से सुरक्षित रखती है।") },
+        { stepNumber: 3, title: tr("Gel Application", "जेल लगाना"), description: tr("Clinical whitening gel smoothly painted onto front upper and lower enamel.", "क्लिनिकल व्हाइटनिंग जेल को ऊपरी और निचले दांतों पर सावधानी से लगाया जाता है।") },
+        { stepNumber: 4, title: tr("Laser Activation", "लेजर एक्टिवेशन"), description: tr("Diode laser light pulses activate gel for three 15-minute cycles.", "डायोड लेजर लाइट 15-15 मिनट के तीन चक्रों के लिए जेल को सक्रिय करती है।") },
+        { stepNumber: 5, title: tr("Fluoride Shield", "फ्लोराइड शील्ड"), description: tr("Remineralizing fluoride varnish applied to ensure zero post-treatment sensitivity.", "झनझनाहट से बचाव के लिए रीमिनरलाइजिंग फ्लोराइड वार्निश लगाया जाता है।") },
+      ],
+      candidateChecklist: [
+        { text: tr("Teeth yellowed from coffee, tea, red wine, turmeric, or tobacco", "कॉफी, चाय, हल्दी या तंबाकू से पीले पड़े दांत") },
+        { text: tr("Natural age-related dullness or enamel staining", "उम्र के साथ होने वाला प्राकृतिक पीलापन या दाग") },
+        { text: tr("Upcoming milestone: weddings, graduations, public speaking", "आगामी विशेष अवसर: शादी, समारोह या इंटरव्यू") },
+        { text: tr("Healthy teeth free of active untreated cavities or severe gum disease", "बिना किसी सक्रिय कैविटी या गंभीर मसूड़ों की बीमारी वाले स्वस्थ दांत") },
+      ],
+      faqs: [
+        {
+          question: tr("Does laser whitening harm tooth enamel?", "क्या लेजर व्हाइटनिंग से दांतों के इनेमल को नुकसान होता है?"),
+          answer: tr(
+            "No. Professional laser whitening releases oxygen ions that break down organic pigment chains without removing or weakening enamel minerals.",
+            "नहीं। प्रोफेशनल लेजर व्हाइटनिंग ऑक्सीजन आयन जारी करती है जो इनेमल खनिजों को कमजोर किए बिना केवल दाग के कणों को तोड़ती है।"
+          ),
+        },
+      ],
+      howItWorksHighlights: [
+        { title: tr("Gingival Dam Seal", "जिंजिवल डैम सील"), desc: tr("Isolates soft tissues to ensure zero gum blanching or stinging.", "मसूड़ों में जलन को रोकने के लिए कोमल ऊतकों को सुरक्षित करता है।") },
+        { title: tr("Photo-Activated Gel", "फोटो-एक्टिवेटेड जेल"), desc: tr("Diode laser wavelength accelerates oxygenation of deep pigments.", "डायोड लेजर गहरे दागों को तेजी से साफ करता है।") },
+        { title: tr("Desensitizing Enamel Varnish", "डीसेंसिटाइजिंग इनेमल वार्निश"), desc: tr("Infuses calcium and fluoride to reinforce enamel luster.", "इनेमल की चमक और मजबूती बढ़ाने के लिए कैल्शियम और फ्लोराइड प्रदान करता है।") },
+      ],
+      beforeAfter: {
+        beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+        afterImage: "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800",
+        label: tr("Clinical Laser Whitening Transformation", "क्लिनिकल लेजर व्हाइटनिंग ट्रांसफॉर्मेशन"),
+        timeline: tr("Single Session (45 Mins)", "एकल सेशन (45 मिनट)"),
+        notes: tr(
+          "Enamel brightened 7 VITA shades with zero post-operative dentinal sensitivity reported.",
+          "बिना किसी झनझनाहट के दांतों का रंग 7 VITA शेड्स तक अधिक चमकदार हुआ।"
+        ),
+      },
     },
-  },
 
-  "dental-crowns-bridges": {
-    id: "dental-crowns-bridges",
-    title: "Dental Crowns & Bridges",
-    category: "Prosthodontics",
-    subtitle:
-      "Custom-crafted monolithic zirconia and E-Max ceramic crowns engineered to protect weakened teeth and bridge missing tooth gaps.",
-    description:
-      "Restore damaged, fractured, or post-RCT teeth with high-strength zirconia crowns that match your natural tooth shade seamlessly and withstand full chewing pressure.",
-    details:
-      "Digitally scanned with our 3D intraoral camera, each crown is precision-milled using CAD/CAM technology, eliminating bulky impression trays and guaranteeing micro-gap margin seals.",
-    image:
-      crown.src,
-    patientImage:
-      "https://images.unsplash.com/photo-1606811841689-23dfddce6395?auto=format&fit=crop&q=80&w=800",
-    duration: "2 Visits",
-    price: "₹4,000 onwards",
-    procedureVideo: "/images/dental_implant_procedure.mp4",
-    procedureGif: "/images/dental_implant_procedure.gif",
-    successMetric: {
-      value: "10-Year",
-      label: "Clinical Warranty",
-      sublabel: "100% Metal-free biocompatible",
-    },
-    heroBadges: [
-      { iconType: "shield-star", label: "Monolithic Zirconia" },
-      { iconType: "sparkles", label: "Zero Black Gum Margins" },
-      { iconType: "tooth", label: "CAD/CAM Digital Fit" },
-    ],
-    overviewChecklist: [
-      { text: "Metal-free zirconia and lithium disilicate (E-Max) eliminate dark gum margins" },
-      { text: "Digitally designed with sub-micron marginal fit to prevent recurrent decay" },
-      { text: "High compressive strength withstands heavy posterior molar bite force" },
-      { text: "Natural tooth translucency matches adjacent teeth seamlessly" },
-    ],
-    benefitsCards: [
-      { iconType: "shield-star", title: "Extreme Durability", description: "Zirconia resists chipping, cracking, and wear over decades of daily chewing." },
-      { iconType: "sparkles", title: "Lifelike Translucency", description: "Multi-layered ceramic reflects light just like natural tooth enamel." },
-      { iconType: "shield-heart", title: "Protects Fragile Teeth", description: "Encases brittle root canal treated teeth to prevent catastrophic fracture." },
-      { iconType: "tooth", title: "Bridges Missing Gaps", description: "Bridges anchor firmly to adjacent teeth to close gaps without surgery." },
-      { iconType: "smile", title: "Healthy Gum Seal", description: "Biocompatible polished margins maintain healthy pink gingiva." },
-    ],
-    procedureSteps: [
-      { stepNumber: 1, title: "Tooth Shaping", description: "Conservative preparation creates space for the high-strength ceramic coping." },
-      { stepNumber: 2, title: "3D Digital Scan", description: "Optical camera captures precision 3D bite registration without messy paste." },
-      { stepNumber: 3, title: "Temporary Crown", description: "Aesthetic temporary crown protects your tooth while the permanent is milled." },
-      { stepNumber: 4, title: "CAD/CAM Milling", description: "Robotic German milling machines sculpt multi-layered zirconia ceramic." },
-      { stepNumber: 5, title: "Resin Bonding", description: "Dual-cure adhesive permanently bonds the crown with seamless margin finish." },
-    ],
-    candidateChecklist: [
-      { text: "Teeth treated with a root canal that require protective capping" },
-      { text: "Fractured, cracked, or severely worn down enamel surfaces" },
-      { text: "Large failing silver amalgam fillings needing durable replacement" },
-      { text: "One or two missing teeth suitable for fixed bridge restoration" },
-    ],
-    faqs: [
-      {
-        question: "Will my crown have a dark black line at the gum?",
-        answer: "No. Monolithic zirconia and E-Max are 100% metal-free, ensuring pure white margins that never turn dark.",
+    "dental-crowns-bridges": {
+      id: "dental-crowns-bridges",
+      title: tr("Dental Crowns & Bridges", "डेंटल क्राउन और ब्रिज"),
+      category: tr("Prosthodontics", "प्रोस्थोडोंटिक्स"),
+      subtitle: tr(
+        "Custom-crafted monolithic zirconia and E-Max ceramic crowns engineered to protect weakened teeth and bridge missing tooth gaps.",
+        "कमजोर दांतों की सुरक्षा और गायब दांतों के गैप को भरने के लिए विशेष रूप से निर्मित मोनोलिथिक ज़िरकोनिया और E-Max सिरेमिक क्राउन।"
+      ),
+      description: tr(
+        "Restore damaged, fractured, or post-RCT teeth with high-strength zirconia crowns that match your natural tooth shade seamlessly and withstand full chewing pressure.",
+        "क्षतिग्रस्त, टूटे हुए या RCT किए गए दांतों को उच्च-शक्ति वाले ज़िरकोनिया क्राउन के साथ पुनर्स्थापित करें जो आपके प्राकृतिक दांतों के रंग से मेल खाते हैं।"
+      ),
+      details: tr(
+        "Digitally scanned with our 3D intraoral camera, each crown is precision-milled using CAD/CAM technology, eliminating bulky impression trays and guaranteeing micro-gap margin seals.",
+        "हमारे 3D इंट्राओरल कैमरे से डिजिटल रूप से स्कैन किया गया प्रत्येक क्राउन CAD/CAM तकनीक का उपयोग करके सटीकता से बनाया जाता है।"
+      ),
+      image: crown.src,
+      patientImage:
+        "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=800",
+      duration: tr("2 Visits", "2 विजिट"),
+      price: tr("₹4,000 onwards", "₹4,000 से शुरू"),
+      procedureVideo: "/images/dental_implant_procedure.mp4",
+      procedureGif: "/images/dental_implant_procedure.gif",
+      successMetric: {
+        value: tr("10-Year", "10-वर्ष"),
+        label: tr("Clinical Warranty", "क्लिनिकल वारंटी"),
+        sublabel: tr("100% Metal-free biocompatible", "100% मेटल-फ्री बायोकम्पैटिबल"),
       },
-    ],
-    howItWorksHighlights: [
-      { title: "Optical Digital Scan", desc: "Captures margins with 10-micron digital precision." },
-      { title: "Diamond CAD Milling", desc: "Carved from high-density multi-gradient ceramic blocks." },
-      { title: "Dual-Cure Luting Seal", desc: "Forms an indestructible biological bond with tooth dentin." },
-    ],
-    beforeAfter: {
-      beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
-      afterImage: "https://images.unsplash.com/photo-1629909615184-74f495363b67?auto=format&fit=crop&q=80&w=800",
-      label: "Premolar Fracture Restored with E-Max Crown",
-      timeline: "2 Visits (5 Days)",
-      notes: "Severe cusp fracture restored with high-translucency lithium disilicate crown with invisible gum margins.",
+      heroBadges: [
+        { iconType: "shield-star", label: tr("Monolithic Zirconia", "मोनोलिथिक ज़िरकोनिया") },
+        { iconType: "sparkles", label: tr("Zero Black Gum Margins", "मसूड़ों पर कोई काली रेखा नहीं") },
+        { iconType: "tooth", label: tr("CAD/CAM Digital Fit", "CAD/CAM डिजिटल फिट") },
+      ],
+      overviewChecklist: [
+        { text: tr("Metal-free zirconia and lithium disilicate (E-Max) eliminate dark gum margins", "मेटल-फ्री ज़िरकोनिया और E-Max मसूड़ों के पास काले निशान नहीं पड़ने देते") },
+        { text: tr("Digitally designed with sub-micron marginal fit to prevent recurrent decay", "दोबारा सड़न को रोकने के लिए डिजिटल रूप से सटीक फिटिंग") },
+        { text: tr("High compressive strength withstands heavy posterior molar bite force", "पीछे की दाढ़ के चबाने के भारी दबाव को सहने के लिए अत्यधिक मजबूत") },
+        { text: tr("Natural tooth translucency matches adjacent teeth seamlessly", "प्राकृतिक पारदर्शिता पास के दांतों से पूरी तरह मेल खाती है") },
+      ],
+      benefitsCards: [
+        { iconType: "shield-star", title: tr("Extreme Durability", "अत्यधिक मजबूती"), description: tr("Zirconia resists chipping, cracking, and wear over decades of daily chewing.", "ज़िरकोनिया दशकों तक रोज़मर्रा के चबाने के दौरान टूटने या घिसने से सुरक्षित रहता है।") },
+        { iconType: "sparkles", title: tr("Lifelike Translucency", "प्राकृतिक चमक"), description: tr("Multi-layered ceramic reflects light just like natural tooth enamel.", "मल्टी-लेयर्ड सिरेमिक प्राकृतिक दांतों के इनेमल की तरह ही चमकता है।") },
+        { iconType: "shield-heart", title: tr("Protects Fragile Teeth", "कमजोर दांतों की सुरक्षा"), description: tr("Encases brittle root canal treated teeth to prevent catastrophic fracture.", "रूट कैनाल किए गए दांतों को टूटने से बचाने के लिए चारों ओर से सुरक्षा देता है।") },
+        { iconType: "tooth", title: tr("Bridges Missing Gaps", "खाली जगह को भरता है"), description: tr("Bridges anchor firmly to adjacent teeth to close gaps without surgery.", "बिना सर्जरी के खाली जगह को बंद करने के लिए पास के दांतों से मजबूती से जुड़ता है।") },
+        { iconType: "smile", title: tr("Healthy Gum Seal", "स्वस्थ मसूड़ों की सील"), description: tr("Biocompatible polished margins maintain healthy pink gingiva.", "बायोकम्पैटिबल पॉलिश किनारे मसूड़ों को स्वस्थ रखते हैं।") },
+      ],
+      procedureSteps: [
+        { stepNumber: 1, title: tr("Tooth Shaping", "दांत को आकार देना"), description: tr("Conservative preparation creates space for the high-strength ceramic coping.", "मजबूत सिरेमिक क्राउन के लिए दांत को हल्का आकार दिया जाता है।") },
+        { stepNumber: 2, title: tr("3D Digital Scan", "3D डिजिटल स्कैन"), description: tr("Optical camera captures precision 3D bite registration without messy paste.", "ऑप्टिकल कैमरा बिना किसी पेस्ट के सटीक 3D माप लेता है।") },
+        { stepNumber: 3, title: tr("Temporary Crown", "अस्थायी क्राउन"), description: tr("Aesthetic temporary crown protects your tooth while the permanent is milled.", "स्थायी क्राउन बनने तक अस्थायी क्राउन आपके दांत की सुरक्षा करता है।") },
+        { stepNumber: 4, title: tr("CAD/CAM Milling", "CAD/CAM मिलिंग"), description: tr("Robotic German milling machines sculpt multi-layered zirconia ceramic.", "आधुनिक मशीनों द्वारा मल्टी-लेयर्ड ज़िरकोनिया क्राउन तैयार किया जाता है।") },
+        { stepNumber: 5, title: tr("Resin Bonding", "रेजिन बॉन्डिंग"), description: tr("Dual-cure adhesive permanently bonds the crown with seamless margin finish.", "विशेष एडहेसिव के साथ क्राउन को स्थायी रूप से जोड़ दिया जाता है।") },
+      ],
+      candidateChecklist: [
+        { text: tr("Teeth treated with a root canal that require protective capping", "रूट कैनाल किए गए दांत जिन्हें सुरक्षात्मक कैप की आवश्यकता है") },
+        { text: tr("Fractured, cracked, or severely worn down enamel surfaces", "टूटे, चटके या अत्यधिक घिसे हुए दांत") },
+        { text: tr("Large failing silver amalgam fillings needing durable replacement", "पुरानी बड़ी सिल्वर फिलिंग जिन्हें मजबूत विकल्प की आवश्यकता है") },
+        { text: tr("One or two missing teeth suitable for fixed bridge restoration", "फिक्स्ड ब्रिज के लिए उपयुक्त एक या दो गायब दांत") },
+      ],
+      faqs: [
+        {
+          question: tr("Will my crown have a dark black line at the gum?", "क्या मेरे क्राउन में मसूड़ों के पास काली रेखा दिखाई देगी?"),
+          answer: tr(
+            "No. Monolithic zirconia and E-Max are 100% metal-free, ensuring pure white margins that never turn dark.",
+            "नहीं। मोनोलिथिक ज़िरकोनिया और E-Max 100% मेटल-फ्री हैं, जो यह सुनिश्चित करते हैं कि किनारे कभी काले न पड़ें।"
+          ),
+        },
+      ],
+      howItWorksHighlights: [
+        { title: tr("Optical Digital Scan", "ऑप्टिकल डिजिटल स्कैन"), desc: tr("Captures margins with 10-micron digital precision.", "10-माइक्रोन डिजिटल सटीकता के साथ माप लेता है।") },
+        { title: tr("Diamond CAD Milling", "डायमंड CAD मिलिंग"), desc: tr("Carved from high-density multi-gradient ceramic blocks.", "उच्च-घनत्व वाले सिरेमिक ब्लॉक से निर्मित।") },
+        { title: tr("Dual-Cure Luting Seal", "डुअल-क्योर सील"), desc: tr("Forms an indestructible biological bond with tooth dentin.", "दांत के साथ एक मजबूत और स्थायी जोड़ बनाता है।") },
+      ],
+      beforeAfter: {
+        beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+        afterImage: "https://images.unsplash.com/photo-1629909615184-74f495363b67?auto=format&fit=crop&q=80&w=800",
+        label: tr("Premolar Fracture Restored with E-Max Crown", "E-Max क्राउन के साथ टूटे हुए दांत का रेस्टोरेशन"),
+        timeline: tr("2 Visits (5 Days)", "2 विजिट (5 दिन)"),
+        notes: tr(
+          "Severe cusp fracture restored with high-translucency lithium disilicate crown with invisible gum margins.",
+          "गंभीर रूप से टूटे हुए दांत को प्राकृतिक दिखने वाले लिथियम डाइसिलिकेट क्राउन के साथ बहाल किया गया।"
+        ),
+      },
     },
-  },
 
-  "wisdom-tooth-extraction": {
-    id: "wisdom-tooth-extraction",
-    title: "Wisdom Tooth Extraction",
-    category: "Oral Surgery",
-    subtitle:
-      "Atraumatic surgical removal of impacted or painful wisdom teeth under sterile, stress-free clinical care.",
-    description:
-      "Relieve wisdom tooth swelling, impaction pain, and crowding. Dr. Nitu Rajpoot uses minimally invasive piezosurgical sectioning and computer-assisted local anesthesia for swift, painless recovery.",
-    details:
-      "Digital OPG and RVG mapping reveal exact inferior alveolar nerve positioning, ensuring a completely safe, stitch-friendly extraction with advanced platelet-rich healing protocols.",
-    image:
-      wisdom.src,
-    patientImage:
-      "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=800",
-    duration: "30 - 45 Mins",
-    price: "₹2,500 onwards",
-    procedureVideo: "/images/dental_implant_procedure.mp4",
-    procedureGif: "/images/dental_implant_procedure.gif",
-    successMetric: {
-      value: "Zero Pain",
-      label: "Comfort Protocol",
-      sublabel: "Atraumatic surgical technique",
-    },
-    heroBadges: [
-      { iconType: "shield-star", label: "Nerve-Safe 3D Mapping" },
-      { iconType: "tooth", label: "Painless Extraction" },
-      { iconType: "clock", label: "Rapid 48-Hour Recovery" },
-    ],
-    overviewChecklist: [
-      { text: "Atraumatic bone-sparing technique minimizes post-op swelling and soreness" },
-      { text: "High-definition nerve tracing prevents sensory paresthesia" },
-      { text: "Dissolvable micro-sutures prevent food trapping and speed gum closure" },
-      { text: "Comprehensive post-operative cold therapy and medication plan" },
-    ],
-    benefitsCards: [
-      { iconType: "shield-heart", title: "Stops Chronic Pain", description: "Permanently ends recurrent jaw throbbing, earache, and cheek biting." },
-      { iconType: "shield-star", title: "Prevents Crowding", description: "Prevents horizontal impaction pressure from shifting straight front teeth." },
-      { iconType: "tooth", title: "Protects Second Molars", description: "Stops hidden food traps and root resorption on adjacent healthy molars." },
-      { iconType: "clock", title: "Fast Outpatient Care", description: "Procedure completed in 30-45 minutes with comfortable same-day discharge." },
-      { iconType: "sparkles", title: "Prevents Cyst Formation", description: "Eliminates risk of follicular cysts and pericoronal bacterial infections." },
-    ],
-    procedureSteps: [
-      { stepNumber: 1, title: "OPG Nerve Mapping", description: "Digital panoramic radiograph traces wisdom tooth roots relative to nerves." },
-      { stepNumber: 2, title: "Targeted Anesthesia", description: "Profound local numbness ensures you feel zero sharpness or pain." },
-      { stepNumber: 3, title: "Atraumatic Sectioning", description: "Tooth sectioned into micro-segments to slide out smoothly without bone removal." },
-      { stepNumber: 4, title: "Ozone Disinfection", description: "Socket thoroughly irrigated with antibacterial rinse to prevent dry socket." },
-      { stepNumber: 5, title: "Self-Dissolving Suture", description: "Tension-free micro-stitches placed that dissolve naturally in 7 days." },
-    ],
-    candidateChecklist: [
-      { text: "Pain, tenderness, or swelling in the rear jaw or behind second molars" },
-      { text: "Partially erupted wisdom tooth with food trapping and gum redness (pericoronitis)" },
-      { text: "Horizontally or vertically impacted tooth shown on routine X-ray" },
-    ],
-    faqs: [
-      {
-        question: "Will I feel pain during wisdom tooth extraction?",
-        answer: "No. With computerized local anesthesia, the entire quadrant is completely numb. You will only feel light pressure, never sharpness or pain.",
+    "wisdom-tooth-extraction": {
+      id: "wisdom-tooth-extraction",
+      title: tr("Wisdom Tooth Extraction", "अक्ल दाढ़ निकालना"),
+      category: tr("Oral Surgery", "ओरल सर्जरी"),
+      subtitle: tr(
+        "Atraumatic surgical removal of impacted or painful wisdom teeth under sterile, stress-free clinical care.",
+        "स्वच्छ और तनाव-मुक्त देखभाल में फंसी हुई या दर्दनाक अक्ल दाढ़ को बिना कष्ट के सुरक्षित रूप से निकालना।"
+      ),
+      description: tr(
+        "Relieve wisdom tooth swelling, impaction pain, and crowding. Dr. Nitu Rajpoot uses minimally invasive piezosurgical sectioning and computer-assisted local anesthesia for swift, painless recovery.",
+        "अक्ल दाढ़ की सूजन और दर्द से राहत पाएं। डॉ. नीतू राजपूत त्वरित और दर्दरहित रिकवरी के लिए मिनिमली इनवेसिव तकनीक और लोकल एनेस्थीसिया का उपयोग करती हैं।"
+      ),
+      details: tr(
+        "Digital OPG and RVG mapping reveal exact inferior alveolar nerve positioning, ensuring a completely safe, stitch-friendly extraction with advanced platelet-rich healing protocols.",
+        "डिजिटल OPG और RVG मैपिंग से नसों की सटीक स्थिति का पता चलता है, जिससे पूरी तरह से सुरक्षित और आरामदायक उपचार सुनिश्चित होता है।"
+      ),
+      image: wisdom.src,
+      patientImage:
+        "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=800",
+      duration: tr("30 - 45 Mins", "30 - 45 मिनट"),
+      price: tr("₹2,500 onwards", "₹2,500 से शुरू"),
+      procedureVideo: "/images/dental_implant_procedure.mp4",
+      procedureGif: "/images/dental_implant_procedure.gif",
+      successMetric: {
+        value: tr("Zero Pain", "शून्य दर्द"),
+        label: tr("Comfort Protocol", "आरामदायक प्रोटोकॉल"),
+        sublabel: tr("Atraumatic surgical technique", "दर्दरहित सर्जिकल तकनीक"),
       },
-    ],
-    howItWorksHighlights: [
-      { title: "Nerve Proximity Mapping", desc: "Ensures complete anatomical safety before surgery." },
-      { title: "Micro-Sectioning", desc: "Atraumatic tooth division protects supporting jawbone." },
-      { title: "Antibacterial Socket Shield", desc: "Medicated packing prevents dry socket formation." },
-    ],
-    beforeAfter: {
-      beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
-      afterImage: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=800",
-      label: "Horizontal Mandibular Impaction Removal",
-      timeline: "Single Session (35 Mins)",
-      notes: "Deeply impacted wisdom tooth safely removed without adjacent root disturbance.",
+      heroBadges: [
+        { iconType: "shield-star", label: tr("Nerve-Safe 3D Mapping", "नर्व-सेफ 3D मैपिंग") },
+        { iconType: "tooth", label: tr("Painless Extraction", "दर्दरहित निष्कर्षण") },
+        { iconType: "clock", label: tr("Rapid 48-Hour Recovery", "48 घंटे में त्वरित रिकवरी") },
+      ],
+      overviewChecklist: [
+        { text: tr("Atraumatic bone-sparing technique minimizes post-op swelling and soreness", "दर्दरहित तकनीक उपचार के बाद की सूजन और दर्द को कम करती है") },
+        { text: tr("High-definition nerve tracing prevents sensory paresthesia", "हाई-डेफिनिशन नर्व ट्रेसिंग नसों की पूरी सुरक्षा सुनिश्चित करती है") },
+        { text: tr("Dissolvable micro-sutures prevent food trapping and speed gum closure", "घुलने वाले सूक्ष्म टांके भोजन को फंसने से रोकते हैं और मसूड़ों को जल्दी ठीक करते हैं") },
+        { text: tr("Comprehensive post-operative cold therapy and medication plan", "उपचार के बाद की देखभाल और दवा की संपूर्ण योजना") },
+      ],
+      benefitsCards: [
+        { iconType: "shield-heart", title: tr("Stops Chronic Pain", "पुराने दर्द को रोकता है"), description: tr("Permanently ends recurrent jaw throbbing, earache, and cheek biting.", "बार-बार होने वाले जबड़े के दर्द, कान के दर्द और गाल कटने की समस्या को स्थायी रूप से समाप्त करता है।") },
+        { iconType: "shield-star", title: tr("Prevents Crowding", "दांतों को टेढ़ा होने से बचाता है"), description: tr("Prevents horizontal impaction pressure from shifting straight front teeth.", "अक्ल दाढ़ के दबाव से सामने के सीधे दांतों को खिसकने से रोकता है।") },
+        { iconType: "tooth", title: tr("Protects Second Molars", "पास की दाढ़ की सुरक्षा"), description: tr("Stops hidden food traps and root resorption on adjacent healthy molars.", "पास के स्वस्थ दांतों में भोजन फंसने और सड़न को रोकता है।") },
+        { iconType: "clock", title: tr("Fast Outpatient Care", "त्वरित देखभाल"), description: tr("Procedure completed in 30-45 minutes with comfortable same-day discharge.", "प्रक्रिया 30-45 मिनट में पूरी हो जाती है और आप उसी दिन आराम से घर जा सकते हैं।") },
+        { iconType: "sparkles", title: tr("Prevents Cyst Formation", "सिस्ट बनने से रोकता है"), description: tr("Eliminates risk of follicular cysts and pericoronal bacterial infections.", "सिस्ट और मसूड़ों के गंभीर बैक्टीरियल संक्रमण के जोखिम को खत्म करता है।") },
+      ],
+      procedureSteps: [
+        { stepNumber: 1, title: tr("OPG Nerve Mapping", "OPG नर्व मैपिंग"), description: tr("Digital panoramic radiograph traces wisdom tooth roots relative to nerves.", "डिजिटल एक्स-रे नसों के सापेक्ष अक्ल दाढ़ की जड़ों की सटीक स्थिति दिखाता है।") },
+        { stepNumber: 2, title: tr("Targeted Anesthesia", "लोकल एनेस्थीसिया"), description: tr("Profound local numbness ensures you feel zero sharpness or pain.", "पूर्ण सुन्नता यह सुनिश्चित करती है कि आपको बिल्कुल भी दर्द महसूस न हो।") },
+        { stepNumber: 3, title: tr("Atraumatic Sectioning", "सुरक्षित निष्कर्षण"), description: tr("Tooth sectioned into micro-segments to slide out smoothly without bone removal.", "दांत को छोटे हिस्सों में विभाजित करके बिना किसी कष्ट के आसानी से बाहर निकाला जाता है।") },
+        { stepNumber: 4, title: tr("Ozone Disinfection", "एंटीबैक्टीरियल सफाई"), description: tr("Socket thoroughly irrigated with antibacterial rinse to prevent dry socket.", "संक्रमण को रोकने के लिए जगह को एंटीबैक्टीरियल घोल से अच्छी तरह साफ किया जाता है।") },
+        { stepNumber: 5, title: tr("Self-Dissolving Suture", "स्वयं घुलने वाले टांके"), description: tr("Tension-free micro-stitches placed that dissolve naturally in 7 days.", "सूक्ष्म टांके लगाए जाते हैं जो 7 दिनों में अपने आप घुल जाते हैं।") },
+      ],
+      candidateChecklist: [
+        { text: tr("Pain, tenderness, or swelling in the rear jaw or behind second molars", "पीछे के जबड़े या दूसरी दाढ़ के पीछे दर्द या सूजन") },
+        { text: tr("Partially erupted wisdom tooth with food trapping and gum redness (pericoronitis)", "आधी निकली हुई अक्ल दाढ़ जिसमें भोजन फंसता हो और मसूड़ों में लालिमा हो") },
+        { text: tr("Horizontally or vertically impacted tooth shown on routine X-ray", "एक्स-रे में तिरछी या फंसी हुई अक्ल दाढ़ दिखाई देना") },
+      ],
+      faqs: [
+        {
+          question: tr("Will I feel pain during wisdom tooth extraction?", "क्या अक्ल दाढ़ निकालते समय मुझे दर्द महसूस होगा?"),
+          answer: tr(
+            "No. With computerized local anesthesia, the entire quadrant is completely numb. You will only feel light pressure, never sharpness or pain.",
+            "नहीं। आधुनिक लोकल एनेस्थीसिया के साथ, वह हिस्सा पूरी तरह से सुन्न हो जाता है। आपको केवल हल्का दबाव महसूस होगा, कभी भी दर्द नहीं।"
+          ),
+        },
+      ],
+      howItWorksHighlights: [
+        { title: tr("Nerve Proximity Mapping", "नर्व प्रॉक्सिमिटी मैपिंग"), desc: tr("Ensures complete anatomical safety before surgery.", "सर्जरी से पहले पूर्ण शारीरिक सुरक्षा सुनिश्चित करता है।") },
+        { title: tr("Micro-Sectioning", "माइक्रो-सेक्शनिंग"), desc: tr("Atraumatic tooth division protects supporting jawbone.", "जबड़े की हड्डी को सुरक्षित रखते हुए दांत को निकालना।") },
+        { title: tr("Antibacterial Socket Shield", "एंटीबैक्टीरियल सॉकेट शील्ड"), desc: tr("Medicated packing prevents dry socket formation.", "औषधीय सुरक्षा ड्राई सॉकेट बनने से रोकती है।") },
+      ],
+      beforeAfter: {
+        beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+        afterImage: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=800",
+        label: tr("Horizontal Mandibular Impaction Removal", "तिरछी फंसी हुई अक्ल दाढ़ का सफल निष्कर्षण"),
+        timeline: tr("Single Session (35 Mins)", "एकल सेशन (35 मिनट)"),
+        notes: tr(
+          "Deeply impacted wisdom tooth safely removed without adjacent root disturbance.",
+          "पास के दांतों की जड़ों को बिना किसी नुकसान के गहराई में फंसी अक्ल दाढ़ को सुरक्षित रूप से निकाला गया।"
+        ),
+      },
     },
-  },
 
-  "cosmetic-smile-makeover-veneers": {
-    id: "cosmetic-smile-makeover-veneers",
-    title: "Cosmetic Smile Makeover & Veneers",
-    category: "Aesthetic Dentistry",
-    subtitle:
-      "Ultra-thin hand-crafted porcelain veneers and aesthetic smile contouring customized perfectly to your facial geometry.",
-    description:
-      "Transform your smile with bespoke porcelain laminates. Correct chipped, deeply discolored, worn, or uneven teeth with wafer-thin ceramic shells bonded seamlessly to your enamel.",
-    details:
-      "Every smile makeover begins with Digital Smile Design (DSD), allowing you to preview your new tooth proportions, lip alignment, and shade in real-life temporaries before final porcelain bonding.",
-    image:
-      veeners.src,
-    patientImage:
-      "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=800",
-    duration: "2-3 Visits",
-    price: "₹8,000 onwards",
-    procedureVideo: "/images/dental_implant_procedure.mp4",
-    procedureGif: "/images/dental_implant_procedure.gif",
-    successMetric: {
-      value: "100%",
-      label: "Custom Facial Harmony",
-      sublabel: "Digital Smile Design protocol",
-    },
-    heroBadges: [
-      { iconType: "sparkles", label: "Ultra-Thin 0.3mm Ceramic" },
-      { iconType: "shield-star", label: "Stain-Resistant Porcelain" },
-      { iconType: "tooth", label: "Digital Mockup Preview" },
-    ],
-    overviewChecklist: [
-      { text: "Minimal tooth preparation preserves maximum healthy natural enamel" },
-      { text: "Hand-layered ceramic replicates micro-texture, translucency, and luster" },
-      { text: "Completely impervious to coffee, tea, red wine, and tobacco stains" },
-      { text: "Harmonizes tooth length and symmetry with your facial smile line" },
-    ],
-    benefitsCards: [
-      { iconType: "sparkles", title: "Flawless Symmetry", description: "Harmonizes uneven lengths, minor overlaps, and unwanted spacing." },
-      { iconType: "shield-star", title: "Permanent White Shade", description: "Glass porcelain surface never discolors or yellows over time." },
-      { iconType: "tooth", title: "Conservative Enamel Care", description: "Requires only 0.3mm to 0.5mm micro-reduction of front enamel." },
-      { iconType: "smile", title: "Boosts Self-Esteem", description: "Laugh and speak with total freedom in social and professional settings." },
-      { iconType: "shield-heart", title: "Strengthens Teeth", description: "High-bond resin adhesive strengthens worn, thin, or chipped tooth edges." },
-    ],
-    procedureSteps: [
-      { stepNumber: 1, title: "Facial Aesthetic Scan", description: "Digital photography and 3D intraoral scan map your golden proportion smile." },
-      { stepNumber: 2, title: "Trial Smile Mockup", description: "Try on temporary composite smile directly in your mouth to approve aesthetics." },
-      { stepNumber: 3, title: "Micro-Preparation", description: "Gentle 0.3mm surface enamel polishing performed with zero sensitivity." },
-      { stepNumber: 4, title: "Artisan Lab Layering", description: "Master ceramist hand-crafts individual porcelain facets with enamel translucency." },
-      { stepNumber: 5, title: "Light-Cured Bonding", description: "Veneers bonded permanently with optical resin for seamless gum margins." },
-    ],
-    candidateChecklist: [
-      { text: "Stubborn intrinsic tetracycline or fluorosis stains resistant to bleaching" },
-      { text: "Chipped, cracked, or naturally small (peg lateral) front teeth" },
-      { text: "Unwanted gaps (diastema) between upper or lower teeth" },
-    ],
-    faqs: [
-      {
-        question: "How long do porcelain veneers last?",
-        answer: "With routine brushing and annual checkups, porcelain veneers reliably last 15 to 20+ years.",
+    "cosmetic-smile-makeover-veneers": {
+      id: "cosmetic-smile-makeover-veneers",
+      title: tr("Cosmetic Smile Makeover & Veneers", "कॉस्मेटिक स्माइल मेकओवर और वेनियर्स"),
+      category: tr("Aesthetic Dentistry", "एस्थेटिक डेंटिस्ट्री"),
+      subtitle: tr(
+        "Ultra-thin hand-crafted porcelain veneers and aesthetic smile contouring customized perfectly to your facial geometry.",
+        "आपके चेहरे की बनावट के अनुसार विशेष रूप से तैयार किए गए अल्ट्रा-थिन पोर्सिलेन वेनियर्स और एस्थेटिक स्माइल कंटूरिंग।"
+      ),
+      description: tr(
+        "Transform your smile with bespoke porcelain laminates. Correct chipped, deeply discolored, worn, or uneven teeth with wafer-thin ceramic shells bonded seamlessly to your enamel.",
+        "कस्टम पोर्सिलेन लैमिनेट्स के साथ अपनी मुस्कान को नया रूप दें। चटके हुए, गहरे दाग वाले, घिसे हुए या असमान दांतों को पतले सिरेमिक वेनियर्स के साथ सुंदर बनाएं।"
+      ),
+      details: tr(
+        "Every smile makeover begins with Digital Smile Design (DSD), allowing you to preview your new tooth proportions, lip alignment, and shade in real-life temporaries before final porcelain bonding.",
+        "प्रत्येक स्माइल मेकओवर डिजिटल स्माइल डिज़ाइन (DSD) के साथ शुरू होता है, जिससे आप अंतिम बॉन्डिंग से पहले ही अपने नए दांतों के आकार और रंग का पूर्वावलोकन कर सकते हैं।"
+      ),
+      image: veeners.src,
+      patientImage:
+        "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=800",
+      duration: tr("2-3 Visits", "2-3 विजिट"),
+      price: tr("₹8,000 onwards", "₹8,000 से शुरू"),
+      procedureVideo: "/images/dental_implant_procedure.mp4",
+      procedureGif: "/images/dental_implant_procedure.gif",
+      successMetric: {
+        value: "100%",
+        label: tr("Custom Facial Harmony", "चेहरे के अनुरूप मुस्कान"),
+        sublabel: tr("Digital Smile Design protocol", "डिजिटल स्माइल डिज़ाइन प्रोटोकॉल"),
       },
-    ],
-    howItWorksHighlights: [
-      { title: "Digital Smile Mockup", desc: "Test drive your dream smile in your mouth before treatment starts." },
-      { title: "Feldspathic Porcelain", desc: "Hand-sculpted ceramic with natural light-refracting opalescence." },
-      { title: "Resin Crystalline Bond", desc: "Chemical adhesion fuses veneer directly to tooth enamel." },
-    ],
-    beforeAfter: {
-      beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
-      afterImage: "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800",
-      label: "6-Unit Anterior Porcelain Veneer Makeover",
-      timeline: "2 Visits (7 Days)",
-      notes: "Chipped enamel edges and central diastema gap completely corrected with ultra-thin E-Max veneers.",
+      heroBadges: [
+        { iconType: "sparkles", label: tr("Ultra-Thin 0.3mm Ceramic", "अल्ट्रा-थिन 0.3mm सिरेमिक") },
+        { iconType: "shield-star", label: tr("Stain-Resistant Porcelain", "दाग-रोधी पोर्सिलेन") },
+        { iconType: "tooth", label: tr("Digital Mockup Preview", "डिजिटल मॉकअप प्रीव्यू") },
+      ],
+      overviewChecklist: [
+        { text: tr("Minimal tooth preparation preserves maximum healthy natural enamel", "न्यूनतम तैयारी अधिकतम स्वस्थ प्राकृतिक इनेमल को सुरक्षित रखती है") },
+        { text: tr("Hand-layered ceramic replicates micro-texture, translucency, and luster", "सिरेमिक प्राकृतिक दांतों की बनावट, पारदर्शिता और चमक को दोहराता है") },
+        { text: tr("Completely impervious to coffee, tea, red wine, and tobacco stains", "कॉफी, चाय और तंबाकू के दागों से पूरी तरह सुरक्षित") },
+        { text: tr("Harmonizes tooth length and symmetry with your facial smile line", "आपकी मुस्कान की रेखा के साथ दांतों की लंबाई और समरूपता का मिलान करता है") },
+      ],
+      benefitsCards: [
+        { iconType: "sparkles", title: tr("Flawless Symmetry", "त्रुटिहीन समरूपता"), description: tr("Harmonizes uneven lengths, minor overlaps, and unwanted spacing.", "असमान लंबाई और दांतों के बीच के अवांछित गैप को एक समान बनाता है।") },
+        { iconType: "shield-star", title: tr("Permanent White Shade", "स्थायी सफेद चमक"), description: tr("Glass porcelain surface never discolors or yellows over time.", "पोर्सिलेन की सतह समय के साथ कभी पीली नहीं पड़ती।") },
+        { iconType: "tooth", title: tr("Conservative Enamel Care", "इनेमल का संरक्षण"), description: tr("Requires only 0.3mm to 0.5mm micro-reduction of front enamel.", "सामने के इनेमल की केवल 0.3mm से 0.5mm सूक्ष्म पॉलिशिंग की आवश्यकता होती है।") },
+        { iconType: "smile", title: tr("Boosts Self-Esteem", "आत्मविश्वास बढ़ाता है"), description: tr("Laugh and speak with total freedom in social and professional settings.", "सामाजिक और व्यावसायिक जीवन में पूरे आत्मविश्वास के साथ मुस्कुराएं।") },
+        { iconType: "shield-heart", title: tr("Strengthens Teeth", "दांतों को मजबूती देता है"), description: tr("High-bond resin adhesive strengthens worn, thin, or chipped tooth edges.", "मजबूत रेजिन बॉन्डिंग घिसे या चटके हुए दांतों के किनारों को मजबूती देती है।") },
+      ],
+      procedureSteps: [
+        { stepNumber: 1, title: tr("Facial Aesthetic Scan", "फेशियल एस्थेटिक स्कैन"), description: tr("Digital photography and 3D intraoral scan map your golden proportion smile.", "डिजिटल फोटोग्राफी और 3D स्कैन आपकी मुस्कान का सटीक अनुपात तैयार करते हैं।") },
+        { stepNumber: 2, title: tr("Trial Smile Mockup", "ट्रायल स्माइल मॉकअप"), description: tr("Try on temporary composite smile directly in your mouth to approve aesthetics.", "अंतिम रूप देने से पहले अस्थायी मॉकअप के माध्यम से अपनी नई मुस्कान को परखें।") },
+        { stepNumber: 3, title: tr("Micro-Preparation", "सूक्ष्म तैयारी"), description: tr("Gentle 0.3mm surface enamel polishing performed with zero sensitivity.", "बिना किसी झनझनाहट के कोमल 0.3mm इनेमल पॉलिशिंग की जाती है।") },
+        { stepNumber: 4, title: tr("Artisan Lab Layering", "कस्टम लैब निर्माण"), description: tr("Master ceramist hand-crafts individual porcelain facets with enamel translucency.", "मास्टर सिरेमिस्ट प्राकृतिक चमक के साथ पोर्सिलेन वेनियर्स तैयार करते हैं।") },
+        { stepNumber: 5, title: tr("Light-Cured Bonding", "लाइट-क्योर्ड बॉन्डिंग"), description: tr("Veneers bonded permanently with optical resin for seamless gum margins.", "वेनियर्स को ऑप्टिकल रेजिन के साथ स्थायी रूप से जोड़ दिया जाता है।") },
+      ],
+      candidateChecklist: [
+        { text: tr("Stubborn intrinsic tetracycline or fluorosis stains resistant to bleaching", "ब्लीचिंग से न हटने वाले गहरे फ्लोरोसिस या टेट्रासाइक्लिन के दाग") },
+        { text: tr("Chipped, cracked, or naturally small (peg lateral) front teeth", "चटके हुए, टूटे हुए या प्राकृतिक रूप से छोटे सामने के दांत") },
+        { text: tr("Unwanted gaps (diastema) between upper or lower teeth", "ऊपरी या निचले दांतों के बीच अवांछित गैप (डायस्टेमा)") },
+      ],
+      faqs: [
+        {
+          question: tr("How long do porcelain veneers last?", "पोर्सिलेन वेनियर्स कितने समय तक चलते हैं?"),
+          answer: tr(
+            "With routine brushing and annual checkups, porcelain veneers reliably last 15 to 20+ years.",
+            "नियमित ब्रशिंग और वार्षिक जांच के साथ, पोर्सिलेन वेनियर्स 15 से 20+ वर्षों तक आसानी से चलते हैं।"
+          ),
+        },
+      ],
+      howItWorksHighlights: [
+        { title: tr("Digital Smile Mockup", "डिजिटल स्माइल मॉकअप"), desc: tr("Test drive your dream smile in your mouth before treatment starts.", "उपचार शुरू होने से पहले अपनी नई मुस्कान का पूर्वावलोकन करें।") },
+        { title: tr("Feldspathic Porcelain", "फेल्डस्पैथिक पोर्सिलेन"), desc: tr("Hand-sculpted ceramic with natural light-refracting opalescence.", "प्राकृतिक चमक वाला हाथ से तराशा गया सिरेमिक।") },
+        { title: tr("Resin Crystalline Bond", "रेजिन क्रिस्टलाइन बॉन्ड"), desc: tr("Chemical adhesion fuses veneer directly to tooth enamel.", "रासायनिक जुड़ाव वेनियर को सीधे दांत के इनेमल से जोड़ता है।") },
+      ],
+      beforeAfter: {
+        beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+        afterImage: "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800",
+        label: tr("6-Unit Anterior Porcelain Veneer Makeover", "6-यूनिट एंटीरियर पोर्सिलेन वेनियर मेकओवर"),
+        timeline: tr("2 Visits (7 Days)", "2 विजिट (7 दिन)"),
+        notes: tr(
+          "Chipped enamel edges and central diastema gap completely corrected with ultra-thin E-Max veneers.",
+          "चटके हुए किनारों और दांतों के बीच के गैप को अल्ट्रा-थिन E-Max वेनियर्स के साथ पूरी तरह से ठीक किया गया।"
+        ),
+      },
     },
-  },
 
-  "teeth-cleaning-scaling": {
-    id: "teeth-cleaning-scaling",
-    title: "Teeth Cleaning & Scaling",
-    category: "Preventive Care",
-    subtitle:
-      "Gentle ultrasonic dental scaling and air-polishing to remove hardened tartar, calculus, and biofilm for fresh breath and pink gums.",
-    description:
-      "Prevent gum disease and tooth loss with professional dental hygiene. Ultrasonic micro-vibrations safely dislodge calcified tartar without scraping or thinning natural enamel.",
-    details:
-      "Completed with gentle prophy-paste air-polishing to buff away tea and coffee stains, followed by a mineralizing fluoride treatment to strengthen tooth enamel.",
-    image:
-     cleaning.src,
-    patientImage:
-      "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=800",
-    duration: "30 Mins",
-    price: "₹1,000 onwards",
-    procedureVideo: "/images/dental_implant_procedure.mp4",
-    procedureGif: "/images/dental_implant_procedure.gif",
-    successMetric: {
-      value: "100%",
-      label: "Plaque & Tartar Removal",
-      sublabel: "Ultrasonic gentle cavitation",
-    },
-    heroBadges: [
-      { iconType: "sparkles", label: "Painless Ultrasonic Tips" },
-      { iconType: "shield-star", label: "Stops Bleeding Gums" },
-      { iconType: "clock", label: "Air-Flow Stain Polish" },
-    ],
-    overviewChecklist: [
-      { text: "Ultrasonic cavitation breaks down stubborn subgingival calculus safely" },
-      { text: "Air-polishing removes surface coffee, tea, and smoke stains effortlessly" },
-      { text: "Eradicates anaerobic bacteria responsible for chronic bad breath (halitosis)" },
-      { text: "Reverses early gingivitis before it progresses to irreversible bone loss" },
-    ],
-    benefitsCards: [
-      { iconType: "shield-star", title: "Fresh Breath", description: "Cleans deep odor-causing bacteria from periodontal pockets." },
-      { iconType: "shield-heart", title: "Stops Gum Bleeding", description: "Calms inflamed red gingiva and eliminates bleeding during brushing." },
-      { iconType: "sparkles", title: "Brightens Enamel", description: "Lifts superficial tobacco, tea, and food stains for a clean shine." },
-      { iconType: "tooth", title: "Prevents Tooth Loss", description: "Stops periodontitis from loosening supporting tooth bone." },
-      { iconType: "clock", title: "Quick 30-Min Visit", description: "Convenient routine maintenance recommended every 6 months." },
-    ],
-    procedureSteps: [
-      { stepNumber: 1, title: "Periodontal Check", description: "Gentle probe assesses gum pocket depth and gingival health." },
-      { stepNumber: 2, title: "Ultrasonic Scaling", description: "Water-cooled acoustic vibrations dislodge calcified tartar without pain." },
-      { stepNumber: 3, title: "Subgingival Flush", description: "Antiseptic flush cleans bacteria residing below the gumline." },
-      { stepNumber: 4, title: "Prophy Air-Polish", description: "Fine polishing paste removes surface stains and smooths enamel surfaces." },
-      { stepNumber: 5, title: "Fluoride Protection", description: "Remineralizing coat strengthens enamel against acid erosion." },
-    ],
-    candidateChecklist: [
-      { text: "Gums that bleed when brushing or flossing" },
-      { text: "Yellowish or brown calcified tartar deposits near gum margins" },
-      { text: "Persistent bad breath despite regular home brushing" },
-    ],
-    faqs: [
-      {
-        question: "Does teeth cleaning weaken or loosen teeth?",
-        answer: "No. Scaling only removes harmful calcified bacterial tartar; it never thins or loosens teeth.",
+    "teeth-cleaning-scaling": {
+      id: "teeth-cleaning-scaling",
+      title: tr("Teeth Cleaning & Scaling", "दांतों की सफाई और स्केलिंग"),
+      category: tr("Preventive Care", "निवारक देखभाल"),
+      subtitle: tr(
+        "Gentle ultrasonic dental scaling and air-polishing to remove hardened tartar, calculus, and biofilm for fresh breath and pink gums.",
+        "ताज़ा सांसों और स्वस्थ मसूड़ों के लिए जमे हुए टार्टर, कैलकुलस और प्लाक को हटाने के लिए कोमल अल्ट्रासोनिक डेंटल स्केलिंग और पॉलिशिंग।"
+      ),
+      description: tr(
+        "Prevent gum disease and tooth loss with professional dental hygiene. Ultrasonic micro-vibrations safely dislodge calcified tartar without scraping or thinning natural enamel.",
+        "प्रोफेशनल दंत स्वच्छता के साथ मसूड़ों की बीमारी और दांतों के नुकसान को रोकें। अल्ट्रासोनिक सूक्ष्म-कंपन प्राकृतिक इनेमल को नुकसान पहुंचाए बिना जमे हुए टार्टर को सुरक्षित रूप से हटाते हैं।"
+      ),
+      details: tr(
+        "Completed with gentle prophy-paste air-polishing to buff away tea and coffee stains, followed by a mineralizing fluoride treatment to strengthen tooth enamel.",
+        "चाय और कॉफी के दागों को हटाने के लिए कोमल एयर-पॉलिशिंग की जाती है, जिसके बाद दांतों के इनेमल को मजबूत करने के लिए फ्लोराइड सुरक्षा दी जाती है।"
+      ),
+      image: cleaning.src,
+      patientImage:
+        "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=800",
+      duration: tr("30 Mins", "30 मिनट"),
+      price: tr("₹1,000 onwards", "₹1,000 से शुरू"),
+      procedureVideo: "/images/dental_implant_procedure.mp4",
+      procedureGif: "/images/dental_implant_procedure.gif",
+      successMetric: {
+        value: "100%",
+        label: tr("Plaque & Tartar Removal", "प्लाक और टार्टर की सफाई"),
+        sublabel: tr("Ultrasonic gentle cavitation", "अल्ट्रासोनिक कोमल सफाई"),
       },
-    ],
-    howItWorksHighlights: [
-      { title: "Piezo Ultrasonic Cavitation", desc: "Acoustic micro-bubbles dissolve hardened tartar without enamel contact." },
-      { title: "Air-Flow Polishing", desc: "Gently lifts surface stains without abrasive enamel scratching." },
-      { title: "Topical Fluoride Bath", desc: "Restores essential minerals to protect against future plaque buildup." },
-    ],
-    beforeAfter: {
-      beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
-      afterImage: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=800",
-      label: "Full-Mouth Ultrasonic Calculus Removal",
-      timeline: "Single Session (30 Mins)",
-      notes: "Severe calcified lower anterior tartar deposits cleared with ultrasonic scaling and air-polishing.",
+      heroBadges: [
+        { iconType: "sparkles", label: tr("Painless Ultrasonic Tips", "दर्दरहित अल्ट्रासोनिक टिप्स") },
+        { iconType: "shield-star", label: tr("Stops Bleeding Gums", "मसूड़ों से खून आना रोकता है") },
+        { iconType: "clock", label: tr("Air-Flow Stain Polish", "एयर-फ्लो स्टेन पॉलिश") },
+      ],
+      overviewChecklist: [
+        { text: tr("Ultrasonic cavitation breaks down stubborn subgingival calculus safely", "अल्ट्रासोनिक तकनीक मसूड़ों के नीचे जमे जिद्दी टार्टर को सुरक्षित रूप से साफ करती है") },
+        { text: tr("Air-polishing removes surface coffee, tea, and smoke stains effortlessly", "एयर-पॉलिशिंग सतह के कॉफी, चाय और धूम्रपान के दागों को आसानी से हटाती है") },
+        { text: tr("Eradicates anaerobic bacteria responsible for chronic bad breath (halitosis)", "मुंह की दुर्गंध (हैलीटोसिस) के लिए जिम्मेदार बैक्टीरिया को खत्म करता है") },
+        { text: tr("Reverses early gingivitis before it progresses to irreversible bone loss", "मसूड़ों की शुरुआती सूजन (जिंजिवाइटिस) को गंभीर बीमारी बनने से पहले ठीक करता है") },
+      ],
+      benefitsCards: [
+        { iconType: "shield-star", title: tr("Fresh Breath", "ताज़ा सांसें"), description: tr("Cleans deep odor-causing bacteria from periodontal pockets.", "मसूड़ों के पॉकेट से दुर्गंध पैदा करने वाले गहरे बैक्टीरिया को साफ करता है।") },
+        { iconType: "shield-heart", title: tr("Stops Gum Bleeding", "मसूड़ों से खून रुकता है"), description: tr("Calms inflamed red gingiva and eliminates bleeding during brushing.", "सूजे हुए मसूड़ों को शांत करता है और ब्रश करते समय खून आना बंद करता है।") },
+        { iconType: "sparkles", title: tr("Brightens Enamel", "इनेमल को चमकाता है"), description: tr("Lifts superficial tobacco, tea, and food stains for a clean shine.", "स्वच्छ चमक के लिए तंबाकू, चाय और भोजन के बाहरी दागों को हटाता है।") },
+        { iconType: "tooth", title: tr("Prevents Tooth Loss", "दांतों को हिलने से बचाता है"), description: tr("Stops periodontitis from loosening supporting tooth bone.", "पायरिया को दांतों की सहायक हड्डी को कमजोर करने से रोकता है।") },
+        { iconType: "clock", title: tr("Quick 30-Min Visit", "त्वरित 30-मिनट की विजिट"), description: tr("Convenient routine maintenance recommended every 6 months.", "हर 6 महीने में अनुशंसित सुविधाजनक नियमित देखभाल।") },
+      ],
+      procedureSteps: [
+        { stepNumber: 1, title: tr("Periodontal Check", "मसूड़ों की जांच"), description: tr("Gentle probe assesses gum pocket depth and gingival health.", "कोमल जांच से मसूड़ों के स्वास्थ्य का आकलन किया जाता है।") },
+        { stepNumber: 2, title: tr("Ultrasonic Scaling", "अल्ट्रासोनिक स्केलिंग"), description: tr("Water-cooled acoustic vibrations dislodge calcified tartar without pain.", "पानी से ठंडा किए गए कंपन बिना किसी दर्द के जमे हुए टार्टर को हटाते हैं।") },
+        { stepNumber: 3, title: tr("Subgingival Flush", "एंटीसेप्टिक फ्लश"), description: tr("Antiseptic flush cleans bacteria residing below the gumline.", "एंटीसेप्टिक फ्लश मसूड़ों की रेखा के नीचे रहने वाले बैक्टीरिया को साफ करता है।") },
+        { stepNumber: 4, title: tr("Prophy Air-Polish", "प्रोफी एयर-पॉलिश"), description: tr("Fine polishing paste removes surface stains and smooths enamel surfaces.", "फाइन पॉलिशिंग पेस्ट सतह के दागों को हटाता है और इनेमल को चिकना बनाता है।") },
+        { stepNumber: 5, title: tr("Fluoride Protection", "फ्लोराइड सुरक्षा"), description: tr("Remineralizing coat strengthens enamel against acid erosion.", "रीमिनरलाइजिंग कोट एसिड क्षरण के खिलाफ इनेमल को मजबूत करता है।") },
+      ],
+      candidateChecklist: [
+        { text: tr("Gums that bleed when brushing or flossing", "ब्रश या फ्लॉस करते समय मसूड़ों से खून आना") },
+        { text: tr("Yellowish or brown calcified tartar deposits near gum margins", "मसूड़ों के किनारों के पास पीले या भूरे रंग का टार्टर जमा होना") },
+        { text: tr("Persistent bad breath despite regular home brushing", "नियमित ब्रश करने के बावजूद मुंह से लगातार दुर्गंध आना") },
+      ],
+      faqs: [
+        {
+          question: tr("Does teeth cleaning weaken or loosen teeth?", "क्या दांतों की सफाई से दांत कमजोर या ढीले होते हैं?"),
+          answer: tr(
+            "No. Scaling only removes harmful calcified bacterial tartar; it never thins or loosens teeth.",
+            "नहीं। स्केलिंग केवल हानिकारक जमे हुए बैक्टीरियल टार्टर को हटाती है; यह कभी भी दांतों को पतला या ढीला नहीं करती है।"
+          ),
+        },
+      ],
+      howItWorksHighlights: [
+        { title: tr("Piezo Ultrasonic Cavitation", "पीजो अल्ट्रासोनिक कैविटेशन"), desc: tr("Acoustic micro-bubbles dissolve hardened tartar without enamel contact.", "सूक्ष्म बुलबुले इनेमल को नुकसान पहुंचाए बिना कठोर टार्टर को हटाते हैं।") },
+        { title: tr("Air-Flow Polishing", "एयर-फ्लो पॉलिशिंग"), desc: tr("Gently lifts surface stains without abrasive enamel scratching.", "बिना किसी खरोंच के सतह के दागों को कोमलता से हटाता है।") },
+        { title: tr("Topical Fluoride Bath", "टॉपिकल फ्लोराइड सुरक्षा"), desc: tr("Restores essential minerals to protect against future plaque buildup.", "भविष्य में प्लाक जमने से बचाने के लिए आवश्यक खनिजों को बहाल करता है।") },
+      ],
+      beforeAfter: {
+        beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+        afterImage: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=800",
+        label: tr("Full-Mouth Ultrasonic Calculus Removal", "संपूर्ण मुंह की अल्ट्रासोनिक टार्टर सफाई"),
+        timeline: tr("Single Session (30 Mins)", "एकल सेशन (30 मिनट)"),
+        notes: tr(
+          "Severe calcified lower anterior tartar deposits cleared with ultrasonic scaling and air-polishing.",
+          "अल्ट्रासोनिक स्केलिंग और एयर-पॉलिशिंग के साथ निचले दांतों में जमे भारी टार्टर को साफ किया गया।"
+        ),
+      },
     },
-  },
 
-  "laser-gum-therapy": {
-    id: "laser-gum-therapy",
-    title: "Laser Gum Therapy",
-    category: "Periodontics",
-    subtitle:
-      "Minimally invasive soft-tissue laser treatment for deep periodontal pocket disinfection, gum contouring, and painless smile reshaping.",
-    description:
-      "Advanced diode laser therapy treats chronic gum disease and gummy smiles without scalpels or stitches. Concentrated light energy vaporizes infected pocket bacteria and stimulates natural tissue reattachment.",
-    details:
-      "Dr. Nitu Rajpoot uses precise diode laser wavelengths that instantly cauterize capillary vessels, ensuring a completely bloodless, comfortable procedure with rapid tissue healing.",
-    image:
-      laser.src,
-    patientImage:
-      "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
-    duration: "30 Mins",
-    price: "₹3,000 onwards",
-    procedureVideo: "/images/dental_implant_procedure.mp4",
-    procedureGif: "/images/dental_implant_procedure.gif",
-    successMetric: {
-      value: "99.4%",
-      label: "Pocket Disinfection",
-      sublabel: "Diode laser biostimulation",
-    },
-    heroBadges: [
-      { iconType: "shield-star", label: "Zero Scalpel / Zero Stitches" },
-      { iconType: "sparkles", label: "Bloodless Treatment" },
-      { iconType: "clock", label: "Instant Tissue Coagulation" },
-    ],
-    overviewChecklist: [
-      { text: "Destroys anaerobic bacteria inside deep gum pockets up to 7mm" },
-      { text: "Biostimulates collagen formation to reattach loose gums to tooth roots" },
-      { text: "Painless aesthetic gingival recontouring for balanced, even gum lines" },
-      { text: "Eliminates dark melanin gum pigmentation for healthy coral-pink gums" },
-    ],
-    benefitsCards: [
-      { iconType: "shield-star", title: "No Cutting or Sutures", description: "Gentle laser light targets only diseased tissue, leaving healthy gums intact." },
-      { iconType: "sparkles", title: "Minimal Bleeding", description: "Laser wavelength seals blood vessels simultaneously as it disinfects." },
-      { iconType: "shield-heart", title: "Stops Bone Loss", description: "Sterilizes infected roots to halt chronic destructive periodontitis." },
-      { iconType: "smile", title: "Aesthetic Gum Lift", description: "Sculpts excessive gummy smiles to reveal fuller, balanced tooth length." },
-      { iconType: "clock", title: "Fast Same-Day Healing", description: "Patients experience minimal post-op soreness and resume eating same day." },
-    ],
-    procedureSteps: [
-      { stepNumber: 1, title: "Pocket Depth Charting", description: "Periodontal probe measures pocket depths and identifies infection zones." },
-      { stepNumber: 2, title: "Topical Comfort Gel", description: "Mild topical gel applied; deep injections are rarely needed for laser care." },
-      { stepNumber: 3, title: "Laser Fiber Insertion", description: "Hair-thin optical fiber sweeps through pocket, vaporizing bacteria." },
-      { stepNumber: 4, title: "Root Decontamination", description: "Ultrasonic micro-tips flush residual toxin deposits from root dentin." },
-      { stepNumber: 5, title: "Tissue Bioseal", description: "Laser creates a natural fibrin clot that seals the pocket for sterile healing." },
-    ],
-    candidateChecklist: [
-      { text: "Moderate to severe gum disease with loose teeth or receding gums" },
-      { text: "Deep gum pockets measuring 4mm or deeper" },
-      { text: "Excessive gum display when smiling ('gummy smile')" },
-    ],
-    faqs: [
-      {
-        question: "Is laser gum therapy better than traditional flap surgery?",
-        answer: "Yes. Laser therapy achieves superior bacterial eradication without cutting gums, removing stitches, or causing severe post-operative gum recession.",
+    "laser-gum-therapy": {
+      id: "laser-gum-therapy",
+      title: tr("Laser Gum Therapy", "लेजर मसूड़ों की थेरेपी"),
+      category: tr("Periodontics", "पेरियोडोंटिक्स"),
+      subtitle: tr(
+        "Minimally invasive soft-tissue laser treatment for deep periodontal pocket disinfection, gum contouring, and painless smile reshaping.",
+        "गहरे मसूड़ों के संक्रमण की सफाई, मसूड़ों को आकार देने और दर्दरहित स्माइल रीशेपिंग के लिए मिनिमली इनवेसिव सॉफ्ट-टिश्यू लेजर उपचार।"
+      ),
+      description: tr(
+        "Advanced diode laser therapy treats chronic gum disease and gummy smiles without scalpels or stitches. Concentrated light energy vaporizes infected pocket bacteria and stimulates natural tissue reattachment.",
+        "उन्नत डायोड लेजर थेरेपी बिना ब्लेड या टांके के मसूड़ों की पुरानी बीमारी और गमी स्माइल का इलाज करती है। लेजर ऊर्जा संक्रमित बैक्टीरिया को नष्ट करती है और मसूड़ों को स्वस्थ बनाती है।"
+      ),
+      details: tr(
+        "Dr. Nitu Rajpoot uses precise diode laser wavelengths that instantly cauterize capillary vessels, ensuring a completely bloodless, comfortable procedure with rapid tissue healing.",
+        "डॉ. नीतू राजपूत सटीक डायोड लेजर तकनीक का उपयोग करती हैं जो बिना रक्तस्राव के एक आरामदायक प्रक्रिया और त्वरित रिकवरी सुनिश्चित करती है।"
+      ),
+      image: laser.src,
+      patientImage:
+        "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+      duration: tr("30 Mins", "30 मिनट"),
+      price: tr("₹3,000 onwards", "₹3,000 से शुरू"),
+      procedureVideo: "/images/dental_implant_procedure.mp4",
+      procedureGif: "/images/dental_implant_procedure.gif",
+      successMetric: {
+        value: "99.4%",
+        label: tr("Pocket Disinfection", "पॉकेट कीटाणुशोधन"),
+        sublabel: tr("Diode laser biostimulation", "डायोड लेजर बायोस्टिमुलेशन"),
       },
-    ],
-    howItWorksHighlights: [
-      { title: "Targeted Fiber Optics", desc: "Selectively targets dark-pigmented diseased bacteria." },
-      { title: "Biostimulation Energy", desc: "Stimulates cellular fibroblasts to regenerate healthy gum attachment." },
-      { title: "Fibrin Clot Seal", desc: "Natural biological barrier protects roots during healing." },
-    ],
-    beforeAfter: {
-      beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
-      afterImage: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=800",
-      label: "Laser Aesthetic Gum Depigmentation & Contouring",
-      timeline: "Single Visit (30 Mins)",
-      notes: "Dark melanin pigmentation vaporized with soft-tissue diode laser, revealing natural healthy coral-pink gingiva.",
+      heroBadges: [
+        { iconType: "shield-star", label: tr("Zero Scalpel / Zero Stitches", "बिना ब्लेड / बिना टांके") },
+        { iconType: "sparkles", label: tr("Bloodless Treatment", "रक्तहीन उपचार") },
+        { iconType: "clock", label: tr("Instant Tissue Coagulation", "त्वरित टिश्यू हीलिंग") },
+      ],
+      overviewChecklist: [
+        { text: tr("Destroys anaerobic bacteria inside deep gum pockets up to 7mm", "7mm तक गहरे मसूड़ों के पॉकेट के अंदर बैक्टीरिया को नष्ट करता है") },
+        { text: tr("Biostimulates collagen formation to reattach loose gums to tooth roots", "ढीले मसूड़ों को दांतों की जड़ों से फिर से जोड़ने के लिए कोलेजन निर्माण को बढ़ावा देता है") },
+        { text: tr("Painless aesthetic gingival recontouring for balanced, even gum lines", "संतुलित और समान मसूड़ों की रेखा के लिए दर्दरहित मसूड़ों की कंटूरिंग") },
+        { text: tr("Eliminates dark melanin gum pigmentation for healthy coral-pink gums", "स्वस्थ गुलाबी मसूड़ों के लिए मसूड़ों के कालेपन (मेलेनिन पिग्मेंटेशन) को हटाता है") },
+      ],
+      benefitsCards: [
+        { iconType: "shield-star", title: tr("No Cutting or Sutures", "कोई कट या टांके नहीं"), description: tr("Gentle laser light targets only diseased tissue, leaving healthy gums intact.", "कोमल लेजर लाइट केवल संक्रमित हिस्से को लक्षित करती है और स्वस्थ मसूड़ों को सुरक्षित रखती है।") },
+        { iconType: "sparkles", title: tr("Minimal Bleeding", "न्यूनतम रक्तस्राव"), description: tr("Laser wavelength seals blood vessels simultaneously as it disinfects.", "लेजर कीटाणुशोधन के साथ-साथ रक्त वाहिकाओं को तुरंत सील कर देता है।") },
+        { iconType: "shield-heart", title: tr("Stops Bone Loss", "हड्डी के नुकसान को रोकता है"), description: tr("Sterilizes infected roots to halt chronic destructive periodontitis.", "पायरिया को रोकने के लिए संक्रमित जड़ों को पूरी तरह कीटाणुरहित करता है।") },
+        { iconType: "smile", title: tr("Aesthetic Gum Lift", "एस्थेटिक गम लिफ्ट"), description: tr("Sculpts excessive gummy smiles to reveal fuller, balanced tooth length.", "संतुलित दांतों की लंबाई दिखाने के लिए अतिरिक्त मसूड़ों को सुंदर आकार देता है।") },
+        { iconType: "clock", title: tr("Fast Same-Day Healing", "उसी दिन त्वरित रिकवरी"), description: tr("Patients experience minimal post-op soreness and resume eating same day.", "मरीजों को न्यूनतम असुविधा होती है और वे उसी दिन सामान्य भोजन कर सकते हैं।") },
+      ],
+      procedureSteps: [
+        { stepNumber: 1, title: tr("Pocket Depth Charting", "पॉकेट गहराई की जांच"), description: tr("Periodontal probe measures pocket depths and identifies infection zones.", "मसूड़ों के पॉकेट की गहराई मापी जाती है और संक्रमण वाले क्षेत्रों की पहचान की जाती है।") },
+        { stepNumber: 2, title: tr("Topical Comfort Gel", "टॉपिकल कम्फर्ट जेल"), description: tr("Mild topical gel applied; deep injections are rarely needed for laser care.", "हल्का सुन्न करने वाला जेल लगाया जाता है; लेजर देखभाल के लिए गहरे इंजेक्शन की आवश्यकता शायद ही कभी होती है।") },
+        { stepNumber: 3, title: tr("Laser Fiber Insertion", "लेजर फाइबर क्लीनिंग"), description: tr("Hair-thin optical fiber sweeps through pocket, vaporizing bacteria.", "बारीक ऑप्टिकल फाइबर पॉकेट के अंदर जाकर बैक्टीरिया को नष्ट करता है।") },
+        { stepNumber: 4, title: tr("Root Decontamination", "जड़ों की सफाई"), description: tr("Ultrasonic micro-tips flush residual toxin deposits from root dentin.", "अल्ट्रासोनिक माइक्रो-टिप्स जड़ों से बचे हुए विषाक्त पदार्थों को साफ करते हैं।") },
+        { stepNumber: 5, title: tr("Tissue Bioseal", "टिश्यू बायोसील"), description: tr("Laser creates a natural fibrin clot that seals the pocket for sterile healing.", "लेजर एक प्राकृतिक सुरक्षा परत बनाता है जो तेजी से ठीक होने के लिए पॉकेट को सील कर देता है।") },
+      ],
+      candidateChecklist: [
+        { text: tr("Moderate to severe gum disease with loose teeth or receding gums", "ढीले दांतों या नीचे खिसकते मसूड़ों के साथ मध्यम से गंभीर मसूड़ों की बीमारी") },
+        { text: tr("Deep gum pockets measuring 4mm or deeper", "4mm या उससे अधिक गहरे मसूड़ों के पॉकेट") },
+        { text: tr("Excessive gum display when smiling ('gummy smile')", "मुस्कुराते समय मसूड़ों का अधिक दिखना ('गमी स्माइल')") },
+      ],
+      faqs: [
+        {
+          question: tr("Is laser gum therapy better than traditional flap surgery?", "क्या लेजर गम थेरेपी पारंपरिक फ्लैप सर्जरी से बेहतर है?"),
+          answer: tr(
+            "Yes. Laser therapy achieves superior bacterial eradication without cutting gums, removing stitches, or causing severe post-operative gum recession.",
+            "हाँ। लेजर थेरेपी मसूड़ों को काटे बिना या टांके लगाए बिना बेहतर तरीके से बैक्टीरिया को खत्म करती है।"
+          ),
+        },
+      ],
+      howItWorksHighlights: [
+        { title: tr("Targeted Fiber Optics", "टार्गेटेड फाइबर ऑप्टिक्स"), desc: tr("Selectively targets dark-pigmented diseased bacteria.", "केवल संक्रमित बैक्टीरिया को लक्षित करके नष्ट करता है।") },
+        { title: tr("Biostimulation Energy", "बायोस्टिमुलेशन ऊर्जा"), desc: tr("Stimulates cellular fibroblasts to regenerate healthy gum attachment.", "स्वस्थ मसूड़ों के जुड़ाव को पुनर्जीवित करने के लिए कोशिकाओं को सक्रिय करता है।") },
+        { title: tr("Fibrin Clot Seal", "फाइब्रिन क्लॉट सील"), desc: tr("Natural biological barrier protects roots during healing.", "प्राकृतिक जैविक सुरक्षा परत ठीक होने के दौरान जड़ों की रक्षा करती है।") },
+      ],
+      beforeAfter: {
+        beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+        afterImage: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=800",
+        label: tr("Laser Aesthetic Gum Depigmentation & Contouring", "लेजर एस्थेटिक मसूड़ों का डीपिग्मेंटेशन और कंटूरिंग"),
+        timeline: tr("Single Visit (30 Mins)", "एकल विजिट (30 मिनट)"),
+        notes: tr(
+          "Dark melanin pigmentation vaporized with soft-tissue diode laser, revealing natural healthy coral-pink gingiva.",
+          "सॉफ्ट-टिश्यू डायोड लेजर से मसूड़ों के कालेपन को हटाया गया, जिससे प्राकृतिक गुलाबी और स्वस्थ मसूड़े प्राप्त हुए।"
+        ),
+      },
     },
-  },
 
-  "composite-fillings": {
-    id: "composite-fillings",
-    title: "Composite Fillings",
-    category: "Restorative",
-    subtitle:
-      "Tooth-colored aesthetic light-cured resin restorations for dental cavities, chipped tooth edges, and minor gap closures.",
-    description:
-      "Invisible, durable tooth restorations that bond directly to your natural enamel and dentin. Replace old dark metal amalgam fillings with biologically safe, BPA-free resin composites.",
-    details:
-      "Dr. Nitu Rajpoot sculpts multi-shade hybrid composite material layer-by-layer, matching natural tooth cusps, grooves, and translucency for an indistinguishable restoration.",
-    image:
-      composite.src,
-    patientImage:
-      "https://images.unsplash.com/photo-1606811841689-23dfddce6395?auto=format&fit=crop&q=80&w=800",
-    duration: "30 Mins",
-    price: "₹1,200 onwards",
-    procedureVideo: "/images/dental_implant_procedure.mp4",
-    procedureGif: "/images/dental_implant_procedure.gif",
-    successMetric: {
-      value: "100%",
-      label: "Tooth-Colored Match",
-      sublabel: "Nano-hybrid composite resin",
-    },
-    heroBadges: [
-      { iconType: "tooth", label: "Natural Shade Matching" },
-      { iconType: "shield-star", label: "Mercury-Free & Safe" },
-      { iconType: "sparkles", label: "Direct Chemical Bond" },
-    ],
-    overviewChecklist: [
-      { text: "Bonds chemically to tooth enamel, reinforcing tooth structure" },
-      { text: "Preserves more healthy natural tooth structure than old silver fillings" },
-      { text: "100% mercury-free, biocompatible, and completely tooth-colored" },
-      { text: "High polish finish prevents food adherence and plaque buildup" },
-    ],
-    benefitsCards: [
-      { iconType: "sparkles", title: "Invisible Appearance", description: "Custom shade matched to blend seamlessly with your natural tooth color." },
-      { iconType: "shield-star", title: "Strengthens Tooth", description: "Direct adhesive bonding holds weakened tooth walls together." },
-      { iconType: "tooth", title: "Conservative Drilling", description: "Requires removal of only the decayed portion, keeping healthy enamel." },
-      { iconType: "clock", title: "Instant Hardening", description: "High-intensity LED blue light cures and hardens the resin in seconds." },
-      { iconType: "smile", title: "Chew Immediately", description: "No waiting hours for setting; enjoy food right after numbness wears off." },
-    ],
-    procedureSteps: [
-      { stepNumber: 1, title: "Cavity Clearance", description: "Decayed area gently cleaned and disinfected with micro-instruments." },
-      { stepNumber: 2, title: "Adhesive Etch & Prime", description: "Microscopic conditioning creates porous enamel bonding surface." },
-      { stepNumber: 3, title: "Layered Sculpting", description: "Nano-hybrid composite incrementally packed and shaped to natural tooth anatomy." },
-      { stepNumber: 4, title: "LED Light Curing", description: "Blue light wavelength polymerizes resin within 20 seconds." },
-      { stepNumber: 5, title: "Diamond Polish", description: "High-gloss buffing produces a mirror-smooth enamel feel." },
-    ],
-    candidateChecklist: [
-      { text: "Cavities, dark spots, or decay on front or rear chewing teeth" },
-      { text: "Chipped, worn, or slightly fractured enamel edges" },
-      { text: "Desire to replace old, unattractive dark silver mercury fillings" },
-    ],
-    faqs: [
-      {
-        question: "How long do composite fillings last?",
-        answer: "High-grade nano-hybrid composite fillings typically last 7 to 12+ years with proper oral hygiene and routine checkups.",
+    "composite-fillings": {
+      id: "composite-fillings",
+      title: tr("Composite Fillings", "कम्पोजिट फिलिंग्स"),
+      category: tr("Restorative", "रेस्टोरेटिव"),
+      subtitle: tr(
+        "Tooth-colored aesthetic light-cured resin restorations for dental cavities, chipped tooth edges, and minor gap closures.",
+        "दांतों की कैविटी, चटके हुए किनारों और छोटे गैप को भरने के लिए दांतों के रंग की लाइट-क्योर्ड रेजिन फिलिंग्स।"
+      ),
+      description: tr(
+        "Invisible, durable tooth restorations that bond directly to your natural enamel and dentin. Replace old dark metal amalgam fillings with biologically safe, BPA-free resin composites.",
+        "अदृश्य और मजबूत दांत रेस्टोरेशन जो सीधे आपके प्राकृतिक इनेमल और डेंटिन से जुड़ते हैं। पुरानी काली मेटल फिलिंग को सुरक्षित और दांतों के रंग के कम्पोजिट से बदलें।"
+      ),
+      details: tr(
+        "Dr. Nitu Rajpoot sculpts multi-shade hybrid composite material layer-by-layer, matching natural tooth cusps, grooves, and translucency for an indistinguishable restoration.",
+        "डॉ. नीतू राजपूत प्राकृतिक दांतों के रंग और बनावट से मेल खाते हुए परत-दर-परत हाइब्रिड कम्पोजिट मटेरियल से दांत को संवारती हैं।"
+      ),
+      image: composite.src,
+      patientImage:
+        "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=800",
+      duration: tr("30 Mins", "30 मिनट"),
+      price: tr("₹1,200 onwards", "₹1,200 से शुरू"),
+      procedureVideo: "/images/dental_implant_procedure.mp4",
+      procedureGif: "/images/dental_implant_procedure.gif",
+      successMetric: {
+        value: "100%",
+        label: tr("Tooth-Colored Match", "दांतों के रंग से पूर्ण मिलान"),
+        sublabel: tr("Nano-hybrid composite resin", "नैनो-हाइब्रिड कम्पोजिट रेजिन"),
       },
-    ],
-    howItWorksHighlights: [
-      { title: "Selective Decay Removal", desc: "Leaves healthy enamel and dentin completely untouched." },
-      { title: "Nano-Ceramic Particles", desc: "Provides high wear-resistance under heavy chewing stress." },
-      { title: "Precision Shade Blending", desc: "Matched to VITA natural tooth shade guides." },
-    ],
-    beforeAfter: {
-      beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
-      afterImage: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=800",
-      label: "Posterior Amalgam Replacement with Composite",
-      timeline: "Single Visit (30 Mins)",
-      notes: "Old deteriorating silver filling removed and restored with tooth-colored nano-hybrid composite resin.",
+      heroBadges: [
+        { iconType: "tooth", label: tr("Natural Shade Matching", "प्राकृतिक शेड मैचिंग") },
+        { iconType: "shield-star", label: tr("Mercury-Free & Safe", "मर्करी-मुक्त और सुरक्षित") },
+        { iconType: "sparkles", label: tr("Direct Chemical Bond", "मजबूत केमिकल बॉन्ड") },
+      ],
+      overviewChecklist: [
+        { text: tr("Bonds chemically to tooth enamel, reinforcing tooth structure", "दांतों के इनेमल से रासायनिक रूप से जुड़कर दांत की संरचना को मजबूत करता है") },
+        { text: tr("Preserves more healthy natural tooth structure than old silver fillings", "पुरानी सिल्वर फिलिंग की तुलना में अधिक स्वस्थ प्राकृतिक दांत संरचना को सुरक्षित रखता है") },
+        { text: tr("100% mercury-free, biocompatible, and completely tooth-colored", "100% मर्करी-मुक्त, बायोकम्पैटिबल और पूरी तरह से दांतों के रंग का") },
+        { text: tr("High polish finish prevents food adherence and plaque buildup", "हाई पॉलिश फिनिश भोजन के चिपकने और प्लाक जमने को रोकती है") },
+      ],
+      benefitsCards: [
+        { iconType: "sparkles", title: tr("Invisible Appearance", "अदृश्य बनावट"), description: tr("Custom shade matched to blend seamlessly with your natural tooth color.", "आपके प्राकृतिक दांतों के रंग के साथ पूरी तरह से घुलने-मिलने के लिए कस्टम शेड मैचिंग।") },
+        { iconType: "shield-star", title: tr("Strengthens Tooth", "दांत को मजबूत बनाता है"), description: tr("Direct adhesive bonding holds weakened tooth walls together.", "डायरेक्ट एडहेसिव बॉन्डिंग कमजोर दांत की दीवारों को एक साथ मजबूती से पकड़ती है।") },
+        { iconType: "tooth", title: tr("Conservative Drilling", "न्यूनतम ड्रिलिंग"), description: tr("Requires removal of only the decayed portion, keeping healthy enamel.", "स्वस्थ इनेमल को बचाते हुए केवल सड़े हुए हिस्से को हटाने की आवश्यकता होती है।") },
+        { iconType: "clock", title: tr("Instant Hardening", "तुरंत सेट होना"), description: tr("High-intensity LED blue light cures and hardens the resin in seconds.", "हाई-इंटेंसिटी LED ब्लू लाइट सेकंडों में रेजिन को सख्त और मजबूत कर देती है।") },
+        { iconType: "smile", title: tr("Chew Immediately", "तुरंत चबाने की सुविधा"), description: tr("No waiting hours for setting; enjoy food right after numbness wears off.", "सेट होने के लिए घंटों इंतजार करने की जरूरत नहीं; तुरंत भोजन का आनंद लें।") },
+      ],
+      procedureSteps: [
+        { stepNumber: 1, title: tr("Cavity Clearance", "कैविटी की सफाई"), description: tr("Decayed area gently cleaned and disinfected with micro-instruments.", "सूक्ष्म उपकरणों से सड़े हुए हिस्से को कोमलता से साफ और कीटाणुरहित किया जाता है।") },
+        { stepNumber: 2, title: tr("Adhesive Etch & Prime", "एडहेसिव प्राइमिंग"), description: tr("Microscopic conditioning creates porous enamel bonding surface.", "बॉन्डिंग के लिए दांत की सतह को तैयार किया जाता है।") },
+        { stepNumber: 3, title: tr("Layered Sculpting", "लेयर्ड स्कल्प्टिंग"), description: tr("Nano-hybrid composite incrementally packed and shaped to natural tooth anatomy.", "नैनो-हाइब्रिड कम्पोजिट को प्राकृतिक दांत के आकार में परत-दर-परत भरा जाता है।") },
+        { stepNumber: 4, title: tr("LED Light Curing", "LED लाइट क्योरिंग"), description: tr("Blue light wavelength polymerizes resin within 20 seconds.", "ब्लू लाइट 20 सेकंड के भीतर रेजिन को सख्त कर देती है।") },
+        { stepNumber: 5, title: tr("Diamond Polish", "डायमंड पॉलिश"), description: tr("High-gloss buffing produces a mirror-smooth enamel feel.", "हाई-ग्लॉस पॉलिशिंग से प्राकृतिक दांत जैसी चिकनी सतह मिलती है।") },
+      ],
+      candidateChecklist: [
+        { text: tr("Cavities, dark spots, or decay on front or rear chewing teeth", "सामने या पीछे के चबाने वाले दांतों में कैविटी, काले धब्बे या सड़न") },
+        { text: tr("Chipped, worn, or slightly fractured enamel edges", "चटके हुए, घिसे हुए या हल्के टूटे हुए दांत के किनारे") },
+        { text: tr("Desire to replace old, unattractive dark silver mercury fillings", "पुरानी काली सिल्वर फिलिंग को दांत के रंग की फिलिंग से बदलने की इच्छा") },
+      ],
+      faqs: [
+        {
+          question: tr("How long do composite fillings last?", "कम्पोजिट फिलिंग कितने समय तक चलती है?"),
+          answer: tr(
+            "High-grade nano-hybrid composite fillings typically last 7 to 12+ years with proper oral hygiene and routine checkups.",
+            "उचित दंत स्वच्छता और नियमित जांच के साथ उच्च श्रेणी की नैनो-हाइब्रिड कम्पोजिट फिलिंग आमतौर पर 7 से 12+ वर्षों तक चलती है।"
+          ),
+        },
+      ],
+      howItWorksHighlights: [
+        { title: tr("Selective Decay Removal", "चयनात्मक सड़न की सफाई"), desc: tr("Leaves healthy enamel and dentin completely untouched.", "स्वस्थ इनेमल और डेंटिन को पूरी तरह से सुरक्षित रखता है।") },
+        { title: tr("Nano-Ceramic Particles", "नैनो-सिरेमिक कण"), desc: tr("Provides high wear-resistance under heavy chewing stress.", "चबाने के भारी दबाव में उच्च मजबूती प्रदान करता है।") },
+        { title: tr("Precision Shade Blending", "सटीक शेड ब्लेंडिंग"), desc: tr("Matched to VITA natural tooth shade guides.", "प्राकृतिक दांतों के शेड गाइड से पूर्ण मिलान।") },
+      ],
+      beforeAfter: {
+        beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+        afterImage: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=800",
+        label: tr("Posterior Amalgam Replacement with Composite", "पुरानी सिल्वर फिलिंग की जगह कम्पोजिट रेस्टोरेशन"),
+        timeline: tr("Single Visit (30 Mins)", "एकल विजिट (30 मिनट)"),
+        notes: tr(
+          "Old deteriorating silver filling removed and restored with tooth-colored nano-hybrid composite resin.",
+          "पुरानी खराब हो रही सिल्वर फिलिंग को हटाकर दांतों के रंग के नैनो-हाइब्रिड कम्पोजिट रेजिन से बहाल किया गया।"
+        ),
+      },
     },
-  },
 
-  "pediatric-dentistry": {
-    id: "pediatric-dentistry",
-    title: "Pediatric Dentistry",
-    category: "Child Dental Care",
-    subtitle:
-      "Gentle, anxiety-free preventive dental care, fluoride varnishes, painless fillings, and milk tooth preservation for children.",
-    description:
-      "We create delightful, happy dental experiences for kids of all ages. From preventive pit & fissure sealants to atraumatic cavity care, our warm pediatric protocols eliminate dental fear early.",
-    details:
-      "Dr. Nitu Rajpoot uses a 'Tell-Show-Do' approach, child-friendly explanations, and gentle topical strawberry gels to make every visit joyful and positive.",
-    image:
-     pediatric.src,
-    patientImage:
-      "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
-    duration: "30 Mins",
-    price: "₹1,000 onwards",
-    procedureVideo: "/images/dental_implant_procedure.mp4",
-    procedureGif: "/images/dental_implant_procedure.gif",
-    successMetric: {
-      value: "100%",
-      label: "Fear-Free Experience",
-      sublabel: "Gentle child-friendly protocols",
-    },
-    heroBadges: [
-      { iconType: "smile", label: "Zero-Fear Environment" },
-      { iconType: "shield-star", label: "Cavity Sealants & Fluoride" },
-      { iconType: "sparkles", label: "Milk Tooth Preservation" },
-    ],
-    overviewChecklist: [
-      { text: "Protective pit & fissure sealants shield deep molars from childhood cavities" },
-      { text: "Topical fluoride varnish remineralizes young enamel against sweet treats" },
-      { text: "Preserves primary milk teeth to guide straight permanent tooth eruption" },
-      { text: "Fun oral hygiene education and habit-breaking therapy" },
-    ],
-    benefitsCards: [
-      { iconType: "smile", title: "Happy Dental Visits", description: "Positive childhood visits build lifelong dental confidence without trauma." },
-      { iconType: "shield-star", title: "Prevents Cavities", description: "Fluoride and sealants reduce childhood tooth decay risk by over 80%." },
-      { iconType: "tooth", title: "Saves Milk Teeth", description: "Milk teeth act as vital natural space maintainers for adult teeth." },
-      { iconType: "sparkles", title: "Habit Correction", description: "Gentle appliances correct thumb sucking and mouth breathing early." },
-      { iconType: "clock", title: "Gentle & Fast", description: "Short, engaging appointments tailored to children's attention spans." },
-    ],
-    procedureSteps: [
-      { stepNumber: 1, title: "Friendly Welcome", description: "Child is introduced to our friendly dental instruments in a fun way." },
-      { stepNumber: 2, title: "Gentle Counting", description: "Teeth counted and examined with an intraoral mirror and HD camera." },
-      { stepNumber: 3, title: "Plaque Cleaning", description: "Soft rotating brush with pleasant bubblegum paste polishes enamel." },
-      { stepNumber: 4, title: "Cavity Sealant", description: "Clear liquid resin painted into deep molar grooves to lock out cavity bacteria." },
-      { stepNumber: 5, title: "Fluoride Shield", description: "Tasty fruit-flavored fluoride varnish painted on teeth to harden enamel." },
-    ],
-    candidateChecklist: [
-      { text: "Children celebrating their first birthday or first tooth eruption" },
-      { text: "Toddlers and school-age children with deep molar grooves" },
-      { text: "Children showing early white spots or brown decay on milk teeth" },
-    ],
-    faqs: [
-      {
-        question: "Why fix milk teeth if they will eventually fall out?",
-        answer: "Milk teeth hold the exact space for adult permanent teeth. Premature loss causes severe adult tooth crowding.",
+    "pediatric-dentistry": {
+      id: "pediatric-dentistry",
+      title: tr("Pediatric Dentistry", "बच्चों की दंत चिकित्सा"),
+      category: tr("Child Dental Care", "बाल दंत देखभाल"),
+      subtitle: tr(
+        "Gentle, anxiety-free preventive dental care, fluoride varnishes, painless fillings, and milk tooth preservation for children.",
+        "बच्चों के लिए कोमल, भय-मुक्त निवारक दंत देखभाल, फ्लोराइड वार्निश, दर्दरहित फिलिंग और दूध के दांतों का संरक्षण।"
+      ),
+      description: tr(
+        "We create delightful, happy dental experiences for kids of all ages. From preventive pit & fissure sealants to atraumatic cavity care, our warm pediatric protocols eliminate dental fear early.",
+        "हम सभी उम्र के बच्चों के लिए सुखद और खुशहाल डेंटल अनुभव बनाते हैं। प्रिवेंटिव सीलेंट से लेकर दर्दरहित कैविटी देखभाल तक, हमारे बाल दंत प्रोटोकॉल बच्चों के डर को दूर करते हैं।"
+      ),
+      details: tr(
+        "Dr. Nitu Rajpoot uses a 'Tell-Show-Do' approach, child-friendly explanations, and gentle topical strawberry gels to make every visit joyful and positive.",
+        "डॉ. नीतू राजपूत हर विजिट को आनंददायक और सकारात्मक बनाने के लिए 'टेल-शो-डू' दृष्टिकोण और बच्चों के अनुकूल सरल भाषा का उपयोग करती हैं।"
+      ),
+      image: pediatric.src,
+      patientImage:
+        "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+      duration: tr("30 Mins", "30 मिनट"),
+      price: tr("₹1,000 onwards", "₹1,000 से शुरू"),
+      procedureVideo: "/images/dental_implant_procedure.mp4",
+      procedureGif: "/images/dental_implant_procedure.gif",
+      successMetric: {
+        value: "100%",
+        label: tr("Fear-Free Experience", "भय-मुक्त अनुभव"),
+        sublabel: tr("Gentle child-friendly protocols", "बच्चों के अनुकूल कोमल प्रोटोकॉल"),
       },
-    ],
-    howItWorksHighlights: [
-      { title: "Tell-Show-Do Method", desc: "Explains every step in cheerful language before doing anything." },
-      { title: "Bioactive Sealants", desc: "Binds into tooth pits to prevent cavity formation." },
-      { title: "Reward Badges", desc: "Children leave proud with smiles and dental champion certificates." },
-    ],
-    beforeAfter: {
-      beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
-      afterImage: "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&q=80&w=800",
-      label: "Childhood Molar Fissure Sealant & Restoration",
-      timeline: "Single Session (25 Mins)",
-      notes: "Early milk molar decay treated with biocompatible tooth-colored glass ionomer and protective sealants.",
+      heroBadges: [
+        { iconType: "smile", label: tr("Zero-Fear Environment", "भय-मुक्त वातावरण") },
+        { iconType: "shield-star", label: tr("Cavity Sealants & Fluoride", "कैविटी सीलेंट और फ्लोराइड") },
+        { iconType: "sparkles", label: tr("Milk Tooth Preservation", "दूध के दांतों का संरक्षण") },
+      ],
+      overviewChecklist: [
+        { text: tr("Protective pit & fissure sealants shield deep molars from childhood cavities", "सुरक्षात्मक पिट और फिशर सीलेंट गहरी दाढ़ों को बचपन की कैविटी से बचाते हैं") },
+        { text: tr("Topical fluoride varnish remineralizes young enamel against sweet treats", "टॉपिकल फ्लोराइड वार्निश मीठे खाद्य पदार्थों से होने वाली सड़न के खिलाफ इनेमल को मजबूत करता है") },
+        { text: tr("Preserves primary milk teeth to guide straight permanent tooth eruption", "सीधे स्थायी दांतों के निकलने का मार्गदर्शन करने के लिए दूध के दांतों को सुरक्षित रखता है") },
+        { text: tr("Fun oral hygiene education and habit-breaking therapy", "मजेदार तरीके से ब्रश करने की शिक्षा और अंगूठा चूसने जैसी आदतों को छुड़ाने की थेरेपी") },
+      ],
+      benefitsCards: [
+        { iconType: "smile", title: tr("Happy Dental Visits", "खुशहाल डेंटल विजिट"), description: tr("Positive childhood visits build lifelong dental confidence without trauma.", "बचपन की सकारात्मक विजिट बिना किसी डर के आजीवन दंत आत्मविश्वास बनाती हैं।") },
+        { iconType: "shield-star", title: tr("Prevents Cavities", "कैविटी से बचाव"), description: tr("Fluoride and sealants reduce childhood tooth decay risk by over 80%.", "फ्लोराइड और सीलेंट बचपन में दांतों की सड़न के जोखिम को 80% से अधिक कम करते हैं।") },
+        { iconType: "tooth", title: tr("Saves Milk Teeth", "दूध के दांत बचाता है"), description: tr("Milk teeth act as vital natural space maintainers for adult teeth.", "दूध के दांत स्थायी दांतों के लिए प्राकृतिक स्पेस मेंटेनर के रूप में कार्य करते हैं।") },
+        { iconType: "sparkles", title: tr("Habit Correction", "आदतों में सुधार"), description: tr("Gentle appliances correct thumb sucking and mouth breathing early.", "कोमल उपकरण अंगूठा चूसने और मुंह से सांस लेने की आदत को समय रहते ठीक करते हैं।") },
+        { iconType: "clock", title: tr("Gentle & Fast", "कोमल और त्वरित"), description: tr("Short, engaging appointments tailored to children's attention spans.", "बच्चों की सुविधा के अनुसार छोटे और रोचक अपॉइंटमेंट।") },
+      ],
+      procedureSteps: [
+        { stepNumber: 1, title: tr("Friendly Welcome", "मित्रवत स्वागत"), description: tr("Child is introduced to our friendly dental instruments in a fun way.", "बच्चे को मजेदार तरीके से हमारे डेंटल उपकरणों से परिचित कराया जाता है।") },
+        { stepNumber: 2, title: tr("Gentle Counting", "कोमल जांच"), description: tr("Teeth counted and examined with an intraoral mirror and HD camera.", "इंट्राओरल मिरर और HD कैमरे से दांतों की गिनती और जांच की जाती है।") },
+        { stepNumber: 3, title: tr("Plaque Cleaning", "प्लाक की सफाई"), description: tr("Soft rotating brush with pleasant bubblegum paste polishes enamel.", "मुलायम ब्रश और स्वादिष्ट पेस्ट से दांतों की पॉलिशिंग की जाती है।") },
+        { stepNumber: 4, title: tr("Cavity Sealant", "कैविटी सीलेंट"), description: tr("Clear liquid resin painted into deep molar grooves to lock out cavity bacteria.", "कैविटी बैक्टीरिया को रोकने के लिए दाढ़ की दरारों में सुरक्षात्मक सीलेंट लगाया जाता है।") },
+        { stepNumber: 5, title: tr("Fluoride Shield", "फ्लोराइड शील्ड"), description: tr("Tasty fruit-flavored fluoride varnish painted on teeth to harden enamel.", "इनेमल को मजबूत करने के लिए फलों के स्वाद वाला फ्लोराइड वार्निश लगाया जाता है।") },
+      ],
+      candidateChecklist: [
+        { text: tr("Children celebrating their first birthday or first tooth eruption", "अपना पहला जन्मदिन मना रहे बच्चे या जिनका पहला दांत निकल रहा हो") },
+        { text: tr("Toddlers and school-age children with deep molar grooves", "गहरी दाढ़ वाले छोटे और स्कूल जाने वाले बच्चे") },
+        { text: tr("Children showing early white spots or brown decay on milk teeth", "दूध के दांतों पर शुरुआती सफेद धब्बे या भूरी सड़न दिखने वाले बच्चे") },
+      ],
+      faqs: [
+        {
+          question: tr("Why fix milk teeth if they will eventually fall out?", "यदि दूध के दांत अंततः टूट ही जाएंगे तो उनका इलाज क्यों करवाएं?"),
+          answer: tr(
+            "Milk teeth hold the exact space for adult permanent teeth. Premature loss causes severe adult tooth crowding.",
+            "दूध के दांत वयस्क स्थायी दांतों के लिए सही जगह बनाए रखते हैं। समय से पहले इनके टूटने से स्थायी दांत टेढ़े-मेढ़े निकल सकते हैं।"
+          ),
+        },
+      ],
+      howItWorksHighlights: [
+        { title: tr("Tell-Show-Do Method", "टेल-शो-डू पद्धति"), desc: tr("Explains every step in cheerful language before doing anything.", "कुछ भी करने से पहले बच्चों को सरल और खुशहाल भाषा में हर कदम समझाया जाता है।") },
+        { title: tr("Bioactive Sealants", "बायोएक्टिव सीलेंट"), desc: tr("Binds into tooth pits to prevent cavity formation.", "कैविटी बनने से रोकने के लिए दांतों की दरारों को सुरक्षित करता है।") },
+        { title: tr("Reward Badges", "रिवॉर्ड बैज"), desc: tr("Children leave proud with smiles and dental champion certificates.", "बच्चे मुस्कान और आत्मविश्वास के साथ क्लिनिक से जाते हैं।") },
+      ],
+      beforeAfter: {
+        beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+        afterImage: "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&q=80&w=800",
+        label: tr("Childhood Molar Fissure Sealant & Restoration", "चाइल्डहुड मोलर फिशर सीलेंट और रेस्टोरेशन"),
+        timeline: tr("Single Session (25 Mins)", "एकल सेशन (25 मिनट)"),
+        notes: tr(
+          "Early milk molar decay treated with biocompatible tooth-colored glass ionomer and protective sealants.",
+          "दूध की दाढ़ की शुरुआती सड़न का इलाज बायोकम्पैटिबल ग्लास आयनोमर और सुरक्षात्मक सीलेंट के साथ किया गया।"
+        ),
+      },
     },
-  },
-};
+  };
+}
 
 /* -------------------------------------------------------------------------- */
 /* BEFORE & AFTER CASE STUDIES FOR GALLERY                                    */
 /* -------------------------------------------------------------------------- */
 
-const BEFORE_AFTER_GALLERY = [
-  {
-    id: "case-rct-crown",
-    title: "Molar Endodontic & Zirconia Crown",
-    category: "Restorative",
-    duration: "2 Visits",
-    beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
-    afterImage: "https://images.unsplash.com/photo-1606811841689-23dfddce6395?auto=format&fit=crop&q=80&w=800",
-    description: "Deep decay reaching pulp cavity saved with rotary endodontics and high-translucency zirconia crown.",
-  },
-  {
-    id: "case-implant",
-    title: "Anterior Single Dental Implant",
-    category: "Implants",
-    duration: "3 Months",
-    beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
-    afterImage: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800",
-    description: "Missing front incisor replaced with keyhole 3D CBCT guided titanium implant and layered ceramic crown.",
-  },
-  {
-    id: "case-whitening",
-    title: "Laser Teeth Whitening Shade Lift",
-    category: "Cosmetics",
-    duration: "45 Mins",
-    beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
-    afterImage: "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800",
-    description: "Extensive coffee and tea stains brightened 7 VITA shades in a single in-office laser session.",
-  },
-  {
-    id: "case-veneers",
-    title: "6-Unit Porcelain Veneer Makeover",
-    category: "Aesthetics",
-    duration: "2 Visits",
-    beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
-    afterImage: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=800",
-    description: "Chipped enamel edges and gap closed with ultra-thin feldspathic porcelain laminates.",
-  },
-];
+function getBeforeAfterGallery(tr: <T>(en: T, hi: T) => T) {
+  return [
+    {
+      id: "case-rct-crown",
+      title: tr("Molar Endodontic & Zirconia Crown", "मोलर एंडोडोंटिक और ज़िरकोनिया क्राउन"),
+      category: tr("Restorative", "रेस्टोरेटिव"),
+      duration: tr("2 Visits", "2 विजिट"),
+      beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+      afterImage: "https://images.unsplash.com/photo-1606811841689-23dfddce6395?auto=format&fit=crop&q=80&w=800",
+      description: tr(
+        "Deep decay reaching pulp cavity saved with rotary endodontics and high-translucency zirconia crown.",
+        "पल्प कैविटी तक पहुंचने वाली गहरी सड़न को रोटरी एंडोडोंटिक्स और ज़िरकोनिया क्राउन के साथ बचाया गया।"
+      ),
+    },
+    {
+      id: "case-implant",
+      title: tr("Anterior Single Dental Implant", "एंटीरियर सिंगल डेंटल इम्प्लांट"),
+      category: tr("Implants", "इम्प्लांट्स"),
+      duration: tr("3 Months", "3 महीने"),
+      beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+      afterImage: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800",
+      description: tr(
+        "Missing front incisor replaced with keyhole 3D CBCT guided titanium implant and layered ceramic crown.",
+        "गायब सामने के दांत को 3D CBCT गाइडेड टाइटेनियम इम्प्लांट और सिरेमिक क्राउन से बदला गया।"
+      ),
+    },
+    {
+      id: "case-whitening",
+      title: tr("Laser Teeth Whitening Shade Lift", "लेजर टीथ व्हाइटनिंग शेड लिफ्ट"),
+      category: tr("Cosmetics", "कॉस्मेटिक्स"),
+      duration: tr("45 Mins", "45 मिनट"),
+      beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+      afterImage: "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&q=80&w=800",
+      description: tr(
+        "Extensive coffee and tea stains brightened 7 VITA shades in a single in-office laser session.",
+        "एक ही इन-ऑफिस लेजर सेशन में कॉफी और चाय के गहरे दागों को साफ कर 7 VITA शेड्स तक चमकाया गया।"
+      ),
+    },
+    {
+      id: "case-veneers",
+      title: tr("6-Unit Porcelain Veneer Makeover", "6-यूनिट पोर्सिलेन वेनियर मेकओवर"),
+      category: tr("Aesthetics", "एस्थेटिक्स"),
+      duration: tr("2 Visits", "2 विजिट"),
+      beforeImage: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800",
+      afterImage: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=800",
+      description: tr(
+        "Chipped enamel edges and gap closed with ultra-thin feldspathic porcelain laminates.",
+        "चटके हुए इनेमल किनारों और गैप को अल्ट्रा-थिन पोर्सिलेन लैमिनेट्स के साथ बंद किया गया।"
+      ),
+    },
+  ];
+}
 
 /* -------------------------------------------------------------------------- */
 /* MAIN CLIENT CONTENT COMPONENT (Exact Blue Theme & Motion Animations)       */
@@ -1104,6 +1256,10 @@ interface TreatmentDetailPageContentProps {
 
 function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContentProps) {
   const router = useRouter();
+  const { tr } = useLanguage();
+  const TREATMENTS_MAP = getTreatmentsMap(tr);
+  const BEFORE_AFTER_GALLERY = getBeforeAfterGallery(tr);
+
   const resolvedKey = TREATMENT_ALIASES[treatmentKey] || treatmentKey;
   const treatment = TREATMENTS_MAP[resolvedKey];
 
@@ -1134,40 +1290,6 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
   // How it works modal & FAQ accordion
   const [showHowItWorksModal, setShowHowItWorksModal] = useState(false);
   const [expandedFaqIndex, setExpandedFaqIndex] = useState<number | null>(0);
-
-  // Hero image hover & Video/GIF toggle state
-  const [isHeroHovered, setIsHeroHovered] = useState(false);
-  const [isHeroMediaPinned, setIsHeroMediaPinned] = useState(false);
-  const [videoProgress, setVideoProgress] = useState(0);
-  const [videoError, setVideoError] = useState(false);
-  const heroVideoRef = useRef<HTMLVideoElement>(null);
-  const isMediaActive = isHeroHovered || isHeroMediaPinned;
-
-  const heroVideoUrl = treatment.procedureVideo || "/images/dental_implant_procedure.mp4";
-  const heroGifUrl = treatment.procedureGif || "/images/dental_implant_procedure.gif";
-
-  // Auto play/pause the video when hovered or pinned
-  useEffect(() => {
-    const video = heroVideoRef.current;
-    if (!video || videoError) return;
-
-    if (isMediaActive) {
-      video.currentTime = 0;
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {});
-      }
-    } else {
-      video.pause();
-    }
-  }, [isMediaActive, videoError]);
-
-  const handleVideoTimeUpdate = () => {
-    const video = heroVideoRef.current;
-    if (video && video.duration) {
-      setVideoProgress((video.currentTime / video.duration) * 100);
-    }
-  };
 
   const handleQuickBookSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1218,10 +1340,17 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
 
   const otherTreatments = Object.values(TREATMENTS_MAP).filter((t) => t.id !== treatment.id);
 
+  const selectedGalleryItem = BEFORE_AFTER_GALLERY.find((c) => c.id === selectedCaseId);
   const activeBeforeAfterCase =
-    selectedCaseId === "default"
+    selectedCaseId === "default" || !selectedGalleryItem
       ? treatment.beforeAfter
-      : BEFORE_AFTER_GALLERY.find((c) => c.id === selectedCaseId) || treatment.beforeAfter;
+      : {
+          beforeImage: selectedGalleryItem.beforeImage,
+          afterImage: selectedGalleryItem.afterImage,
+          label: selectedGalleryItem.title,
+          timeline: selectedGalleryItem.duration,
+          notes: selectedGalleryItem.description,
+        };
 
   return (
     <motion.div
@@ -1238,11 +1367,11 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
           <RevealText delay={0.05} direction="down">
             <nav className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 mb-8 font-medium">
               <Link href="/" className="hover:text-blue-600 transition-colors text-slate-600">
-                Home
+                {tr("Home", "होम")}
               </Link>
               <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
               <Link href="/treatments" className="hover:text-blue-600 transition-colors text-slate-600">
-                Treatments
+                {tr("Treatments", "उपचार")}
               </Link>
               <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
               <span className="text-blue-600 font-semibold">{treatment.title}</span>
@@ -1255,7 +1384,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
               <RevealText delay={0.1}>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100/80 border border-blue-200 text-blue-800 text-xs font-bold tracking-wide">
                   <ShieldCheck className="w-4 h-4 text-blue-600" />
-                  <span>Certified Clinical Excellence</span>
+                  <span>{tr("Certified Clinical Excellence", "प्रमाणित क्लिनिकल उत्कृष्टता")}</span>
                 </div>
               </RevealText>
 
@@ -1296,7 +1425,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                     className="px-7 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-600/25 transition-all hover:scale-102 flex items-center gap-2"
                   >
                     <Calendar className="w-4 h-4" />
-                    <span>Book an Appointment</span>
+                    <span>{tr("Book an Appointment", "अपॉइंटमेंट बुक करें")}</span>
                   </Link>
 
                   <button
@@ -1307,143 +1436,40 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                     <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
                       <Play className="w-3 h-3 fill-blue-600 ml-0.5" />
                     </div>
-                    <span>How It Works</span>
+                    <span>{tr("How It Works", "यह कैसे काम करता है")}</span>
                   </button>
                 </div>
               </RevealText>
             </div>
 
-            {/* Right Side: Interactive Hover-to-Video Card */}
+            {/* Right Side: Static Clinical Image Card */}
             <div className="lg:col-span-6 flex flex-col items-center lg:items-end">
               <motion.div
                 initial={{ opacity: 0, y: 24, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                className={`relative w-full max-w-lg aspect-4/3 sm:aspect-16/11 rounded-3xl overflow-hidden shadow-2xl transition-all duration-300 group cursor-pointer select-none ${
-                  isMediaActive
-                    ? "border-2 border-blue-400 shadow-blue-500/25 ring-4 ring-blue-500/10"
-                    : "border border-blue-100 shadow-blue-900/10 hover:border-blue-400 hover:shadow-xl"
-                }`}
-                onMouseEnter={() => setIsHeroHovered(true)}
-                onMouseLeave={() => setIsHeroHovered(false)}
-                onClick={() => setIsHeroMediaPinned((prev) => !prev)}
-                title="Hover or tap to play 3D procedure simulation video"
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setIsHeroMediaPinned((prev) => !prev);
-                  }
-                }}
+                className="relative w-full max-w-lg aspect-4/3 sm:aspect-16/11 rounded-3xl overflow-hidden shadow-2xl border border-blue-100 shadow-blue-900/10 select-none"
               >
-                {/* 1. Base Static High-Resolution Clinical Photograph */}
+                {/* Base Static High-Resolution Clinical Photograph */}
                 <img
                   src={treatment.image}
                   alt={treatment.title}
-                  className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out ${
-                    isMediaActive ? "scale-105" : "scale-100"
-                  }`}
+                  className="absolute inset-0 w-full h-full object-cover"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src =
                       "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=1200";
                   }}
                 />
 
-                {/* 2. Interactive HD Clinical Procedure Video */}
-                {!videoError ? (
-                  <video
-                    ref={heroVideoRef}
-                    src={heroVideoUrl}
-                    muted
-                    loop
-                    playsInline
-                    preload="auto"
-                    onTimeUpdate={handleVideoTimeUpdate}
-                    onError={() => setVideoError(true)}
-                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ease-out ${
-                      isMediaActive
-                        ? "opacity-100 pointer-events-auto"
-                        : "opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
-                    }`}
-                  />
-                ) : (
-                  <img
-                    src={heroGifUrl}
-                    alt={`${treatment.title} animated clinical procedure`}
-                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ease-out ${
-                      isMediaActive
-                        ? "opacity-100 pointer-events-auto"
-                        : "opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
-                    }`}
-                  />
-                )}
-
                 <div className="absolute inset-0 bg-radial from-transparent via-transparent to-blue-950/20 pointer-events-none" />
-
-                {/* Top-Left Hover Badge */}
-                <div className="absolute top-4 left-4 z-10 transition-all duration-200 pointer-events-none">
-                  <div className="relative">
-                    <div
-                      className={`px-3 py-1.5 rounded-full bg-slate-950/90 backdrop-blur-md border border-cyan-400/70 text-white text-xs font-bold shadow-lg flex items-center gap-2 transition-opacity duration-200 ${
-                        isMediaActive
-                          ? "opacity-100"
-                          : "opacity-0 group-hover:opacity-100 absolute inset-0"
-                      }`}
-                    >
-                      <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400"></span>
-                      </span>
-                      <span className="text-cyan-300 font-semibold tracking-wide text-[11px] flex items-center gap-1">
-                        <Video className="w-3.5 h-3.5 text-cyan-300" />
-                        <span>3D Video (2.0s)</span>
-                      </span>
-                      <VolumeX className="w-3 h-3 text-slate-400 ml-0.5 opacity-75" />
-                    </div>
-
-                    <div
-                      className={`px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-blue-200 text-slate-700 text-xs font-semibold shadow-sm flex items-center gap-1.5 transition-opacity duration-200 ${
-                        isMediaActive ? "opacity-0 pointer-events-none" : "opacity-100 group-hover:opacity-0"
-                      }`}
-                    >
-                      <Play className="w-3.5 h-3.5 fill-blue-600 text-blue-600 animate-pulse" />
-                      <span className="text-[11px] font-medium text-slate-700">Hover for 2.0s Video</span>
-                    </div>
-                  </div>
-                </div>
 
                 {/* Top-Right Certified Care Pill */}
                 <div className="absolute top-4 right-4 z-10 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-blue-200 text-blue-800 text-xs font-bold shadow-md flex items-center gap-2 pointer-events-none">
                   <ShieldCheck className="w-4 h-4 text-blue-600" />
-                  <span>Certified Clinical Care</span>
+                  <span>{tr("Certified Clinical Care", "प्रमाणित क्लिनिकल देखभाल")}</span>
                 </div>
 
-                {/* Scanner Reticle Brackets */}
-                <div
-                  className={`absolute inset-3 border border-cyan-400/30 rounded-2xl pointer-events-none transition-opacity duration-300 ${
-                    isMediaActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                  }`}
-                >
-                  <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-cyan-400" />
-                  <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-cyan-400" />
-                  <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-cyan-400" />
-                  <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-cyan-400" />
-                </div>
-
-                {/* Scrubbing Timeline Bar */}
-                <div
-                  className={`absolute bottom-16 left-4 right-4 h-1 bg-slate-900/60 rounded-full overflow-hidden transition-opacity duration-200 pointer-events-none ${
-                    isMediaActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                  }`}
-                >
-                  <div
-                    className="h-full bg-gradient-to-r from-sky-400 via-cyan-400 to-blue-500 transition-all duration-75"
-                    style={{ width: `${videoProgress}%` }}
-                  />
-                </div>
-
-                {/* Bottom Clinical Metric & Quick Switcher */}
+                {/* Bottom Clinical Metric Card */}
                 <div className="absolute bottom-4 left-4 right-4 z-10 p-3 rounded-2xl bg-white/95 backdrop-blur-md border border-white/80 shadow-lg flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
@@ -1451,52 +1477,20 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                     </div>
                     <div>
                       <div className="text-xs font-bold text-slate-900">
-                        {isMediaActive ? "Interactive 3D Simulation" : "Painless & Precise"}
+                        {tr("Painless & Precise", "दर्दरहित और सटीक")}
                       </div>
                       <div className="text-[11px] text-slate-500">
-                        {isMediaActive ? "Microscopic & Laser Guided" : "Advanced digital dentistry"}
+                        {tr("Advanced digital dentistry", "उन्नत डिजिटल दंत चिकित्सा")}
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsHeroMediaPinned((prev) => !prev);
-                      }}
-                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer ${
-                        isMediaActive
-                          ? "bg-blue-600 text-white shadow-xs"
-                          : "bg-slate-100 hover:bg-slate-200 text-slate-700"
-                      }`}
-                    >
-                      {isMediaActive ? (
-                        <>
-                          <ImageIcon className="w-3 h-3" />
-                          <span>Photo</span>
-                        </>
-                      ) : (
-                        <>
-                          <Play className="w-3 h-3 fill-current" />
-                          <span>Video</span>
-                        </>
-                      )}
-                    </button>
-
-                    <div className="text-right border-l border-slate-200 pl-2">
-                      <div className="text-xs font-bold text-blue-600">{treatment.successMetric.value}</div>
-                      <div className="text-[10px] text-slate-400">{treatment.successMetric.label}</div>
-                    </div>
+                  <div className="text-right border-l border-slate-200 pl-3">
+                    <div className="text-xs font-bold text-blue-600">{treatment.successMetric.value}</div>
+                    <div className="text-[10px] text-slate-400">{treatment.successMetric.label}</div>
                   </div>
                 </div>
               </motion.div>
-
-              <div className="mt-2.5 flex items-center gap-2 text-xs text-slate-500 font-medium">
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                <span>Hover over the image to convert it into a 2.0s 3D procedure simulation video</span>
-              </div>
             </div>
           </div>
         </div>
@@ -1510,14 +1504,14 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
               <div className="flex items-center gap-2">
                 <span className="w-5 h-0.5 bg-blue-600" />
                 <span className="text-blue-600 text-xs font-extrabold tracking-widest uppercase">
-                  Clinical Overview
+                  {tr("Clinical Overview", "क्लिनिकल अवलोकन")}
                 </span>
               </div>
             </RevealText>
 
             <RevealHeading delay={0.1}>
               <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-slate-950 tracking-tight">
-                Modern, Evidence-Based {treatment.title}
+                {tr(`Modern, Evidence-Based ${treatment.title}`, `आधुनिक और प्रमाणित ${treatment.title}`)}
               </h2>
             </RevealHeading>
 
@@ -1543,7 +1537,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
           <div className="lg:col-span-6 relative flex justify-center">
             <RevealImage
               src={treatment.patientImage}
-              alt="Patient Smile Consultation"
+              alt={tr("Patient Smile Consultation", "मरीज स्माइल परामर्श")}
               delay={0.2}
               className="w-full max-w-md aspect-4/3 rounded-3xl shadow-xl border border-blue-100 bg-slate-100"
             >
@@ -1582,12 +1576,12 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
           <div className="text-center space-y-2 max-w-2xl mx-auto">
             <RevealText delay={0.05}>
               <span className="text-blue-600 text-xs font-extrabold tracking-widest uppercase">
-                WHY CHOOSE THIS TREATMENT
+                {tr("WHY CHOOSE THIS TREATMENT", "यह उपचार क्यों चुनें")}
               </span>
             </RevealText>
             <RevealHeading delay={0.1}>
               <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-slate-950 tracking-tight">
-                Key Patient Advantages & Benefits
+                {tr("Key Patient Advantages & Benefits", "मरीजों के लिए मुख्य लाभ और फायदे")}
               </h2>
             </RevealHeading>
           </div>
@@ -1617,12 +1611,12 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
         <div className="text-center space-y-2 max-w-2xl mx-auto">
           <RevealText delay={0.05}>
             <span className="text-blue-600 text-xs font-extrabold tracking-widest uppercase">
-              TREATMENT TIMELINE
+              {tr("TREATMENT TIMELINE", "उपचार की प्रक्रिया")}
             </span>
           </RevealText>
           <RevealHeading delay={0.1}>
             <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-slate-950 tracking-tight">
-              How Your Care Unfolds Step by Step
+              {tr("How Your Care Unfolds Step by Step", "आपकी देखभाल चरण-दर-चरण कैसे होती है")}
             </h2>
           </RevealHeading>
         </div>
@@ -1655,19 +1649,22 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
               <RevealText delay={0.05}>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200/80 text-xs font-extrabold uppercase tracking-wider">
                   <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Verified Clinical Transformations</span>
+                  <span>{tr("Verified Clinical Transformations", "सत्यापित क्लिनिकल परिणाम")}</span>
                 </div>
               </RevealText>
 
               <RevealHeading delay={0.1}>
                 <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-950">
-                  {treatment.title}: Before & After Case Study
+                  {treatment.title}: {tr("Before & After Case Study", "पहले और बाद का केस स्टडी")}
                 </h2>
               </RevealHeading>
 
               <RevealText delay={0.15}>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Genuine photographic outcomes achieved at our clinical practice. Drag the interactive comparison slider or toggle views to inspect genuine tooth shade, alignment, and structural restorations.
+                  {tr(
+                    "Genuine photographic outcomes achieved at our clinical practice. Drag the interactive comparison slider or toggle views to inspect genuine tooth shade, alignment, and structural restorations.",
+                    "हमारे क्लिनिक में प्राप्त वास्तविक परिणाम। दांतों के रंग, संरेखण और संरचनात्मक सुधारों का निरीक्षण करने के लिए इंटरैक्टिव तुलना स्लाइडर को खींचें।"
+                  )}
                 </p>
               </RevealText>
             </div>
@@ -1686,7 +1683,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                       : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                   }`}
                 >
-                  Before
+                  {tr("Before", "पहले")}
                 </button>
                 <button
                   type="button"
@@ -1700,7 +1697,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                       : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                   }`}
                 >
-                  50/50 Split
+                  {tr("50/50 Split", "50/50 विभाजन")}
                 </button>
                 <button
                   type="button"
@@ -1714,7 +1711,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                       : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                   }`}
                 >
-                  After
+                  {tr("After", "बाद में")}
                 </button>
               </div>
             </RevealText>
@@ -1724,7 +1721,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
             <RevealText delay={0.1}>
               <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
                 <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider shrink-0 mr-1">
-                  Select Case:
+                  {tr("Select Case:", "केस चुनें:")}
                 </span>
 
                 <button
@@ -1741,7 +1738,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                   }`}
                 >
                   <Sparkle className="w-3 h-3" />
-                  <span>{treatment.title} (Featured)</span>
+                  <span>{treatment.title} ({tr("Featured", "प्रमुख")})</span>
                 </button>
 
                 {BEFORE_AFTER_GALLERY.map((item) => (
@@ -1777,7 +1774,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                 <div className="relative aspect-16/10 sm:aspect-16/9 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-inner select-none group">
                   <img
                     src={activeBeforeAfterCase.afterImage}
-                    alt="Clinical After Outcome"
+                    alt={tr("Clinical After Outcome", "उपचार के बाद का परिणाम")}
                     className="absolute inset-0 w-full h-full object-cover"
                   />
 
@@ -1787,21 +1784,21 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                   >
                     <img
                       src={activeBeforeAfterCase.beforeImage}
-                      alt="Clinical Before Condition"
+                      alt={tr("Clinical Before Condition", "उपचार से पहले की स्थिति")}
                       className="absolute inset-0 w-full h-full object-cover max-w-none"
                       style={{ width: "100%", height: "100%" }}
                     />
 
                     <div className="absolute top-4 left-4 z-20">
                       <span className="px-3 py-1 rounded-full bg-rose-600 text-white text-[11px] font-extrabold uppercase tracking-wider shadow-md border border-rose-400/30">
-                        Before Treatment
+                        {tr("Before Treatment", "उपचार से पहले")}
                       </span>
                     </div>
                   </div>
 
                   <div className="absolute top-4 right-4 z-10">
                     <span className="px-3 py-1 rounded-full bg-emerald-600 text-white text-[11px] font-extrabold uppercase tracking-wider shadow-md border border-emerald-400/30">
-                      After Transformation
+                      {tr("After Transformation", "उपचार के बाद")}
                     </span>
                   </div>
 
@@ -1824,7 +1821,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                       setSliderViewMode("split");
                     }}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-40"
-                    aria-label="Drag before and after comparison slider"
+                    aria-label={tr("Drag before and after comparison slider", "पहले और बाद की तुलना करने के लिए स्लाइडर खींचें")}
                   />
                 </div>
               </div>
@@ -1833,7 +1830,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <span className="text-[11px] font-extrabold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100 uppercase tracking-widest">
-                      Specialty Care
+                      {tr("Specialty Care", "विशेष देखभाल")}
                     </span>
                     <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
                       <Clock className="w-3 h-3 text-slate-400" />
@@ -1858,13 +1855,13 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                         label: activeBeforeAfterCase.label,
                         timeline: activeBeforeAfterCase.timeline,
                         notes: activeBeforeAfterCase.notes,
-                        category: "Clinical Case",
+                        category: tr("Clinical Case", "क्लिनिकल केस"),
                       })
                     }
                     className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-blue-600 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs"
                   >
                     <Maximize2 className="w-3.5 h-3.5" />
-                    <span>Inspect Full HD</span>
+                    <span>{tr("Inspect Full HD", "फुल HD में देखें")}</span>
                   </button>
 
                   <Link
@@ -1872,7 +1869,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                     className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-blue-600/20"
                   >
                     <Calendar className="w-3.5 h-3.5" />
-                    <span>Book Consultation</span>
+                    <span>{tr("Book Consultation", "परामर्श बुक करें")}</span>
                   </Link>
                 </div>
               </div>
@@ -1881,7 +1878,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
             {/* Gallery Grid */}
             <div className="space-y-4 pt-6">
               <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-                Explore More Transformations
+                {tr("Explore More Transformations", "अन्य परिणाम देखें")}
               </h4>
 
               <StaggerContainer staggerDelay={0.08} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -1902,22 +1899,22 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                           <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
                             <img
                               src={item.beforeImage}
-                              alt="Before"
+                              alt={tr("Before", "पहले")}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             />
                             <span className="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded-md bg-rose-600 text-white text-[9px] font-black uppercase shadow-xs">
-                              Before
+                              {tr("Before", "पहले")}
                             </span>
                           </div>
 
                           <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
                             <img
                               src={item.afterImage}
-                              alt="After"
+                              alt={tr("After", "बाद में")}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             />
                             <span className="absolute bottom-1.5 right-1.5 px-2 py-0.5 rounded-md bg-emerald-600 text-white text-[9px] font-black uppercase shadow-xs">
-                              After
+                              {tr("After", "बाद में")}
                             </span>
                           </div>
                         </div>
@@ -1960,7 +1957,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                           }`}
                         >
                           <SlidersHorizontal className="w-3 h-3" />
-                          <span>Test Slider</span>
+                          <span>{tr("Test Slider", "स्लाइडर परखें")}</span>
                         </button>
 
                         <button
@@ -1978,7 +1975,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                           className="py-2 px-2 bg-slate-900 hover:bg-blue-600 text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 shadow-2xs"
                         >
                           <Eye className="w-3 h-3" />
-                          <span>Inspect HD</span>
+                          <span>{tr("Inspect HD", "HD में देखें")}</span>
                         </button>
                       </div>
                     </StaggerItem>
@@ -1997,13 +1994,13 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
             <div className="lg:col-span-4 space-y-5">
               <RevealText delay={0.05}>
                 <span className="text-blue-600 text-xs font-extrabold tracking-widest uppercase">
-                  Candidate Criteria
+                  {tr("Candidate Criteria", "उपयुक्तता मानदंड")}
                 </span>
               </RevealText>
 
               <RevealHeading delay={0.1}>
                 <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-950 tracking-tight leading-snug">
-                  Is {treatment.title} Right for You?
+                  {tr(`Is ${treatment.title} Right for You?`, `क्या ${treatment.title} आपके लिए सही है?`)}
                 </h2>
               </RevealHeading>
 
@@ -2031,10 +2028,13 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                 <div className="p-4 space-y-2">
                   <div className="flex items-center gap-2 text-blue-600 font-bold text-xs">
                     <ShieldCheck className="w-4 h-4" />
-                    <span>Specialist Consultation</span>
+                    <span>{tr("Specialist Consultation", "विशेषज्ञ परामर्श")}</span>
                   </div>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Our senior specialists evaluate your oral health and craft a personalized treatment roadmap tailored to your comfort and long-term oral vitality.
+                    {tr(
+                      "Our senior specialists evaluate your oral health and craft a personalized treatment roadmap tailored to your comfort and long-term oral vitality.",
+                      "हमारे विशेषज्ञ आपके दंत स्वास्थ्य का मूल्यांकन करते हैं और आपके आराम व दीर्घकालिक दंत स्वास्थ्य के अनुसार एक व्यक्तिगत उपचार योजना तैयार करते हैं।"
+                    )}
                   </p>
                 </div>
               </RevealImage>
@@ -2050,19 +2050,27 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
               >
                 <div className="space-y-1">
                   <h3 className="font-serif text-xl sm:text-2xl font-bold text-blue-700">
-                    Ready to Restore Your Smile?
+                    {tr("Ready to Restore Your Smile?", "अपनी मुस्कान संवारने के लिए तैयार हैं?")}
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Book an appointment with our {treatment.title.toLowerCase()} specialists today.
+                    {tr(
+                      `Book an appointment with our ${treatment.title.toLowerCase()} specialists today.`,
+                      `आज ही हमारे ${treatment.title} विशेषज्ञ के साथ अपॉइंटमेंट बुक करें।`
+                    )}
                   </p>
                 </div>
 
                 {bookingSuccess ? (
                   <div className="p-6 rounded-2xl bg-blue-50 border border-blue-200 text-center space-y-2">
                     <CheckCircle2 className="w-10 h-10 text-blue-600 mx-auto animate-bounce" />
-                    <h4 className="text-sm font-bold text-slate-900">Booking Request Received!</h4>
+                    <h4 className="text-sm font-bold text-slate-900">
+                      {tr("Booking Request Received!", "बुकिंग अनुरोध प्राप्त हुआ!")}
+                    </h4>
                     <p className="text-xs text-slate-600">
-                      Redirecting to finalize your customized appointment slot...
+                      {tr(
+                        "Redirecting to finalize your customized appointment slot...",
+                        "आपका अपॉइंटमेंट स्लॉट सुनिश्चित करने के लिए रीडायरेक्ट किया जा रहा है..."
+                      )}
                     </p>
                   </div>
                 ) : (
@@ -2071,7 +2079,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                       <input
                         type="text"
                         required
-                        placeholder="Full Name"
+                        placeholder={tr("Full Name", "पूरा नाम")}
                         value={formName}
                         onChange={(e) => setFormName(e.target.value)}
                         className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
@@ -2082,7 +2090,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                       <input
                         type="tel"
                         required
-                        placeholder="Phone Number"
+                        placeholder={tr("Phone Number", "फ़ोन नंबर")}
                         value={formPhone}
                         onChange={(e) => setFormPhone(e.target.value)}
                         className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
@@ -2104,7 +2112,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                           onChange={(e) => setFormTime(e.target.value)}
                           className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-700 focus:outline-none focus:border-blue-600 bg-white"
                         >
-                          <option value="">Select Time</option>
+                          <option value="">{tr("Select Time", "समय चुनें")}</option>
                           <option value="10:00 AM">10:00 AM</option>
                           <option value="11:30 AM">11:30 AM</option>
                           <option value="02:00 PM">02:00 PM</option>
@@ -2118,7 +2126,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                       type="submit"
                       className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-blue-600/25 transition-all cursor-pointer hover:scale-101"
                     >
-                      Book Appointment Now
+                      {tr("Book Appointment Now", "अभी अपॉइंटमेंट बुक करें")}
                     </button>
                   </form>
                 )}
@@ -2134,12 +2142,12 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
           <div className="text-center space-y-2">
             <RevealText delay={0.05}>
               <span className="text-blue-600 text-xs font-extrabold tracking-widest uppercase">
-                FREQUENTLY ASKED QUESTIONS
+                {tr("FREQUENTLY ASKED QUESTIONS", "अक्सर पूछे जाने वाले प्रश्न")}
               </span>
             </RevealText>
             <RevealHeading delay={0.1}>
               <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-950">
-                Questions About This Treatment
+                {tr("Questions About This Treatment", "इस उपचार से जुड़े सामान्य प्रश्न")}
               </h2>
             </RevealHeading>
           </div>
@@ -2192,12 +2200,12 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
             <div>
               <RevealText delay={0.05}>
                 <span className="text-blue-600 text-xs font-extrabold tracking-widest uppercase">
-                  EXPLORE MORE
+                  {tr("EXPLORE MORE", "और जानें")}
                 </span>
               </RevealText>
               <RevealHeading delay={0.1}>
                 <h3 className="font-serif text-xl sm:text-2xl font-bold text-slate-950">
-                  Explore Other Treatments
+                  {tr("Explore Other Treatments", "अन्य उपचार देखें")}
                 </h3>
               </RevealHeading>
             </div>
@@ -2206,7 +2214,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
               href="/treatments"
               className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1 cursor-pointer"
             >
-              <span>View All Treatments</span>
+              <span>{tr("View All Treatments", "सभी उपचार देखें")}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -2235,7 +2243,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                   </div>
 
                   <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600 w-full">
-                    <span>View Details</span>
+                    <span>{tr("View Details", "विवरण देखें")}</span>
                     <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </Link>
@@ -2259,10 +2267,10 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
 
             <div className="space-y-1">
               <span className="text-blue-600 text-xs font-extrabold tracking-widest uppercase">
-                CLINICAL PROTOCOL
+                {tr("CLINICAL PROTOCOL", "क्लिनिकल प्रोटोकॉल")}
               </span>
               <h3 className="font-serif text-2xl font-bold text-slate-950">
-                How It Works: {treatment.title}
+                {tr("How It Works:", "यह कैसे काम करता है:")} {treatment.title}
               </h3>
             </div>
 
@@ -2274,8 +2282,12 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-4 text-white">
                 <div>
-                  <div className="text-xs font-bold text-blue-300">3D Computer Guided Precision</div>
-                  <div className="text-sm font-semibold">100% Safe, Pain-Free Hospital Grade Dental Care</div>
+                  <div className="text-xs font-bold text-blue-300">
+                    {tr("3D Computer Guided Precision", "3D कंप्यूटर गाइडेड सटीकता")}
+                  </div>
+                  <div className="text-sm font-semibold">
+                    {tr("100% Safe, Pain-Free Hospital Grade Dental Care", "100% सुरक्षित, दर्दरहित अस्पताल-स्तरीय दंत देखभाल")}
+                  </div>
                 </div>
               </div>
             </div>
@@ -2295,14 +2307,14 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                 onClick={() => setShowHowItWorksModal(false)}
                 className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-100 cursor-pointer"
               >
-                Close
+                {tr("Close", "बंद करें")}
               </button>
               <Link
                 href={`/patient/book?treatment=${encodeURIComponent(treatment.id)}`}
                 onClick={() => setShowHowItWorksModal(false)}
                 className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md"
               >
-                Book Consultation
+                {tr("Book Consultation", "परामर्श बुक करें")}
               </Link>
             </div>
           </div>
@@ -2323,7 +2335,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-extrabold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100 uppercase tracking-widest">
-                    {lightboxCase.category || "Specialty Transformation"}
+                    {lightboxCase.category || tr("Specialty Transformation", "विशेष परिवर्तन")}
                   </span>
                   <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
                     <Clock className="w-3 h-3 text-slate-400" />
@@ -2339,7 +2351,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                 type="button"
                 onClick={() => setLightboxCase(null)}
                 className="p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
-                aria-label="Close Lightbox"
+                aria-label={tr("Close Lightbox", "लाइटबॉक्स बंद करें")}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2348,13 +2360,13 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs font-bold text-rose-700 bg-rose-50 px-3 py-1.5 rounded-xl border border-rose-100">
-                  <span>Initial Clinical State (Before)</span>
+                  <span>{tr("Initial Clinical State (Before)", "प्रारंभिक क्लिनिकल स्थिति (पहले)")}</span>
                   <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
                 </div>
                 <div className="aspect-4/3 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-2xs">
                   <img
                     src={lightboxCase.before}
-                    alt="Before Treatment Condition"
+                    alt={tr("Before Treatment Condition", "उपचार से पहले की स्थिति")}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -2362,13 +2374,13 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100">
-                  <span>Restored Final Outcome (After)</span>
+                  <span>{tr("Restored Final Outcome (After)", "अंतिम परिणाम (बाद में)")}</span>
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
                 </div>
                 <div className="aspect-4/3 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-2xs">
                   <img
                     src={lightboxCase.after}
-                    alt="After Treatment Outcome"
+                    alt={tr("After Treatment Outcome", "उपचार के बाद का परिणाम")}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -2377,7 +2389,9 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
 
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="space-y-0.5">
-                <div className="font-bold text-slate-900 text-xs">Clinical Case Summary:</div>
+                <div className="font-bold text-slate-900 text-xs">
+                  {tr("Clinical Case Summary:", "क्लिनिकल केस सारांश:")}
+                </div>
                 <p className="leading-relaxed text-slate-600">{lightboxCase.notes}</p>
               </div>
               <Link
@@ -2385,7 +2399,7 @@ function TreatmentDetailPageContent({ treatmentKey }: TreatmentDetailPageContent
                 onClick={() => setLightboxCase(null)}
                 className="shrink-0 w-full sm:w-auto px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow-md shadow-blue-500/20 transition-all hover:scale-[1.02]"
               >
-                Book Similar Transformation
+                {tr("Book Similar Transformation", "समान उपचार बुक करें")}
               </Link>
             </div>
           </div>
@@ -2411,13 +2425,15 @@ function TreatmentDetailLoader({ params }: PageProps) {
 }
 
 export default function TreatmentDetailPage({ params }: PageProps) {
+  const { tr } = useLanguage();
+
   return (
     <Suspense
       fallback={
         <div className="min-h-screen bg-white flex items-center justify-center py-32 text-blue-600 text-sm font-semibold">
           <div className="flex items-center gap-2.5">
             <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-ping" />
-            <span>Loading treatment details...</span>
+            <span>{tr("Loading treatment details...", "उपचार विवरण लोड हो रहा है...")}</span>
           </div>
         </div>
       }

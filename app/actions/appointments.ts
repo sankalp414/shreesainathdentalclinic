@@ -55,7 +55,7 @@ export async function bookDentalAppointment(data: {
       .insert(users)
       .values({
         clerkId: userId,
-        email: email || `${userId}@shreesainathdental.com`,
+        email: email || `shreesainathdental.com`,
         fullName,
         phone: data.patientPhone,
         role: "PATIENT",

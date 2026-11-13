@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useClerk, useSignIn, useSignUp } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/components/LanguageContext";
 
 export default function CustomClerkAuthModal({
   isOpen,
@@ -15,6 +16,7 @@ export default function CustomClerkAuthModal({
 }) {
   const router = useRouter();
   const clerk = useClerk();
+  const { tr } = useLanguage();
   const { signIn, setActive: setSignInActive, isLoaded: signInLoaded } = useSignIn();
   const { signUp, setActive: setSignUpActive, isLoaded: signUpLoaded } = useSignUp();
 
@@ -48,8 +50,10 @@ export default function CustomClerkAuthModal({
       const activeSignIn = clerk?.client?.signIn || signIn;
 
       if (!activeSignIn) {
-        const msg =
-          "Clerk is still initializing. Please check NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY in .env.local.";
+        const msg = tr(
+          "Clerk is still initializing. Please check NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY in .env.local.",
+          "Clerk अभी इनिशियलाइज़ हो रहा है। कृपया .env.local में NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY जांचें।"
+        );
         setError(msg);
         alert(msg);
         setGoogleLoading(false);
@@ -84,9 +88,9 @@ export default function CustomClerkAuthModal({
         err?.errors?.[0]?.longMessage ||
         err?.errors?.[0]?.message ||
         err?.message ||
-        "Could not start Google Sign-In.";
+        tr("Could not start Google Sign-In.", "गूगल साइन-इन शुरू नहीं हो सका।");
       setError(clerkErrorMsg);
-      alert(`Google Login Error: ${clerkErrorMsg}`);
+      alert(`${tr("Google Login Error:", "गूगल लॉग इन त्रुटि:")} ${clerkErrorMsg}`);
       setGoogleLoading(false);
     }
   };
@@ -109,13 +113,18 @@ export default function CustomClerkAuthModal({
         router.push("/patient/dashboard");
         router.refresh();
       } else {
-        setError("Additional verification required. Please check your email.");
+        setError(
+          tr(
+            "Additional verification required. Please check your email.",
+            "अतिरिक्त सत्यापन आवश्यक है। कृपया अपना ईमेल जांचें।"
+          )
+        );
       }
     } catch (err: any) {
       setError(
         err?.errors?.[0]?.longMessage ||
           err?.errors?.[0]?.message ||
-          "Invalid email or password."
+          tr("Invalid email or password.", "अमान्य ईमेल या पासवर्ड।")
       );
     } finally {
       setLoading(false);
@@ -143,7 +152,7 @@ export default function CustomClerkAuthModal({
       setError(
         err?.errors?.[0]?.longMessage ||
           err?.errors?.[0]?.message ||
-          "Sign up failed."
+          tr("Sign up failed.", "पंजीकरण विफल रहा।")
       );
     } finally {
       setLoading(false);
@@ -167,13 +176,18 @@ export default function CustomClerkAuthModal({
         router.push("/patient/dashboard");
         router.refresh();
       } else {
-        setError("Verification incomplete. Please check the 6-digit code.");
+        setError(
+          tr(
+            "Verification incomplete. Please check the 6-digit code.",
+            "सत्यापन अधूरा है। कृपया 6-अंकीय कोड जांचें।"
+          )
+        );
       }
     } catch (err: any) {
       setError(
         err?.errors?.[0]?.longMessage ||
           err?.errors?.[0]?.message ||
-          "Invalid verification code."
+          tr("Invalid verification code.", "अमान्य सत्यापन कोड।")
       );
     } finally {
       setLoading(false);
@@ -196,29 +210,38 @@ export default function CustomClerkAuthModal({
         <div className="lg:col-span-5 relative hidden lg:flex flex-col justify-between p-8 text-white bg-blue-900 overflow-hidden">
           <img
             src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=900&q=80"
-            alt="Shree Sainath Dental Clinic"
+            alt={tr("Shree Sainath Dental Clinic", "श्री साईनाथ डेंटल क्लिनिक")}
             className="absolute inset-0 w-full h-full object-cover opacity-35"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-blue-950 via-blue-900/80 to-blue-700/40" />
 
           <div className="relative z-10 space-y-2">
             <span className="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-[10px] font-extrabold uppercase tracking-widest">
-              🦷 Shree Sainath Dental Clinic
+              🦷 {tr("Shree Sainath Dental Clinic", "श्री साईनाथ डेंटल क्लिनिक")}
             </span>
             <h3 className="text-2xl font-extrabold leading-tight">
-              Dr. Nitu Rajpoot, BDS
+              {tr("Dr. Nitu Rajpoot, BDS", "डॉ. नीतू राजपूत, बीडीएस")}
             </h3>
             <p className="text-xs text-blue-100">
-              Micro-Endodontics &amp; Aesthetic Smile Design
+              {tr(
+                "Micro-Endodontics & Aesthetic Smile Design",
+                "माइक्रो-एंडोडोंटिक्स और एस्थेटिक स्माइल डिज़ाइन"
+              )}
             </p>
           </div>
 
           <div className="relative z-10 space-y-3 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/15">
             <p className="text-xs text-blue-50 leading-relaxed">
-              Access your interactive 32-tooth digital odontogram, download prescriptions, and join Google Meet video consultations.
+              {tr(
+                "Access your interactive 32-tooth digital odontogram, download prescriptions, and join Google Meet video consultations.",
+                "अपने इंटरैक्टिव 32-दांत डिजिटल ओडोंटोग्राम को देखें, प्रिस्क्रिप्शन डाउनलोड करें, और गूगल मीट वीडियो परामर्श से जुड़ें।"
+              )}
             </p>
             <div className="text-[11px] font-extrabold text-emerald-300">
-              ✓ Instant WhatsApp &amp; Google Meet Sync
+              {tr(
+                "✓ Instant WhatsApp & Google Meet Sync",
+                "✓ तुरंत व्हाट्सएप और गूगल मीट सिंक"
+              )}
             </div>
           </div>
         </div>
@@ -228,14 +251,14 @@ export default function CustomClerkAuthModal({
           <div className="flex items-center justify-between pr-8">
             <div>
               <span className="text-[10px] font-extrabold text-blue-600 uppercase tracking-wider block">
-                Unified Clinical Portal
+                {tr("Unified Clinical Portal", "एकीकृत क्लिनिकल पोर्टल")}
               </span>
               <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900">
                 {pendingVerification
-                  ? "Enter Email OTP"
+                  ? tr("Enter Email OTP", "ईमेल ओटीपी (OTP) दर्ज करें")
                   : mode === "SIGN_IN"
-                  ? "Sign In to Clinic Portal"
-                  : "Create Patient Account"}
+                  ? tr("Sign In to Clinic Portal", "क्लिनिक पोर्टल में साइन इन करें")
+                  : tr("Create Patient Account", "मरीज खाता बनाएं")}
               </h2>
             </div>
 
@@ -248,7 +271,9 @@ export default function CustomClerkAuthModal({
                 }}
                 className="text-xs font-extrabold text-blue-600 hover:underline cursor-pointer"
               >
-                {mode === "SIGN_IN" ? "New Patient? Register →" : "Sign In →"}
+                {mode === "SIGN_IN"
+                  ? tr("New Patient? Register →", "नए मरीज हैं? रजिस्टर करें →")
+                  : tr("Sign In →", "साइन इन करें →")}
               </button>
             )}
           </div>
@@ -287,15 +312,15 @@ export default function CustomClerkAuthModal({
                 </svg>
                 <span>
                   {googleLoading
-                    ? "Connecting to Google..."
-                    : "Continue with Google"}
+                    ? tr("Connecting to Google...", "गूगल से कनेक्ट हो रहा है...")
+                    : tr("Continue with Google", "गूगल के साथ जारी रखें")}
                 </span>
               </button>
 
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-px bg-slate-200" />
                 <span className="text-[11px] font-bold text-slate-400 uppercase">
-                  Or continue with email
+                  {tr("Or continue with email", "या ईमेल के साथ जारी रखें")}
                 </span>
                 <div className="flex-1 h-px bg-slate-200" />
               </div>
@@ -310,7 +335,7 @@ export default function CustomClerkAuthModal({
                 maxLength={6}
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                placeholder="Enter 6-digit OTP"
+                placeholder={tr("Enter 6-digit OTP", "6-अंकीय ओटीपी (OTP) दर्ज करें")}
                 className="w-full px-4 py-3.5 text-center tracking-widest text-xl font-extrabold rounded-2xl border-2 border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
               <button
@@ -318,14 +343,16 @@ export default function CustomClerkAuthModal({
                 disabled={loading}
                 className="w-full py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold shadow-md transition cursor-pointer"
               >
-                {loading ? "Verifying OTP..." : "Verify & Open Portal →"}
+                {loading
+                  ? tr("Verifying OTP...", "ओटीपी सत्यापित हो रहा है...")
+                  : tr("Verify & Open Portal →", "सत्यापित करें और पोर्टल खोलें →")}
               </button>
             </form>
           ) : mode === "SIGN_IN" ? (
             <form onSubmit={handleSignInSubmit} className="space-y-3.5">
               <div className="space-y-1">
                 <label className="block text-xs font-bold text-slate-700">
-                  Email Address
+                  {tr("Email Address", "ईमेल पता")}
                 </label>
                 <input
                   type="email"
@@ -339,7 +366,7 @@ export default function CustomClerkAuthModal({
 
               <div className="space-y-1">
                 <label className="block text-xs font-bold text-slate-700">
-                  Password
+                  {tr("Password", "पासवर्ड")}
                 </label>
                 <input
                   type="password"
@@ -356,28 +383,30 @@ export default function CustomClerkAuthModal({
                 disabled={loading}
                 className="w-full py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold shadow-md transition cursor-pointer mt-2"
               >
-                {loading ? "Signing In..." : "Sign In to Portal →"}
+                {loading
+                  ? tr("Signing In...", "साइन इन हो रहा है...")
+                  : tr("Sign In to Portal →", "पोर्टल में साइन इन करें →")}
               </button>
             </form>
           ) : (
             <form onSubmit={handleSignUpSubmit} className="space-y-3.5">
               <div className="space-y-1">
                 <label className="block text-xs font-bold text-slate-700">
-                  Full Name
+                  {tr("Full Name", "पूरा नाम")}
                 </label>
                 <input
                   type="text"
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Enter your full name"
+                  placeholder={tr("Enter your full name", "अपना पूरा नाम दर्ज करें")}
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue-600"
                 />
               </div>
 
               <div className="space-y-1">
                 <label className="block text-xs font-bold text-slate-700">
-                  Email Address
+                  {tr("Email Address", "ईमेल पता")}
                 </label>
                 <input
                   type="email"
@@ -391,14 +420,14 @@ export default function CustomClerkAuthModal({
 
               <div className="space-y-1">
                 <label className="block text-xs font-bold text-slate-700">
-                  Create Password
+                  {tr("Create Password", "पासवर्ड बनाएं")}
                 </label>
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Minimum 8 characters"
+                  placeholder={tr("Minimum 8 characters", "कम से कम 8 अक्षर")}
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue-600"
                 />
               </div>
@@ -408,7 +437,9 @@ export default function CustomClerkAuthModal({
                 disabled={loading}
                 className="w-full py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold shadow-md transition cursor-pointer mt-2"
               >
-                {loading ? "Sending Email OTP..." : "Create Account & Verify →"}
+                {loading
+                  ? tr("Sending Email OTP...", "ईमेल ओटीपी भेजा जा रहा है...")
+                  : tr("Create Account & Verify →", "खाता बनाएं और सत्यापित करें →")}
               </button>
             </form>
           )}

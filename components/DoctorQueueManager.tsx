@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { updateAppointmentClinicalStatus } from "@/app/actions/clinical-portal";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/components/LanguageContext";
 
 export default function DoctorQueueManager({
   appointmentsList,
@@ -10,6 +11,7 @@ export default function DoctorQueueManager({
   appointmentsList: Array<any>;
 }) {
   const router = useRouter();
+  const { tr } = useLanguage();
   const [busyId, setBusyId] = useState<string | null>(null);
 
   const handleUpdateStatus = async (id: string, status: string) => {
@@ -29,7 +31,7 @@ export default function DoctorQueueManager({
     printWindow.document.write(`
       <html>
         <head>
-          <title>Prescription - Shree Sainath Dental Clinic</title>
+          <title>${tr("Prescription - Shree Sainath Dental Clinic", "प्रिस्क्रिप्शन - श्री साईनाथ डेंटल क्लिनिक")}</title>
           <style>
             body { font-family: Arial, sans-serif; padding: 40px; color: #1e293b; }
             .header { border-bottom: 2px solid #2563eb; padding-bottom: 15px; margin-bottom: 20px; }
@@ -41,17 +43,17 @@ export default function DoctorQueueManager({
         </head>
         <body>
           <div class="header">
-            <div class="doctor">Shree Sainath Dental Clinic</div>
-            <div class="sub">Dr. Nitu Rajpoot, BDS • Conservative Dentistry & Endodontics</div>
-            <div class="sub">Booking Ref: ${apt.bookingReference} | Date: ${new Date(apt.appointmentDate).toLocaleDateString("en-IN")}</div>
+            <div class="doctor">${tr("Shree Sainath Dental Clinic", "श्री साईनाथ डेंटल क्लिनिक")}</div>
+            <div class="sub">${tr("Dr. Nitu Rajpoot, BDS • Conservative Dentistry & Endodontics", "डॉ. नीतू राजपूत, बीडीएस • कंजर्वेटिव डेंटिस्ट्री और एंडोडोंटिक्स")}</div>
+            <div class="sub">${tr("Booking Ref:", "बुकिंग संदर्भ:")} ${apt.bookingReference} | ${tr("Date:", "तारीख:")} ${new Date(apt.appointmentDate).toLocaleDateString("en-IN")}</div>
           </div>
-          <div><strong>Patient Name:</strong> ${apt.patientName || "Valued Patient"}</div>
+          <div><strong>${tr("Patient Name:", "मरीज का नाम:")}</strong> ${apt.patientName || tr("Valued Patient", "सम्मानित मरीज")}</div>
           <div class="rx">Rx</div>
-          <div class="content">${apt.prescriptionNotes || "No specific prescription notes recorded."}</div>
+          <div class="content">${apt.prescriptionNotes || tr("No specific prescription notes recorded.", "कोई विशेष प्रिस्क्रिप्शन नोट दर्ज नहीं किया गया है।")}</div>
           <br/><br/><br/>
           <div style="text-align: right;">
-            <strong>Dr. Nitu Rajpoot, BDS</strong><br/>
-            <span class="sub">Signature</span>
+            <strong>${tr("Dr. Nitu Rajpoot, BDS", "डॉ. नीतू राजपूत, बीडीएस")}</strong><br/>
+            <span class="sub">${tr("Signature", "हस्ताक्षर")}</span>
           </div>
         </body>
       </html>
@@ -66,10 +68,10 @@ export default function DoctorQueueManager({
       <div className="flex items-center justify-between">
         <div>
           <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">
-            Waiting Room &amp; In-Clinic Workflow
+            {tr("Waiting Room & In-Clinic Workflow", "वेटिंग रूम और क्लिनिक वर्कफ़्लो")}
           </span>
           <h2 className="text-xl font-extrabold text-slate-900">
-            Physical Check-In &amp; Printable Prescriptions
+            {tr("Physical Check-In & Printable Prescriptions", "क्लिनिक चेक-इन और प्रिंट करने योग्य प्रिस्क्रिप्शन")}
           </h2>
         </div>
       </div>
@@ -93,7 +95,8 @@ export default function DoctorQueueManager({
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-1">
-                Time: <strong>{apt.startTime}</strong> • {apt.reason || "Dental Visit"}
+                {tr("Time:", "समय:")} <strong>{apt.startTime}</strong> •{" "}
+                {apt.reason || tr("Dental Visit", "डेंटल विजिट")}
               </p>
             </div>
 
@@ -104,7 +107,7 @@ export default function DoctorQueueManager({
                 onClick={() => handleUpdateStatus(apt.id, "CONFIRMED")}
                 className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100 cursor-pointer"
               >
-                Checked-In
+                {tr("Checked-In", "चेक-इन किया")}
               </button>
 
               {apt.prescriptionNotes && (
@@ -113,7 +116,7 @@ export default function DoctorQueueManager({
                   onClick={() => handlePrintPrescription(apt)}
                   className="px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 text-xs font-extrabold hover:bg-blue-100 cursor-pointer"
                 >
-                  🖨️ Print Rx PDF
+                  🖨️ {tr("Print Rx PDF", "प्रिस्क्रिप्शन प्रिंट करें")}
                 </button>
               )}
             </div>

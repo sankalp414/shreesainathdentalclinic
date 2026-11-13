@@ -60,7 +60,10 @@ export default function Navbar() {
             </Link>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-1" aria-label="Main navigation">
+            <nav
+              className="hidden lg:flex items-center gap-1"
+              aria-label={tr("Main navigation", "मुख्य नेविगेशन")}
+            >
               {NAV_LINKS.map((item) => (
                 <Link
                   key={item.href}
@@ -81,7 +84,7 @@ export default function Navbar() {
 
             {/* Desktop Auth & Actions */}
             <div className="hidden sm:flex items-center gap-2.5">
-              {/* <LanguageSwitcherButton /> */}
+              <LanguageSwitcherButton />
 
               {isSignedIn ? (
                 <div className="flex items-center gap-2">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLanguage } from "@/components/LanguageContext";
 import DoctorCMSClient from "@/components/DoctorCMSClient";
 import DoctorPatientWorkspace from "@/components/DoctorPatientWorkspace";
 import { DoctorReviewModerationPanel } from "@/components/ReviewModerationComponents";
@@ -36,12 +37,13 @@ export default function DoctorDashboardTabsClient({
   blogs,
 }: DoctorDashboardTabsClientProps) {
   const [activeTab, setActiveTab] = useState<string>(initialTab || "workspace");
+  const { tr } = useLanguage();
 
   // Tabs with symbols directly from your sidebar design
   const tabsList = [
     {
       id: "workspace",
-      label: "Clinical Workspace",
+      label: tr("Clinical Workspace", "क्लिनिकल वर्कस्पेस"),
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -51,7 +53,7 @@ export default function DoctorDashboardTabsClient({
     },
     {
       id: "queue",
-      label: "Patient Queue",
+      label: tr("Patient Queue", "मरीज कतार (Queue)"),
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -62,7 +64,7 @@ export default function DoctorDashboardTabsClient({
     },
     {
       id: "analytics",
-      label: "Revenue & Analytics",
+      label: tr("Revenue & Analytics", "राजस्व और एनालिटिक्स"),
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -72,7 +74,7 @@ export default function DoctorDashboardTabsClient({
     },
     {
       id: "qr",
-      label: "Reception QR",
+      label: tr("Reception QR", "रिसेप्शन QR"),
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
@@ -82,7 +84,7 @@ export default function DoctorDashboardTabsClient({
     },
     {
       id: "reviews",
-      label: "Review Moderation",
+      label: tr("Review Moderation", "समीक्षा मॉडरेशन"),
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
@@ -93,7 +95,7 @@ export default function DoctorDashboardTabsClient({
     },
     {
       id: "cms",
-      label: "Clinic Schedule & CMS",
+      label: tr("Clinic Schedule & CMS", "क्लिनिक समय और CMS"),
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -104,7 +106,7 @@ export default function DoctorDashboardTabsClient({
     },
     {
       id: "all",
-      label: "View All",
+      label: tr("View All", "सभी देखें"),
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -124,19 +126,20 @@ export default function DoctorDashboardTabsClient({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/60 text-blue-700 text-[11px] font-extrabold uppercase tracking-wider">
-              <span>🦷 Shree Sainath Dental Clinic</span>
+              <span>🦷 {tr("Shree Sainath Dental Clinic", "श्री साईनाथ डेंटल क्लिनिक")}</span>
               <span className="text-blue-300">•</span>
-              <span>Doctor Command Center</span>
+              <span>{tr("Doctor Command Center", "डॉक्टर कमांड सेंटर")}</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              Dr. Nitu Rajpoot, BDS
+              {tr("Dr. Nitu Rajpoot, BDS", "डॉ. नीतू राजपूत, बीडीएस")}
             </h1>
             <p className="text-xs text-slate-500">
-              24-Hr Operating Schedule:{" "}
+              {tr("24-Hr Operating Schedule:", "क्लिनिक संचालन समय:")}{" "}
               <strong className="text-slate-800 font-semibold">
                 {scheduleConfig.startTime} – {scheduleConfig.endTime}
               </strong>{" "}
-              (Break: {scheduleConfig.lunchStart} – {scheduleConfig.lunchEnd}) • Signed in as{" "}
+              ({tr("Break:", "लंच ब्रेक:")} {scheduleConfig.lunchStart} – {scheduleConfig.lunchEnd}) •{" "}
+              {tr("Signed in as", "लॉग इन ईमेल:")}{" "}
               <span className="font-medium text-slate-700">{email}</span>
             </p>
           </div>
@@ -157,13 +160,13 @@ export default function DoctorDashboardTabsClient({
             </div>
             <div className="min-w-0">
               <span className="text-[11px] font-bold text-rose-700/80 uppercase tracking-wide block truncate">
-                Active Queue
+                {tr("Active Queue", "सक्रिय कतार")}
               </span>
               <span className="text-3xl font-black text-slate-900 tracking-tight block">
                 {activeQueueCount}
               </span>
               <span className="text-[11px] font-semibold text-rose-600">
-                Waiting Patients
+                {tr("Waiting Patients", "प्रतीक्षारत मरीज")}
               </span>
             </div>
           </button>
@@ -181,13 +184,13 @@ export default function DoctorDashboardTabsClient({
             </div>
             <div className="min-w-0">
               <span className="text-[11px] font-bold text-blue-700/80 uppercase tracking-wide block truncate">
-                Video Visits
+                {tr("Video Visits", "वीडियो परामर्श")}
               </span>
               <span className="text-3xl font-black text-slate-900 tracking-tight block">
                 {videoCount}
               </span>
               <span className="text-[11px] font-semibold text-blue-600">
-                Scheduled Consults
+                {tr("Scheduled Consults", "निर्धारित परामर्श")}
               </span>
             </div>
           </button>
@@ -205,13 +208,13 @@ export default function DoctorDashboardTabsClient({
             </div>
             <div className="min-w-0">
               <span className="text-[11px] font-bold text-emerald-700/80 uppercase tracking-wide block truncate">
-                Completed
+                {tr("Completed", "पूर्ण विजिट")}
               </span>
               <span className="text-3xl font-black text-slate-900 tracking-tight block">
                 {completedCount}
               </span>
               <span className="text-[11px] font-semibold text-emerald-600">
-                Past Visits
+                {tr("Past Visits", "पिछली विजिट")}
               </span>
             </div>
           </button>
@@ -229,13 +232,13 @@ export default function DoctorDashboardTabsClient({
             </div>
             <div className="min-w-0">
               <span className="text-[11px] font-bold text-amber-800/80 uppercase tracking-wide block truncate">
-                Reviews Queue
+                {tr("Reviews Queue", "समीक्षा कतार")}
               </span>
               <span className="text-3xl font-black text-slate-900 tracking-tight block">
                 {pendingReviewsCount}
               </span>
               <span className="text-[11px] font-semibold text-amber-700">
-                Awaiting Review
+                {tr("Awaiting Review", "समीक्षा हेतु लंबित")}
               </span>
             </div>
           </button>

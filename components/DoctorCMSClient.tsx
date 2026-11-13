@@ -28,6 +28,7 @@ import {
   type ClosureScope,
 } from "@/app/actions/clinic-schedule";
 import { saveBlogPost, deleteBlogPost } from "@/app/actions/clinic-cms";
+import { useLanguage } from "@/components/LanguageContext";
 
 // Generate full 24-hour clock options in 30-minute intervals (12:00 AM to 11:30 PM)
 const FULL_24_HOUR_TIME_OPTIONS: string[] = Array.from(
@@ -44,16 +45,6 @@ const FULL_24_HOUR_TIME_OPTIONS: string[] = Array.from(
     )} ${period}`;
   }
 );
-
-const DAYS_OF_WEEK = [
-  { label: "Sun", value: 0 },
-  { label: "Mon", value: 1 },
-  { label: "Tue", value: 2 },
-  { label: "Wed", value: 3 },
-  { label: "Thu", value: 4 },
-  { label: "Fri", value: 5 },
-  { label: "Sat", value: 6 },
-];
 
 // Helper to strip HTML/Markdown tags for clean card previews & auto-excerpts
 function stripFormattingToPlainText(input?: string | null): string {
@@ -109,6 +100,17 @@ export default function DoctorCMSClient({
   initialSchedule: ClinicScheduleConfig;
 }) {
   const router = useRouter();
+  const { tr } = useLanguage();
+
+  const DAYS_OF_WEEK = [
+    { label: tr("Sun", "रवि"), value: 0 },
+    { label: tr("Mon", "सोम"), value: 1 },
+    { label: tr("Tue", "मंगल"), value: 2 },
+    { label: tr("Wed", "बुध"), value: 3 },
+    { label: tr("Thu", "गुरु"), value: 4 },
+    { label: tr("Fri", "शुक्र"), value: 5 },
+    { label: tr("Sat", "शनि"), value: 6 },
+  ];
 
   // Schedule State
   const [schedule, setSchedule] = useState<ClinicScheduleConfig>(initialSchedule);
@@ -171,7 +173,10 @@ export default function DoctorCMSClient({
 
   const handleInsertLink = () => {
     const url = window.prompt(
-      "Enter the full URL (e.g. https://shreesainathdental.in/patient/book):",
+      tr(
+        "Enter the full URL (e.g. https://shreesainathdental.in/patient/book):",
+        "पूरा URL दर्ज करें (उदा. https://shreesainathdental.in/patient/book):"
+      ),
       "https://"
     );
     if (!url) return;
@@ -180,8 +185,10 @@ export default function DoctorCMSClient({
       execEditorCommand("createLink", url);
     } else {
       const linkText =
-        window.prompt("Enter clickable text for this link:", "Book a Consultation") ||
-        url;
+        window.prompt(
+          tr("Enter clickable text for this link:", "इस लिंक के लिए टेक्स्ट दर्ज करें:"),
+          tr("Book a Consultation", "परामर्श बुक करें")
+        ) || url;
       execEditorCommand(
         "insertHTML",
         `<a href="${url}" target="_blank" rel="noopener noreferrer">${linkText}</a>`
@@ -190,11 +197,18 @@ export default function DoctorCMSClient({
   };
 
   const handleInsertInlineImage = () => {
-    const imgUrl = window.prompt("Enter Image URL to insert inside the article:");
+    const imgUrl = window.prompt(
+      tr(
+        "Enter Image URL to insert inside the article:",
+        "लेख के अंदर जोड़ने के लिए इमेज URL दर्ज करें:"
+      )
+    );
     if (!imgUrl) return;
     const caption =
-      window.prompt("Enter optional image caption:", "Clinical illustration") ||
-      "";
+      window.prompt(
+        tr("Enter optional image caption:", "वैकल्पिक इमेज कैप्शन दर्ज करें:"),
+        tr("Clinical illustration", "क्लिनिकल चित्रण")
+      ) || "";
     execEditorCommand(
       "insertHTML",
       `<figure class="my-4"><img src="${imgUrl}" alt="${caption}" class="rounded-2xl max-h-96 w-full object-cover border border-slate-200" />${
@@ -208,7 +222,13 @@ export default function DoctorCMSClient({
   const handleInsertCallout = () => {
     execEditorCommand(
       "insertHTML",
-      `<blockquote><strong>Clinical Tip from Dr. Nitu:</strong> Add your key takeaway or post-care instruction here.</blockquote><p><br/></p>`
+      `<blockquote><strong>${tr(
+        "Clinical Tip from Dr. Nitu:",
+        "डॉ. नीतू का क्लिनिकल सुझाव:"
+      )}</strong> ${tr(
+        "Add your key takeaway or post-care instruction here.",
+        "यहाँ अपना मुख्य सुझाव या उपचार के बाद की देखभाल का निर्देश लिखें।"
+      )}</blockquote><p><br/></p>`
     );
   };
 
@@ -229,7 +249,7 @@ export default function DoctorCMSClient({
     const entry: ClosedDateEntry = {
       date: newClosedDate,
       scope: newClosedScope,
-      reason: newClosedReason.trim() || "Clinic Holiday",
+      reason: newClosedReason.trim() || tr("Clinic Holiday", "क्लिनिक अवकाश"),
     };
     setSchedule((prev) => ({
       ...prev,
@@ -256,7 +276,10 @@ export default function DoctorCMSClient({
     setSavingSchedule(false);
     if (res.success) {
       setScheduleToast(
-        "✓ 24-Hour Clinic Operating Schedule & Time Slots updated across the portal!"
+        tr(
+          "✓ 24-Hour Clinic Operating Schedule & Time Slots updated across the portal!",
+          "✓ 24-घंटे का क्लिनिक समय और टाइम स्लॉट पूरे पोर्टल पर अपडेट हो गए हैं!"
+        )
       );
       router.refresh();
       setTimeout(() => setScheduleToast(null), 4000);
@@ -303,12 +326,19 @@ export default function DoctorCMSClient({
     const cleanTextCheck = stripFormattingToPlainText(liveHtmlContent);
 
     if (!blogTitle.trim()) {
-      setBlogError("Please enter an Article Title.");
+      setBlogError(
+        tr("Please enter an Article Title.", "कृपया लेख का शीर्षक दर्ज करें।")
+      );
       return;
     }
 
     if (!cleanTextCheck) {
-      setBlogError("Please write some article content before publishing.");
+      setBlogError(
+        tr(
+          "Please write some article content before publishing.",
+          "कृपया प्रकाशित करने से पहले कुछ लेख सामग्री लिखें।"
+        )
+      );
       return;
     }
 
@@ -344,17 +374,32 @@ export default function DoctorCMSClient({
           });
         }
         setIsBlogModalOpen(false);
-        setBlogToast("✓ Dental article saved to Neon Database and published live!");
+        setBlogToast(
+          tr(
+            "✓ Dental article saved to Neon Database and published live!",
+            "✓ दंत स्वास्थ्य लेख डेटाबेस में सहेजा गया और लाइव प्रकाशित हो गया!"
+          )
+        );
         router.refresh();
         setTimeout(() => setBlogToast(null), 4000);
       } else {
         setBlogError(
-          res?.error || "Failed to save article to database. Please try again."
+          res?.error ||
+            tr(
+              "Failed to save article to database. Please try again.",
+              "लेख को डेटाबेस में सहेजने में विफल। कृपया पुनः प्रयास करें।"
+            )
         );
       }
     } catch (err: any) {
       setSavingBlog(false);
-      setBlogError(err?.message || "Unexpected error while saving blog post.");
+      setBlogError(
+        err?.message ||
+          tr(
+            "Unexpected error while saving blog post.",
+            "ब्लॉग पोस्ट सहेजते समय अप्रत्याशित त्रुटि हुई।"
+          )
+      );
     }
   };
 
@@ -371,13 +416,23 @@ export default function DoctorCMSClient({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
           <div>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-[11px] font-extrabold uppercase tracking-wider">
-              ⏰ 24-Hour Clinic Operating Timings &amp; Slot Engine
+              ⏰{" "}
+              {tr(
+                "24-Hour Clinic Operating Timings & Slot Engine",
+                "24-घंटे क्लिनिक संचालन समय और स्लॉट इंजन"
+              )}
             </span>
             <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 mt-2">
-              Clinic Opening, Closing &amp; Break Hours (24-Hr Selection)
+              {tr(
+                "Clinic Opening, Closing & Break Hours (24-Hr Selection)",
+                "क्लिनिक खुलने, बंद होने और ब्रेक का समय (24-घंटे चयन)"
+              )}
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Choose any opening and closing time across 24 hours (`12:00 AM` – `11:30 PM`). Patient booking slots auto-regenerate immediately.
+              {tr(
+                "Choose any opening and closing time across 24 hours (`12:00 AM` – `11:30 PM`). Patient booking slots auto-regenerate immediately.",
+                "24 घंटों (`12:00 AM` – `11:30 PM`) में से कोई भी खुलने और बंद होने का समय चुनें। मरीज बुकिंग स्लॉट तुरंत अपने आप अपडेट हो जाएंगे।"
+              )}
             </p>
           </div>
 
@@ -388,8 +443,11 @@ export default function DoctorCMSClient({
             className="px-6 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-extrabold shadow-md shadow-blue-600/20 transition cursor-pointer shrink-0"
           >
             {savingSchedule
-              ? "Syncing 24-Hr Slots..."
-              : "✓ Save 24-Hr Schedule & Regenerate Slots"}
+              ? tr("Syncing 24-Hr Slots...", "24-घंटे के स्लॉट सिंक हो रहे हैं...")
+              : tr(
+                  "✓ Save 24-Hr Schedule & Regenerate Slots",
+                  "✓ 24-घंटे का समय सहेजें और स्लॉट अपडेट करें"
+                )}
           </button>
         </div>
 
@@ -403,7 +461,7 @@ export default function DoctorCMSClient({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="p-4 rounded-2xl bg-blue-50/50 border border-blue-100 space-y-1.5">
             <label className="block text-[11px] font-extrabold text-blue-900 uppercase">
-              🌅 Clinic Start Time (24-Hr)
+              🌅 {tr("Clinic Start Time (24-Hr)", "क्लिनिक खुलने का समय (24-घंटे)")}
             </label>
             <select
               value={schedule.startTime}
@@ -422,7 +480,7 @@ export default function DoctorCMSClient({
 
           <div className="p-4 rounded-2xl bg-blue-50/50 border border-blue-100 space-y-1.5">
             <label className="block text-[11px] font-extrabold text-blue-900 uppercase">
-              🌙 Clinic Closing Time (24-Hr)
+              🌙 {tr("Clinic Closing Time (24-Hr)", "क्लिनिक बंद होने का समय (24-घंटे)")}
             </label>
             <select
               value={schedule.endTime}
@@ -441,7 +499,7 @@ export default function DoctorCMSClient({
 
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
             <label className="block text-[11px] font-extrabold text-slate-700 uppercase">
-              ☕ Break / Lunch Start
+              ☕ {tr("Break / Lunch Start", "ब्रेक / लंच शुरू")}
             </label>
             <select
               value={schedule.lunchStart}
@@ -460,7 +518,7 @@ export default function DoctorCMSClient({
 
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
             <label className="block text-[11px] font-extrabold text-slate-700 uppercase">
-              ⚡ Break / Lunch End
+              ⚡ {tr("Break / Lunch End", "ब्रेक / लंच समाप्त")}
             </label>
             <select
               value={schedule.lunchEnd}
@@ -479,7 +537,7 @@ export default function DoctorCMSClient({
 
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
             <label className="block text-[11px] font-extrabold text-slate-700 uppercase">
-              ⏱️ Slot Duration
+              ⏱️ {tr("Slot Duration", "स्लॉट की अवधि")}
             </label>
             <select
               value={schedule.slotDurationMinutes}
@@ -491,10 +549,10 @@ export default function DoctorCMSClient({
               }
               className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-extrabold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
             >
-              <option value={15}>15 Minutes</option>
-              <option value={30}>30 Minutes</option>
-              <option value={45}>45 Minutes</option>
-              <option value={60}>60 Minutes (1 Hr)</option>
+              <option value={15}>{tr("15 Minutes", "15 मिनट")}</option>
+              <option value={30}>{tr("30 Minutes", "30 मिनट")}</option>
+              <option value={45}>{tr("45 Minutes", "45 मिनट")}</option>
+              <option value={60}>{tr("60 Minutes (1 Hr)", "60 मिनट (1 घंटा)")}</option>
             </select>
           </div>
         </div>
@@ -503,7 +561,7 @@ export default function DoctorCMSClient({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
           <div className="p-5 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-3">
             <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider block">
-              Weekly Off Days
+              {tr("Weekly Off Days", "साप्ताहिक अवकाश के दिन")}
             </span>
             <div className="flex flex-wrap gap-2">
               {DAYS_OF_WEEK.map((d) => {
@@ -519,7 +577,7 @@ export default function DoctorCMSClient({
                         : "bg-white text-slate-700 border-slate-200 hover:border-blue-300"
                     }`}
                   >
-                    {d.label} {isOff ? "(Closed)" : ""}
+                    {d.label} {isOff ? tr("(Closed)", "(बंद)") : ""}
                   </button>
                 );
               })}
@@ -528,7 +586,7 @@ export default function DoctorCMSClient({
 
           <div className="p-5 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-3">
             <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider block">
-              Holiday / Specific Date Closures
+              {tr("Holiday / Specific Date Closures", "अवकाश / विशेष तारीख को बंद")}
             </span>
             <div className="flex flex-wrap items-center gap-2">
               <input
@@ -544,16 +602,21 @@ export default function DoctorCMSClient({
                 }
                 className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold"
               >
-                <option value="BOTH">Close Both (In-Clinic &amp; Video)</option>
+                <option value="BOTH">
+                  {tr("Close Both (In-Clinic & Video)", "दोनों बंद करें (क्लिनिक और वीडियो)")}
+                </option>
                 <option value="IN_CLINIC_ONLY">
-                  Close In-Clinic Only (Keep Video Open)
+                  {tr(
+                    "Close In-Clinic Only (Keep Video Open)",
+                    "केवल क्लिनिक बंद करें (वीडियो चालू रखें)"
+                  )}
                 </option>
               </select>
               <input
                 type="text"
                 value={newClosedReason}
                 onChange={(e) => setNewClosedReason(e.target.value)}
-                placeholder="Reason (e.g. Conference)"
+                placeholder={tr("Reason (e.g. Conference)", "कारण (उदा. कॉन्फ्रेंस)")}
                 className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs flex-1 min-w-[140px]"
               />
               <button
@@ -561,7 +624,7 @@ export default function DoctorCMSClient({
                 onClick={handleAddClosedDate}
                 className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold cursor-pointer"
               >
-                + Add Date
+                {tr("+ Add Date", "+ तारीख जोड़ें")}
               </button>
             </div>
 
@@ -572,7 +635,7 @@ export default function DoctorCMSClient({
                     key={cd.date}
                     className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 border border-red-200 text-red-800 text-[11px] font-bold"
                   >
-                    {cd.date} ({cd.reason || "Closed"})
+                    {cd.date} ({cd.reason || tr("Closed", "बंद")})
                     <button
                       type="button"
                       onClick={() => handleRemoveClosedDate(cd.date)}
@@ -593,10 +656,14 @@ export default function DoctorCMSClient({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-[11px] font-extrabold uppercase tracking-wider">
-              ✍️ Patient Education &amp; Blog Studio
+              ✍️{" "}
+              {tr(
+                "Patient Education & Blog Studio",
+                "मरीज शिक्षा और ब्लॉग स्टूडियो"
+              )}
             </span>
             <h2 className="text-xl font-extrabold text-slate-900 mt-1.5">
-              Published Dental Articles ({blogs.length})
+              {tr("Published Dental Articles", "प्रकाशित दंत स्वास्थ्य लेख")} ({blogs.length})
             </h2>
           </div>
 
@@ -605,7 +672,7 @@ export default function DoctorCMSClient({
             onClick={openNewBlogModal}
             className="px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold shadow-xs transition cursor-pointer"
           >
-            + Write New Dental Blog
+            {tr("+ Write New Dental Blog", "+ नया डेंटल ब्लॉग लिखें")}
           </button>
         </div>
 
@@ -617,7 +684,7 @@ export default function DoctorCMSClient({
 
         {blogs.length === 0 ? (
           <p className="text-xs text-slate-500 py-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-            No articles published yet.
+            {tr("No articles published yet.", "अभी तक कोई लेख प्रकाशित नहीं हुआ है।")}
           </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -644,14 +711,14 @@ export default function DoctorCMSClient({
                     onClick={() => openEditBlogModal(b)}
                     className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:border-blue-300 cursor-pointer"
                   >
-                    Edit
+                    {tr("Edit", "संपादित करें")}
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDeleteBlog(b.id)}
                     className="px-3 py-1.5 rounded-xl bg-red-50 text-red-600 text-xs font-bold hover:bg-red-100 cursor-pointer"
                   >
-                    Delete
+                    {tr("Delete", "हटाएं")}
                   </button>
                 </div>
               </div>
@@ -670,10 +737,12 @@ export default function DoctorCMSClient({
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-600 block">
-                  Rich-Text Clinical Publisher
+                  {tr("Rich-Text Clinical Publisher", "रिच-टेक्स्ट क्लिनिकल पब्लिशर")}
                 </span>
                 <h3 className="text-lg font-extrabold text-slate-900">
-                  {editingBlog ? "Edit Clinical Article" : "Publish New Article"}
+                  {editingBlog
+                    ? tr("Edit Clinical Article", "क्लिनिकल लेख संपादित करें")
+                    : tr("Publish New Article", "नया लेख प्रकाशित करें")}
                 </h3>
               </div>
               <button
@@ -697,28 +766,37 @@ export default function DoctorCMSClient({
                 required
                 value={blogTitle}
                 onChange={(e) => setBlogTitle(e.target.value)}
-                placeholder="Article Title (e.g. Why Single-Sitting Root Canal Is Painless)..."
+                placeholder={tr(
+                  "Article Title (e.g. Why Single-Sitting Root Canal Is Painless)...",
+                  "लेख का शीर्षक (उदा. सिंगल-सिटिंग रूट कैनाल दर्दरहित क्यों है)..."
+                )}
                 className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold sm:col-span-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <input
                 type="text"
                 value={blogCategory}
                 onChange={(e) => setBlogCategory(e.target.value)}
-                placeholder="Category (e.g. Endodontics & RCT)"
+                placeholder={tr(
+                  "Category (e.g. Endodontics & RCT)",
+                  "श्रेणी (उदा. एंडोडोंटिक्स और आरसीटी)"
+                )}
                 className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <input
                 type="text"
                 value={blogReadTime}
                 onChange={(e) => setBlogReadTime(e.target.value)}
-                placeholder="Read Time (e.g. 4 Min Read)"
+                placeholder={tr("Read Time (e.g. 4 Min Read)", "पढ़ने का समय (उदा. 4 मिनट)")}
                 className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <input
                 type="url"
                 value={blogCoverImage}
                 onChange={(e) => setBlogCoverImage(e.target.value)}
-                placeholder="Cover Image URL (optional https://...)"
+                placeholder={tr(
+                  "Cover Image URL (optional https://...)",
+                  "कवर इमेज URL (वैकल्पिक https://...)"
+                )}
                 className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -727,7 +805,10 @@ export default function DoctorCMSClient({
               rows={2}
               value={blogExcerpt}
               onChange={(e) => setBlogExcerpt(e.target.value)}
-              placeholder="Short summary for blog card (leave blank to auto-generate from article)..."
+              placeholder={tr(
+                "Short summary for blog card (leave blank to auto-generate from article)...",
+                "ब्लॉग कार्ड के लिए संक्षिप्त सारांश (लेख से स्वतः बनाने के लिए खाली छोड़ दें)..."
+              )}
               className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
@@ -739,17 +820,17 @@ export default function DoctorCMSClient({
                   <button
                     type="button"
                     onClick={() => execEditorCommand("formatBlock", "P")}
-                    title="Normal Paragraph"
+                    title={tr("Normal Paragraph", "सामान्य पैराग्राफ")}
                     className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-200/80 transition cursor-pointer"
                   >
                     <Type className="w-3.5 h-3.5" />
-                    <span>Para</span>
+                    <span>{tr("Para", "पैरा")}</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => execEditorCommand("formatBlock", "H1")}
-                    title="Heading 1 (Large)"
+                    title={tr("Heading 1 (Large)", "शीर्षक 1 (बड़ा)")}
                     className="inline-flex items-center gap-0.5 rounded-lg px-2 py-1.5 text-xs font-extrabold text-slate-800 hover:bg-slate-200/80 transition cursor-pointer"
                   >
                     <Heading1 className="w-4 h-4" />
@@ -759,7 +840,7 @@ export default function DoctorCMSClient({
                   <button
                     type="button"
                     onClick={() => execEditorCommand("formatBlock", "H2")}
-                    title="Heading 2 (Section)"
+                    title={tr("Heading 2 (Section)", "शीर्षक 2 (अनुभाग)")}
                     className="inline-flex items-center gap-0.5 rounded-lg px-2 py-1.5 text-xs font-extrabold text-slate-800 hover:bg-slate-200/80 transition cursor-pointer"
                   >
                     <Heading2 className="w-4 h-4" />
@@ -769,7 +850,7 @@ export default function DoctorCMSClient({
                   <button
                     type="button"
                     onClick={() => execEditorCommand("formatBlock", "H3")}
-                    title="Heading 3 (Subheading)"
+                    title={tr("Heading 3 (Subheading)", "शीर्षक 3 (उपशीर्षक)")}
                     className="inline-flex items-center gap-0.5 rounded-lg px-2 py-1.5 text-xs font-extrabold text-slate-800 hover:bg-slate-200/80 transition cursor-pointer"
                   >
                     <Heading3 className="w-4 h-4" />
@@ -781,7 +862,7 @@ export default function DoctorCMSClient({
                   <button
                     type="button"
                     onClick={() => execEditorCommand("bold")}
-                    title="Bold"
+                    title={tr("Bold", "बोल्ड")}
                     className="rounded-lg p-1.5 text-slate-700 hover:bg-slate-200/80 transition cursor-pointer"
                   >
                     <Bold className="w-4 h-4" />
@@ -790,7 +871,7 @@ export default function DoctorCMSClient({
                   <button
                     type="button"
                     onClick={() => execEditorCommand("italic")}
-                    title="Italic"
+                    title={tr("Italic", "इटैलिक")}
                     className="rounded-lg p-1.5 text-slate-700 hover:bg-slate-200/80 transition cursor-pointer"
                   >
                     <Italic className="w-4 h-4" />
@@ -799,7 +880,7 @@ export default function DoctorCMSClient({
                   <button
                     type="button"
                     onClick={() => execEditorCommand("underline")}
-                    title="Underline"
+                    title={tr("Underline", "अंडरलाइन")}
                     className="rounded-lg p-1.5 text-slate-700 hover:bg-slate-200/80 transition cursor-pointer"
                   >
                     <Underline className="w-4 h-4" />
@@ -810,31 +891,31 @@ export default function DoctorCMSClient({
                   <button
                     type="button"
                     onClick={() => execEditorCommand("insertUnorderedList")}
-                    title="Bullet List"
+                    title={tr("Bullet List", "बुलेट सूची")}
                     className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200/80 transition cursor-pointer"
                   >
                     <List className="w-4 h-4" />
-                    <span>Bullets</span>
+                    <span>{tr("Bullets", "बुलेट्स")}</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => execEditorCommand("insertOrderedList")}
-                    title="Numbered List"
+                    title={tr("Numbered List", "क्रमांकित सूची")}
                     className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200/80 transition cursor-pointer"
                   >
                     <ListOrdered className="w-4 h-4" />
-                    <span>Numbers</span>
+                    <span>{tr("Numbers", "नंबर")}</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={handleInsertCallout}
-                    title="Insert Highlight Callout"
+                    title={tr("Insert Highlight Callout", "हाइलाइट कॉलआउट जोड़ें")}
                     className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 transition cursor-pointer"
                   >
                     <Quote className="w-3.5 h-3.5" />
-                    <span>Callout</span>
+                    <span>{tr("Callout", "कॉलआउट")}</span>
                   </button>
 
                   <div className="h-4 w-px bg-slate-300 mx-1" />
@@ -842,27 +923,27 @@ export default function DoctorCMSClient({
                   <button
                     type="button"
                     onClick={handleInsertLink}
-                    title="Insert Clickable Link"
+                    title={tr("Insert Clickable Link", "लिंक जोड़ें")}
                     className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200/80 transition cursor-pointer"
                   >
                     <LinkIcon className="w-3.5 h-3.5 text-blue-600" />
-                    <span>Link</span>
+                    <span>{tr("Link", "लिंक")}</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={handleInsertInlineImage}
-                    title="Insert Image in Article"
+                    title={tr("Insert Image in Article", "लेख में इमेज जोड़ें")}
                     className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200/80 transition cursor-pointer"
                   >
                     <ImageIcon className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Image</span>
+                    <span>{tr("Image", "इमेज")}</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => execEditorCommand("insertHorizontalRule")}
-                    title="Horizontal Divider"
+                    title={tr("Horizontal Divider", "क्षैतिज विभाजक रेखा")}
                     className="rounded-lg p-1.5 text-slate-700 hover:bg-slate-200/80 transition cursor-pointer"
                   >
                     <Minus className="w-4 h-4" />
@@ -871,7 +952,7 @@ export default function DoctorCMSClient({
                   <button
                     type="button"
                     onClick={() => execEditorCommand("removeFormat")}
-                    title="Clear Formatting"
+                    title={tr("Clear Formatting", "फ़ॉर्मेटिंग साफ़ करें")}
                     className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-200/80 transition cursor-pointer"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
@@ -890,7 +971,7 @@ export default function DoctorCMSClient({
                     }`}
                   >
                     <Edit3 className="w-3 h-3" />
-                    <span>Visual</span>
+                    <span>{tr("Visual", "विजुअल")}</span>
                   </button>
                   <button
                     type="button"
@@ -907,7 +988,7 @@ export default function DoctorCMSClient({
                     }`}
                   >
                     <Eye className="w-3 h-3" />
-                    <span>Preview</span>
+                    <span>{tr("Preview", "प्रीव्यू")}</span>
                   </button>
                   <button
                     type="button"
@@ -934,7 +1015,10 @@ export default function DoctorCMSClient({
                 <div className="relative">
                   {!stripFormattingToPlainText(blogContent) && (
                     <div className="pointer-events-none absolute top-4 left-4 right-4 text-xs text-slate-400 select-none">
-                      Start writing your dental article here... Use the toolbar above to add H1/H2/H3 headings, paragraphs, bullet points, links, callout boxes, and images.
+                      {tr(
+                        "Start writing your dental article here... Use the toolbar above to add H1/H2/H3 headings, paragraphs, bullet points, links, callout boxes, and images.",
+                        "अपना दंत स्वास्थ्य लेख यहाँ लिखना शुरू करें... H1/H2/H3 शीर्षक, पैराग्राफ, बुलेट पॉइंट, लिंक, कॉलआउट बॉक्स और इमेज जोड़ने के लिए ऊपर दिए गए टूलबार का उपयोग करें।"
+                      )}
                     </div>
                   )}
                   <div
@@ -952,7 +1036,7 @@ export default function DoctorCMSClient({
               {editorMode === "PREVIEW" && (
                 <div className="min-h-[260px] max-h-[420px] overflow-y-auto p-5 bg-slate-50/50">
                   <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-600 block mb-2">
-                    Live Article Preview
+                    {tr("Live Article Preview", "लाइव लेख प्रीव्यू")}
                   </span>
                   {blogContent ? (
                     <div
@@ -961,7 +1045,7 @@ export default function DoctorCMSClient({
                     />
                   ) : (
                     <p className="text-xs text-slate-400 italic">
-                      Nothing written yet...
+                      {tr("Nothing written yet...", "अभी तक कुछ नहीं लिखा गया है...")}
                     </p>
                   )}
                 </div>
@@ -973,7 +1057,10 @@ export default function DoctorCMSClient({
                   rows={10}
                   value={blogContent}
                   onChange={(e) => setBlogContent(e.target.value)}
-                  placeholder="<p>Write or paste HTML here...</p>"
+                  placeholder={tr(
+                    "<p>Write or paste HTML here...</p>",
+                    "<p>यहाँ HTML लिखें या पेस्ट करें...</p>"
+                  )}
                   className="w-full p-4 font-mono text-xs bg-slate-950 text-emerald-300 focus:outline-none"
                 />
               )}
@@ -985,14 +1072,16 @@ export default function DoctorCMSClient({
                 onClick={() => setIsBlogModalOpen(false)}
                 className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
               >
-                Cancel
+                {tr("Cancel", "रद्द करें")}
               </button>
               <button
                 type="submit"
                 disabled={savingBlog}
                 className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold shadow-md shadow-blue-600/20 cursor-pointer"
               >
-                {savingBlog ? "Publishing..." : "Publish Article"}
+                {savingBlog
+                  ? tr("Publishing...", "प्रकाशित हो रहा है...")
+                  : tr("Publish Article", "लेख प्रकाशित करें")}
               </button>
             </div>
           </form>

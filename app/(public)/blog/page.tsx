@@ -10,6 +10,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { getBlogs } from "@/app/actions/clinic-cms";
+import { getServerLanguage } from "@/lib/server-language";
 import explainedcare from "@/assets/images/explainedcare.jpg";
 import family from "@/assets/images/familyclinic.jpg";
 import familybrushing from "@/assets/images/familybrushing.jpg";
@@ -29,7 +30,10 @@ function cleanMarkdownText(text?: string | null): string {
 }
 
 async function BlogDirectoryContent() {
-  const blogs = await getBlogs(false);
+  const [blogs, { tr }] = await Promise.all([
+    getBlogs(false),
+    getServerLanguage(),
+  ]);
 
   // First blog acts as featured note; remaining blogs populate the journal grid
   const featuredBlog = blogs[0];
@@ -42,7 +46,7 @@ async function BlogDirectoryContent() {
         {/* Background Photo */}
         <img
           src={bloghero.src}
-          alt="A sunlit dental journal and clinical desk"
+          alt={tr("A sunlit dental journal and clinical desk", "धूप से रोशन डेंटल जर्नल और क्लिनिकल डेस्क")}
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
 
@@ -55,20 +59,23 @@ async function BlogDirectoryContent() {
           {/* Eyebrow Frosted Pill */}
           <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-[#0c2a2a]/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-md shadow-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-[#eb6a4c]" />
-            The Smile Journal
+            {tr("The Smile Journal", "द स्माइल जर्नल")}
           </div>
 
           {/* Oversized Serif Headline */}
           <h1 className="mt-6 max-w-4xl font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[5.25rem] text-white leading-[0.92] tracking-tight font-normal text-balance">
-            Useful guidance.{" "}
+            {tr("Useful guidance.", "उपयोगी मार्गदर्शन।")}{" "}
             <em className="font-serif italic font-normal text-[#f4f3ef]">
-              No jargon.
+              {tr("No jargon.", "सरल भाषा में।")}
             </em>
           </h1>
 
           {/* Editorial Subcopy */}
           <p className="mt-6 max-w-xl text-base sm:text-lg text-white/85 leading-relaxed font-light font-sans">
-            Honest, practical notes from Dr. Nitu Rajpoot, BDS to help you make confident decisions about your dental health.
+            {tr(
+              "Honest, practical notes from Dr. Nitu Rajpoot, BDS to help you make confident decisions about your dental health.",
+              "आपके दंत स्वास्थ्य के बारे में सही और आत्मविश्वासपूर्ण निर्णय लेने में मदद के लिए डॉ. नीतू राजपूत, बीडीएस के व्यावहारिक लेख।"
+            )}
           </p>
 
           {/* Action Buttons */}
@@ -77,13 +84,13 @@ async function BlogDirectoryContent() {
               href="/patient/book-appointment?type=IN_CLINIC"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-white text-[#0c2a2a] px-7 py-3.5 text-sm font-bold shadow-lg hover:bg-white/90 hover:-translate-y-0.5 transition-all"
             >
-              Book a visit <ArrowRight className="size-4" />
+              {tr("Book a visit", "अपॉइंटमेंट बुक करें")} <ArrowRight className="size-4" />
             </Link>
             <a
               href="tel:+916261474753"
               className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 text-white px-7 py-3.5 text-sm font-bold backdrop-blur-md hover:bg-white/20 hover:-translate-y-0.5 transition-all"
             >
-              <Phone className="size-4" /> Call the clinic
+              <Phone className="size-4" /> {tr("Call the clinic", "क्लिनिक में कॉल करें")}
             </a>
           </div>
         </div>
@@ -99,10 +106,10 @@ async function BlogDirectoryContent() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
         <div className="mb-10">
           <p className="text-xs font-bold uppercase tracking-widest text-[#eb6a4c]">
-            Featured note
+            {tr("Featured note", "प्रमुख लेख")}
           </p>
           <h2 className="font-serif text-3xl sm:text-5xl text-[#0c2a2a] mt-2 tracking-tight">
-            A bright smile starts long before the mirror.
+            {tr("A bright smile starts long before the mirror.", "एक चमकती मुस्कान की शुरुआत आईने से बहुत पहले होती है।")}
           </h2>
         </div>
 
@@ -124,7 +131,7 @@ async function BlogDirectoryContent() {
 
             <div className="flex flex-col justify-center p-8 sm:p-12 lg:p-14 space-y-5">
               <p className="text-xs font-bold uppercase tracking-widest text-[#eb6a4c]">
-                From Dr. Nitu
+                {tr("From Dr. Nitu", "डॉ. नीतू की कलम से")}
               </p>
               <h3 className="font-serif text-3xl sm:text-4xl text-white leading-tight font-normal">
                 {cleanMarkdownText(featuredBlog.title)}
@@ -145,7 +152,7 @@ async function BlogDirectoryContent() {
                   href={`/blog/${featuredBlog.slug}`}
                   className="inline-flex items-center gap-2 text-sm font-bold text-white hover:text-[#eb6a4c] transition-colors"
                 >
-                  Read the note <ArrowRight className="size-4 text-[#eb6a4c]" />
+                  {tr("Read the note", "पूरा लेख पढ़ें")} <ArrowRight className="size-4 text-[#eb6a4c]" />
                 </Link>
               </div>
             </div>
@@ -155,22 +162,28 @@ async function BlogDirectoryContent() {
             <div className="relative min-h-[22rem] overflow-hidden bg-[#164e4e]">
               <img
                 src="https://images.unsplash.com/photo-1594824813589-322131920786?auto=format&fit=crop&w=1200&q=80"
-                alt="Dr. Nitu Rajpoot"
+                alt={tr("Dr. Nitu Rajpoot", "डॉ. नीतू राजपूत")}
                 className="h-full w-full object-cover object-top"
               />
             </div>
             <div className="flex flex-col justify-center p-8 sm:p-12 space-y-5">
               <p className="text-xs font-bold uppercase tracking-widest text-[#eb6a4c]">
-                From Dr. Nitu
+                {tr("From Dr. Nitu", "डॉ. नीतू की कलम से")}
               </p>
               <h3 className="font-serif text-3xl sm:text-4xl text-white leading-tight font-normal">
-                The five-minute routine your future smile will thank you for.
+                {tr(
+                  "The five-minute routine your future smile will thank you for.",
+                  "पांच मिनट की वह दिनचर्या जिसके लिए आपकी भविष्य की मुस्कान आपको धन्यवाद देगी।"
+                )}
               </h3>
               <p className="text-sm leading-relaxed text-white/75 font-light">
-                Good oral health is rarely about perfection. It is about a few small actions, repeated consistently—and knowing when to ask for help.
+                {tr(
+                  "Good oral health is rarely about perfection. It is about a few small actions, repeated consistently—and knowing when to ask for help.",
+                  "अच्छा दंत स्वास्थ्य केवल छोटी-छोटी आदतों को नियमित रूप से दोहराने और समय पर सही परामर्श लेने से जुड़ा है।"
+                )}
               </p>
               <span className="inline-flex items-center gap-2 text-sm font-bold text-[#eb6a4c]">
-                Articles publishing soon <ArrowRight className="size-4" />
+                {tr("Articles publishing soon", "नए लेख जल्द प्रकाशित होंगे")} <ArrowRight className="size-4" />
               </span>
             </div>
           </article>
@@ -183,14 +196,14 @@ async function BlogDirectoryContent() {
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-[#eb6a4c]">
-                Latest stories
+                {tr("Latest stories", "नवीनतम लेख")}
               </p>
               <h2 className="font-serif text-3xl sm:text-4xl text-[#0c2a2a] mt-2">
-                Fresh from the journal.
+                {tr("Fresh from the journal.", "जर्नल से नए लेख।")}
               </h2>
             </div>
             <span className="text-xs text-stone-500 font-medium">
-              Clinical advice & patient guides
+              {tr("Clinical advice & patient guides", "चिकित्सीय सलाह और मरीज मार्गदर्शिका")}
             </span>
           </div>
 
@@ -243,7 +256,7 @@ async function BlogDirectoryContent() {
                     </span>
                   </div>
                   <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0c2a2a] group-hover:text-[#eb6a4c] transition-colors">
-                    <span>Read Full Article</span>
+                    <span>{tr("Read Full Article", "पूरा लेख पढ़ें")}</span>
                     <ArrowRight className="size-3.5 group-hover:translate-x-1 transition-transform text-[#eb6a4c]" />
                   </div>
                 </div>
@@ -260,7 +273,7 @@ async function BlogDirectoryContent() {
             <div className="lg:col-span-6 relative aspect-square sm:aspect-[4/3] lg:aspect-square overflow-hidden rounded-3xl bg-stone-100 shadow-lg">
               <img
                 src={explainedcare.src}
-                alt="Dr. Nitu explaining a dental model to a patient"
+                alt={tr("Dr. Nitu explaining a dental model to a patient", "मरीज को डेंटल मॉडल समझातीं डॉ. नीतू")}
                 className="h-full w-full object-cover hover:scale-105 transition duration-700 ease-out"
               />
             </div>
@@ -268,20 +281,26 @@ async function BlogDirectoryContent() {
             <div className="lg:col-span-6 space-y-6 max-w-xl">
               <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-[#eb6a4c]">
-                  From the dentist
+                  {tr("From the dentist", "डेंटिस्ट का संदेश")}
                 </p>
                 <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-[#0c2a2a] mt-2 leading-tight">
-                  Good questions make better care.
+                  {tr("Good questions make better care.", "सही सवाल बेहतर देखभाल बनाते हैं।")}
                 </h2>
               </div>
 
               <p className="text-sm sm:text-base text-stone-600 leading-relaxed font-light">
-                When you understand what is happening in your mouth, it becomes easier to care for it every day. Dental procedures should never feel mysterious or intimidating.
+                {tr(
+                  "When you understand what is happening in your mouth, it becomes easier to care for it every day. Dental procedures should never feel mysterious or intimidating.",
+                  "जब आप अपने दांतों और मसूड़ों की स्थिति को अच्छी तरह समझते हैं, तो हर दिन उनकी देखभाल करना आसान हो जाता है। दंत उपचार कभी भी डरावना या उलझन भरा नहीं लगना चाहिए।"
+                )}
               </p>
 
               <div className="border-t border-[#e7e5df] pt-6">
                 <p className="text-xs sm:text-sm text-stone-500 leading-relaxed italic">
-                  Ask at your next visit. We would rather spend an extra minute explaining than leave you wondering.
+                  {tr(
+                    "Ask at your next visit. We would rather spend an extra minute explaining than leave you wondering.",
+                    "अपनी अगली विजिट पर बेझिझक पूछें। आपको किसी भी संशय में छोड़ने के बजाय हम समझाने में अतिरिक्त समय देना पसंद करेंगे।"
+                  )}
                 </p>
               </div>
 
@@ -290,7 +309,7 @@ async function BlogDirectoryContent() {
                   href="/patient/book-appointment?type=IN_CLINIC"
                   className="inline-flex items-center gap-2 rounded-full bg-[#0c2a2a] px-7 py-3.5 text-xs font-bold text-white hover:bg-[#164e4e] transition-colors shadow-md"
                 >
-                  Ask Dr. Nitu <ArrowRight className="size-3.5" />
+                  {tr("Ask Dr. Nitu", "डॉ. नीतू से पूछें")} <ArrowRight className="size-3.5" />
                 </Link>
               </div>
             </div>
@@ -303,13 +322,16 @@ async function BlogDirectoryContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-2">
             <p className="text-xs font-bold uppercase tracking-widest text-[#eb6a4c]">
-              Everyday inspiration
+              {tr("Everyday inspiration", "हर दिन की प्रेरणा")}
             </p>
             <h2 className="font-serif text-3xl sm:text-4xl text-[#0c2a2a]">
-              Small moments, healthier smiles.
+              {tr("Small moments, healthier smiles.", "छोटे पल, स्वस्थ मुस्कान।")}
             </h2>
             <p className="text-xs sm:text-sm text-stone-600">
-              Caring for your teeth is part of everyday living—not just a twice-a-year appointment.
+              {tr(
+                "Caring for your teeth is part of everyday living—not just a twice-a-year appointment.",
+                "अपने दांतों की देखभाल करना रोज़मर्रा के जीवन का हिस्सा है—केवल साल में दो बार का अपॉइंटमेंट नहीं।"
+              )}
             </p>
           </div>
 
@@ -318,12 +340,12 @@ async function BlogDirectoryContent() {
               <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-white shadow-sm">
                 <img
                   src={family.src}
-                  alt="A father and son sharing a smile at the clinic"
+                  alt={tr("A father and son sharing a smile at the clinic", "क्लिनिक में मुस्कुराते हुए पिता और पुत्र")}
                   className="h-full w-full object-cover group-hover:scale-105 transition duration-700 ease-out"
                 />
               </div>
               <figcaption className="font-serif text-2xl text-[#0c2a2a] font-normal">
-                Make visits feel familiar
+                {tr("Make visits feel familiar", "क्लिनिक विजिट को सहज बनाएं")}
               </figcaption>
             </figure>
 
@@ -331,12 +353,12 @@ async function BlogDirectoryContent() {
               <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-white shadow-sm">
                 <img
                   src={familybrushing.src}
-                  alt="Mother and daughter brushing together"
+                  alt={tr("Mother and daughter brushing together", "माँ और बेटी एक साथ ब्रश करते हुए")}
                   className="h-full w-full object-cover group-hover:scale-105 transition duration-700 ease-out"
                 />
               </div>
               <figcaption className="font-serif text-2xl text-[#0c2a2a] font-normal">
-                Make routines feel fun
+                {tr("Make routines feel fun", "रोज़मर्रा की आदतों को मजेदार बनाएं")}
               </figcaption>
             </figure>
 
@@ -344,12 +366,12 @@ async function BlogDirectoryContent() {
               <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-white shadow-sm">
                 <img
                   src={smile.src}
-                  alt="Dentist and patient sharing a happy smile"
+                  alt={tr("Dentist and patient sharing a happy smile", "डेंटिस्ट और मरीज की खुशहाल मुस्कान")}
                   className="h-full w-full object-cover group-hover:scale-105 transition duration-700 ease-out"
                 />
               </div>
               <figcaption className="font-serif text-2xl text-[#0c2a2a] font-normal">
-                Celebrate the little wins
+                {tr("Celebrate the little wins", "हर छोटी खुशी का जश्न मनाएं")}
               </figcaption>
             </figure>
           </div>
@@ -360,20 +382,23 @@ async function BlogDirectoryContent() {
       <section className="bg-white py-16 sm:py-20 border-b border-[#e7e5df]">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center space-y-4">
           <p className="text-xs font-bold uppercase tracking-widest text-[#eb6a4c]">
-            Have a question?
+            {tr("Have a question?", "कोई सवाल है?")}
           </p>
           <h2 className="font-serif text-3xl sm:text-4xl text-[#0c2a2a] leading-tight">
-            Your question could help someone else, too.
+            {tr("Your question could help someone else, too.", "आपका सवाल किसी और की भी मदद कर सकता है।")}
           </h2>
           <p className="text-xs sm:text-sm text-stone-600 max-w-xl mx-auto leading-relaxed font-light">
-            Tell Dr. Nitu what you would like explained next. The most common patient questions become future journal notes and video discussions.
+            {tr(
+              "Tell Dr. Nitu what you would like explained next. The most common patient questions become future journal notes and video discussions.",
+              "डॉ. नीतू को बताएं कि आप अगला लेख किस विषय पर पढ़ना चाहेंगे। मरीजों के सबसे सामान्य सवाल भविष्य के लेखों और वीडियो चर्चाओं का हिस्सा बनते हैं।"
+            )}
           </p>
           <div className="pt-4">
             <Link
               href="/patient/book-appointment?type=IN_CLINIC"
               className="inline-flex items-center gap-2 rounded-full bg-[#0c2a2a] px-8 py-3.5 text-xs font-bold text-white hover:bg-[#164e4e] transition-colors shadow-md"
             >
-              Send your question <ArrowRight className="size-4" />
+              {tr("Send your question", "अपना सवाल भेजें")} <ArrowRight className="size-4" />
             </Link>
           </div>
         </div>
@@ -384,13 +409,16 @@ async function BlogDirectoryContent() {
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
           <div className="space-y-2">
             <p className="text-xs font-bold uppercase tracking-widest text-white/80">
-              A different kind of dental visit
+              {tr("A different kind of dental visit", "एक अलग और सुखद डेंटल अनुभव")}
             </p>
             <h2 className="font-serif text-2xl sm:text-4xl font-normal text-white">
-              Thoughtful care for your whole family.
+              {tr("Thoughtful care for your whole family.", "आपके पूरे परिवार के लिए संवेदनशील देखभाल।")}
             </h2>
             <p className="text-xs sm:text-sm text-white/90">
-              Same-day relief, preventive care, and clear transparent pricing in Pune.
+              {tr(
+                "Same-day relief, preventive care, and clear transparent pricing in Pune.",
+                "उसी दिन राहत, निवारक देखभाल और पूरी तरह से पारदर्शी शुल्क।"
+              )}
             </p>
           </div>
           <div className="flex flex-wrap gap-3 justify-center shrink-0">
@@ -398,13 +426,13 @@ async function BlogDirectoryContent() {
               href="/patient/book-appointment?type=IN_CLINIC"
               className="rounded-full bg-[#0c2a2a] px-7 py-3.5 text-xs font-bold text-white hover:bg-[#164e4e] transition-colors shadow-lg"
             >
-              Book In-Clinic Visit
+              {tr("Book In-Clinic Visit", "क्लिनिक अपॉइंटमेंट बुक करें")}
             </Link>
             <Link
               href="/patient/book-appointment?type=VIDEO"
               className="rounded-full bg-white text-[#0c2a2a] px-7 py-3.5 text-xs font-bold hover:bg-white/90 transition-colors shadow-lg"
             >
-              Book Video Consult
+              {tr("Book Video Consult", "वीडियो परामर्श बुक करें")}
             </Link>
           </div>
         </div>

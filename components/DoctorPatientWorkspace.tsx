@@ -7,6 +7,7 @@ import {
   ClinicalChatBox,
 } from "./ClinicalOdontogramAndChat";
 import { updateAppointmentClinicalStatus } from "@/app/actions/clinical-portal";
+import { useLanguage } from "@/components/LanguageContext";
 
 function isVideoAppointment(apt: any): boolean {
   const typeStr = String(
@@ -33,8 +34,8 @@ function resolveMeetLink(apt: any): string {
   return process.env.NEXT_PUBLIC_CLINIC_MEET_LINK || "https://meet.google.com/new";
 }
 
-function formatSafeDate(rawDate: any): string {
-  if (!rawDate) return "Scheduled Visit";
+function formatSafeDate(rawDate: any, fallbackLabel = "Scheduled Visit"): string {
+  if (!rawDate) return fallbackLabel;
   const parsed = new Date(rawDate);
   if (isNaN(parsed.getTime())) return String(rawDate);
   return parsed.toLocaleDateString("en-IN", {
@@ -61,6 +62,7 @@ export default function DoctorPatientWorkspace({
   appointmentsList: Array<any>;
 }) {
   const router = useRouter();
+  const { tr } = useLanguage();
   const odontogramRef = useRef<HTMLDivElement>(null);
 
   const defaultPatientId =
@@ -114,13 +116,18 @@ export default function DoctorPatientWorkspace({
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-5">
           <div>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-[11px] font-extrabold uppercase tracking-wider">
-              🩺 Daily Clinical Queue &amp; Tele-Dentistry
+              🩺 {tr("Daily Clinical Queue & Tele-Dentistry", "दैनिक क्लिनिकल कतार और टेली-डेंटिस्ट्री")}
             </span>
             <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 mt-2">
-              Patient Appointments &amp; Visit Completion ({filteredAppointments.length})
+              {tr("Patient Appointments & Visit Completion", "मरीज अपॉइंटमेंट और विजिट पूर्णता")} ({filteredAppointments.length})
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Marking a visit as <strong>Completed</strong> saves the digital prescription and prompts the patient review.
+              {tr("Marking a visit as", "किसी विजिट को")}{" "}
+              <strong>{tr("Completed", "पूर्ण (Completed)")}</strong>{" "}
+              {tr(
+                "saves the digital prescription and prompts the patient review.",
+                "के रूप में चिह्नित करने से डिजिटल प्रिस्क्रिप्शन सहेजा जाता है और मरीज समीक्षा को सक्रिय करता है।"
+              )}
             </p>
           </div>
 
@@ -134,7 +141,7 @@ export default function DoctorPatientWorkspace({
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
-              All Visits ({appointmentsList.length})
+              {tr("All Visits", "सभी विजिट")} ({appointmentsList.length})
             </button>
             <button
               type="button"
@@ -145,7 +152,7 @@ export default function DoctorPatientWorkspace({
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
-              🏥 In-Clinic Only
+              🏥 {tr("In-Clinic Only", "केवल क्लिनिक विजिट")}
             </button>
             <button
               type="button"
@@ -156,7 +163,7 @@ export default function DoctorPatientWorkspace({
                   : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
               }`}
             >
-              🎥 Video Consultations
+              🎥 {tr("Video Consultations", "वीडियो परामर्श")}
             </button>
           </div>
         </div>
@@ -164,7 +171,7 @@ export default function DoctorPatientWorkspace({
         {filteredAppointments.length === 0 ? (
           <div className="p-10 rounded-2xl bg-slate-50/70 border border-dashed border-slate-200 text-center space-y-1">
             <p className="text-sm font-extrabold text-slate-700">
-              No appointments match this filter.
+              {tr("No appointments match this filter.", "इस फ़िल्टर से कोई अपॉइंटमेंट मेल नहीं खाता।")}
             </p>
           </div>
         ) : (
@@ -182,7 +189,7 @@ export default function DoctorPatientWorkspace({
               const safePatientName =
                 apt.patientName && apt.patientName !== "Clinic Patient"
                   ? apt.patientName
-                  : matchedPat?.fullName || `Patient (${apt.bookingReference})`;
+                  : matchedPat?.fullName || `${tr("Patient", "मरीज")} (${apt.bookingReference})`;
               const safePatientCode = matchedPat?.patientCode || "PAT-REF";
 
               return (
@@ -224,7 +231,9 @@ export default function DoctorPatientWorkspace({
                               : "bg-blue-50 text-blue-800 border-blue-200"
                           }`}
                         >
-                          {isVideo ? "🎥 Online Video Consultation" : "🏥 In-Clinic Visit"}
+                          {isVideo
+                            ? tr("🎥 Online Video Consultation", "🎥 ऑनलाइन वीडियो परामर्श")
+                            : tr("🏥 In-Clinic Visit", "🏥 क्लिनिक विजिट")}
                         </span>
 
                         <span
@@ -242,20 +251,23 @@ export default function DoctorPatientWorkspace({
 
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600">
                         <span>
-                          📅 Date:{" "}
+                          📅 {tr("Date:", "तारीख:")}{" "}
                           <strong className="text-slate-900">
-                            {formatSafeDate(apt.appointmentDate || apt.createdAt)}
+                            {formatSafeDate(
+                              apt.appointmentDate || apt.createdAt,
+                              tr("Scheduled Visit", "निर्धारित विजिट")
+                            )}
                           </strong>
                         </span>
                         <span>
-                          ⏰ Slot:{" "}
+                          ⏰ {tr("Slot:", "स्लॉट:")}{" "}
                           <strong className="text-blue-600">
                             {apt.startTime || "10:00 AM"}
                           </strong>
                         </span>
                         {(apt.patientPhone || matchedPat?.phone) && (
                           <span>
-                            📞 Phone:{" "}
+                            📞 {tr("Phone:", "फ़ोन:")}{" "}
                             <strong className="text-slate-800">
                               {apt.patientPhone || matchedPat?.phone}
                             </strong>
@@ -265,7 +277,7 @@ export default function DoctorPatientWorkspace({
 
                       {apt.reason && (
                         <p className="text-xs text-slate-500">
-                          Chief Complaint:{" "}
+                          {tr("Chief Complaint:", "मुख्य समस्या:")}{" "}
                           <span className="font-bold text-slate-800">{apt.reason}</span>
                         </p>
                       )}
@@ -281,7 +293,7 @@ export default function DoctorPatientWorkspace({
                         className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold shadow-sm flex items-center gap-1.5"
                       >
                         <span>🎥</span>
-                        <span>Launch Google Meet</span>
+                        <span>{tr("Launch Google Meet", "गूगल मीट शुरू करें")}</span>
                       </a>
                     )}
 
@@ -294,7 +306,7 @@ export default function DoctorPatientWorkspace({
                           [String(apt.id)]: e.target.value,
                         }))
                       }
-                      placeholder="Write prescription notes..."
+                      placeholder={tr("Write prescription notes...", "प्रिस्क्रिप्शन नोट्स लिखें...")}
                       className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs text-slate-800 w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-600"
                     />
 
@@ -311,10 +323,10 @@ export default function DoctorPatientWorkspace({
                       className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white text-xs font-extrabold shadow-xs transition cursor-pointer"
                     >
                       {busyAptId === String(apt.id)
-                        ? "Saving..."
+                        ? tr("Saving...", "सहेजा जा रहा है...")
                         : apt.status === "COMPLETED"
-                        ? "✓ Update Rx Note"
-                        : "✓ Mark Completed"}
+                        ? tr("✓ Update Rx Note", "✓ प्रिस्क्रिप्शन अपडेट करें")
+                        : tr("✓ Mark Completed", "✓ पूर्ण चिह्नित करें")}
                     </button>
 
                     {matchedPat && (
@@ -333,7 +345,7 @@ export default function DoctorPatientWorkspace({
                         }}
                         className="px-4 py-2.5 rounded-xl bg-white hover:bg-blue-50 text-blue-700 border border-blue-200 text-xs font-extrabold transition cursor-pointer shadow-xs"
                       >
-                        🦷 Open Odontogram
+                        🦷 {tr("Open Odontogram", "ओडोंटोग्राम खोलें")}
                       </button>
                     )}
                   </div>
@@ -350,10 +362,13 @@ export default function DoctorPatientWorkspace({
           <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-6 sm:p-7 text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <span className="px-3 py-1 rounded-full bg-white/20 text-white text-[10px] font-extrabold uppercase tracking-wider">
-                Active Patient Clinical Record
+                {tr("Active Patient Clinical Record", "सक्रिय मरीज क्लिनिकल रिकॉर्ड")}
               </span>
               <h2 className="text-xl font-extrabold mt-2">
-                Select Patient to Chart 32-Tooth Odontogram or Chat Live
+                {tr(
+                  "Select Patient to Chart 32-Tooth Odontogram or Chat Live",
+                  "32-दांत ओडोंटोग्राम चार्ट करने या लाइव चैट के लिए मरीज चुनें"
+                )}
               </h2>
             </div>
 
@@ -382,13 +397,19 @@ export default function DoctorPatientWorkspace({
               <ClinicalChatBox
                 patientId={String(selectedPatient.id)}
                 currentUserRole="DOCTOR"
-                currentUserName="Dr. Nitu Rajpoot, BDS"
-                title={`Direct Clinical Chat with ${selectedPatient.fullName} (${selectedPatient.patientCode})`}
+                currentUserName={tr("Dr. Nitu Rajpoot, BDS", "डॉ. नीतू राजपूत, बीडीएस")}
+                title={tr(
+                  `Direct Clinical Chat with ${selectedPatient.fullName} (${selectedPatient.patientCode})`,
+                  `${selectedPatient.fullName} (${selectedPatient.patientCode}) के साथ डायरेक्ट क्लिनिकल चैट`
+                )}
               />
             </div>
           ) : (
             <div className="p-8 bg-white rounded-3xl border border-slate-200 text-center text-xs text-slate-500">
-              Please select a patient above to load their 32-tooth odontogram.
+              {tr(
+                "Please select a patient above to load their 32-tooth odontogram.",
+                "कृपया 32-दांत ओडोंटोग्राम लोड करने के लिए ऊपर से एक मरीज चुनें।"
+              )}
             </div>
           )}
         </div>

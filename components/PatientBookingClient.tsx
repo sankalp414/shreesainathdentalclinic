@@ -9,6 +9,7 @@ import {
   type SlotStatusItem,
   type DateAvailabilityResponse,
 } from "@/app/actions/booking";
+import { useLanguage } from "@/components/LanguageContext";
 
 function getISTDateString(offsetDays = 0): string {
   const now = new Date();
@@ -24,6 +25,7 @@ export default function PatientBookingClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, isLoaded, isSignedIn } = useUser();
+  const { tr } = useLanguage();
 
   const typeParam = (
     searchParams.get("type") ||
@@ -105,12 +107,22 @@ export default function PatientBookingClient() {
     setErrorMsg(null);
 
     if (isLoaded && !isSignedIn) {
-      setErrorMsg("Please sign in to your account to complete your booking.");
+      setErrorMsg(
+        tr(
+          "Please sign in to your account to complete your booking.",
+          "अपनी बुकिंग पूरी करने के लिए कृपया अपने खाते में साइन इन करें।"
+        )
+      );
       return;
     }
 
     if (!timeSlot) {
-      setErrorMsg("Please select an available time slot.");
+      setErrorMsg(
+        tr(
+          "Please select an available time slot.",
+          "कृपया एक उपलब्ध समय स्लॉट चुनें।"
+        )
+      );
       return;
     }
 
@@ -136,7 +148,10 @@ export default function PatientBookingClient() {
       });
 
       if (!result?.success) {
-        setErrorMsg(result?.error || "Failed to book appointment.");
+        setErrorMsg(
+          result?.error ||
+            tr("Failed to book appointment.", "अपॉइंटमेंट बुक करने में विफल।")
+        );
         await loadSlotStatus(date, mode, isEmergency, true);
         return;
       }
@@ -145,7 +160,11 @@ export default function PatientBookingClient() {
       router.refresh();
     } catch (error: any) {
       setErrorMsg(
-        error?.message || "Failed to book appointment. Please try again."
+        error?.message ||
+          tr(
+            "Failed to book appointment. Please try again.",
+            "अपॉइंटमेंट बुक करने में विफल। कृपया पुनः प्रयास करें।"
+          )
       );
     } finally {
       setLoading(false);
@@ -162,16 +181,22 @@ export default function PatientBookingClient() {
         <div className="border-b border-slate-100 pb-5 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">
-              Shree Sainath Dental Clinic
+              {tr("Shree Sainath Dental Clinic", "श्री साईनाथ डेंटल क्लिनिक")}
             </span>
             <h1 className="text-2xl font-extrabold text-slate-900 mt-1">
-              Book Your Dental Consultation
+              {tr(
+                "Book Your Dental Consultation",
+                "अपना डेंटल परामर्श बुक करें"
+              )}
             </h1>
             <p className="text-sm text-slate-500 mt-0.5">
-              Dr. Nitu Rajpoot, BDS •{" "}
+              {tr("Dr. Nitu Rajpoot, BDS", "डॉ. नीतू राजपूत, बीडीएस")} •{" "}
               {availability?.scheduleSummary
-                ? `Hours: ${availability.scheduleSummary.startTime} – ${availability.scheduleSummary.endTime} (Lunch: ${availability.scheduleSummary.lunchStart} – ${availability.scheduleSummary.lunchEnd})`
-                : "Live IST Slot Sync"}
+                ? tr(
+                    `Hours: ${availability.scheduleSummary.startTime} – ${availability.scheduleSummary.endTime} (Lunch: ${availability.scheduleSummary.lunchStart} – ${availability.scheduleSummary.lunchEnd})`,
+                    `समय: ${availability.scheduleSummary.startTime} – ${availability.scheduleSummary.endTime} (लंच: ${availability.scheduleSummary.lunchStart} – ${availability.scheduleSummary.lunchEnd})`
+                  )
+                : tr("Live IST Slot Sync", "लाइव समय स्लॉट सिंक")}
             </p>
           </div>
         </div>
@@ -186,7 +211,10 @@ export default function PatientBookingClient() {
           {/* 1. Consultation Mode */}
           <div>
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">
-              1. Select Consultation Type
+              {tr(
+                "1. Select Consultation Type",
+                "1. परामर्श का प्रकार चुनें"
+              )}
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button
@@ -202,10 +230,13 @@ export default function PatientBookingClient() {
                 }`}
               >
                 <div className="font-bold text-slate-900 text-sm">
-                  In-Clinic Consultation
+                  {tr("In-Clinic Consultation", "क्लिनिक में परामर्श")}
                 </div>
                 <div className="text-xs text-slate-500 mt-1">
-                  Visit Shree Sainath Dental Clinic • ₹500
+                  {tr(
+                    "Visit Shree Sainath Dental Clinic • ₹500",
+                    "श्री साईनाथ डेंटल क्लिनिक विजिट करें • ₹500"
+                  )}
                 </div>
               </button>
 
@@ -228,12 +259,18 @@ export default function PatientBookingClient() {
                 }`}
               >
                 <div className="font-bold text-slate-900 text-sm">
-                  Online Video Consultation
+                  {tr("Online Video Consultation", "ऑनलाइन वीडियो परामर्श")}
                 </div>
                 <div className="text-xs text-slate-500 mt-1">
                   {availability?.allowedConsultationType === "IN_CLINIC_ONLY"
-                    ? "Currently paused by doctor"
-                    : "1-on-1 Video Call with Dr. Nitu • ₹700"}
+                    ? tr(
+                        "Currently paused by doctor",
+                        "वर्तमान में डॉक्टर द्वारा रोका गया है"
+                      )
+                    : tr(
+                        "1-on-1 Video Call with Dr. Nitu • ₹700",
+                        "डॉ. नीतू के साथ 1-ऑन-1 वीडियो कॉल • ₹700"
+                      )}
                 </div>
               </button>
             </div>
@@ -243,7 +280,10 @@ export default function PatientBookingClient() {
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                2. Select Appointment Date
+                {tr(
+                  "2. Select Appointment Date",
+                  "2. अपॉइंटमेंट की तारीख चुनें"
+                )}
               </label>
               <div className="flex items-center gap-2">
                 <button
@@ -258,7 +298,7 @@ export default function PatientBookingClient() {
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
                 >
-                  Today
+                  {tr("Today", "आज")}
                 </button>
                 <button
                   type="button"
@@ -272,7 +312,7 @@ export default function PatientBookingClient() {
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
                 >
-                  Tomorrow
+                  {tr("Tomorrow", "कल")}
                 </button>
               </div>
             </div>
@@ -295,7 +335,10 @@ export default function PatientBookingClient() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <span className="text-[11px] font-extrabold text-amber-800 uppercase tracking-wider">
-                    Schedule Notice for {date}
+                    {tr(
+                      `Schedule Notice for ${date}`,
+                      `${date} के लिए समय सूचना`
+                    )}
                   </span>
                   <p className="text-sm font-bold text-slate-900 mt-0.5">
                     {availability.closureMessage}
@@ -318,8 +361,11 @@ export default function PatientBookingClient() {
                     }`}
                   >
                     {isEmergency
-                      ? "✓ Emergency Mode Active"
-                      : "Request Emergency Consultation"}
+                      ? tr("✓ Emergency Mode Active", "✓ आपातकालीन मोड सक्रिय")
+                      : tr(
+                          "Request Emergency Consultation",
+                          "आपातकालीन परामर्श का अनुरोध करें"
+                        )}
                   </button>
                 </div>
               )}
@@ -330,20 +376,23 @@ export default function PatientBookingClient() {
           <div>
             <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                3. Select Available Time Slot ({openSlotsCount} Open)
+                {tr(
+                  `3. Select Available Time Slot (${openSlotsCount} Open)`,
+                  `3. उपलब्ध समय स्लॉट चुनें (${openSlotsCount} उपलब्ध)`
+                )}
               </label>
               <div className="flex items-center gap-3 text-[11px] font-medium text-slate-500">
                 <span className="flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-blue-600 inline-block" />{" "}
-                  Selected
+                  {tr("Selected", "चयनित")}
                 </span>
                 <span className="flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-slate-400 inline-block" />{" "}
-                  Time Passed
+                  {tr("Time Passed", "समय समाप्त")}
                 </span>
                 <span className="flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-red-400 inline-block" />{" "}
-                  Booked
+                  {tr("Booked", "बुक हो चुका")}
                 </span>
               </div>
             </div>
@@ -360,10 +409,16 @@ export default function PatientBookingClient() {
             ) : slots.length === 0 ? (
               <div className="p-6 rounded-2xl bg-slate-50 border border-dashed border-slate-200 text-center space-y-2">
                 <p className="text-sm font-bold text-slate-700">
-                  No regular slots open for this selection
+                  {tr(
+                    "No regular slots open for this selection",
+                    "इस चयन के लिए कोई नियमित स्लॉट उपलब्ध नहीं है"
+                  )}
                 </p>
                 <p className="text-xs text-slate-500">
-                  Please choose another date, switch consultation mode, or enable Emergency Consultation above if applicable.
+                  {tr(
+                    "Please choose another date, switch consultation mode, or enable Emergency Consultation above if applicable.",
+                    "कृपया कोई अन्य तारीख चुनें, परामर्श मोड बदलें, या यदि लागू हो तो ऊपर आपातकालीन परामर्श सक्षम करें।"
+                  )}
                 </p>
               </div>
             ) : (
@@ -371,7 +426,7 @@ export default function PatientBookingClient() {
                 {morningSlots.length > 0 && (
                   <div>
                     <p className="text-[11px] font-bold text-slate-500 uppercase mb-2">
-                      Morning Session
+                      {tr("Morning Session", "सुबह का समय")}
                     </p>
                     <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
                       {morningSlots.map((slot) => {
@@ -396,12 +451,12 @@ export default function PatientBookingClient() {
                             <span>{slot.time}</span>
                             {slot.isBooked && (
                               <span className="text-[10px] font-bold text-red-500 no-underline mt-0.5">
-                                Booked
+                                {tr("Booked", "बुक हो चुका")}
                               </span>
                             )}
                             {!slot.isBooked && slot.isPast && (
                               <span className="text-[10px] font-medium text-slate-400 no-underline mt-0.5">
-                                Time Passed
+                                {tr("Time Passed", "समय समाप्त")}
                               </span>
                             )}
                           </button>
@@ -413,15 +468,17 @@ export default function PatientBookingClient() {
 
                 {availability?.scheduleSummary && (
                   <div className="py-2 px-3 rounded-xl bg-slate-100 text-slate-600 text-[11px] font-bold text-center">
-                    Clinic Lunch Break: {availability.scheduleSummary.lunchStart}{" "}
-                    – {availability.scheduleSummary.lunchEnd}
+                    {tr(
+                      `Clinic Lunch Break: ${availability.scheduleSummary.lunchStart} – ${availability.scheduleSummary.lunchEnd}`,
+                      `क्लिनिक लंच ब्रेक: ${availability.scheduleSummary.lunchStart} – ${availability.scheduleSummary.lunchEnd}`
+                    )}
                   </div>
                 )}
 
                 {eveningSlots.length > 0 && (
                   <div>
                     <p className="text-[11px] font-bold text-slate-500 uppercase mb-2">
-                      Evening Session
+                      {tr("Evening Session", "शाम का समय")}
                     </p>
                     <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
                       {eveningSlots.map((slot) => {
@@ -446,12 +503,12 @@ export default function PatientBookingClient() {
                             <span>{slot.time}</span>
                             {slot.isBooked && (
                               <span className="text-[10px] font-bold text-red-500 no-underline mt-0.5">
-                                Booked
+                                {tr("Booked", "बुक हो चुका")}
                               </span>
                             )}
                             {!slot.isBooked && slot.isPast && (
                               <span className="text-[10px] font-medium text-slate-400 no-underline mt-0.5">
-                                Time Passed
+                                {tr("Time Passed", "समय समाप्त")}
                               </span>
                             )}
                           </button>
@@ -467,7 +524,7 @@ export default function PatientBookingClient() {
           {/* 4. Payment Method */}
           <div>
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">
-              4. Payment Preference
+              {tr("4. Payment Preference", "4. भुगतान का विकल्प")}
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {mode === "in-clinic" && (
@@ -481,10 +538,13 @@ export default function PatientBookingClient() {
                   }`}
                 >
                   <div className="font-bold text-slate-900 text-sm">
-                    Pay Cash at Clinic
+                    {tr("Pay Cash at Clinic", "क्लिनिक में नकद भुगतान करें")}
                   </div>
                   <div className="text-xs text-slate-500 mt-1">
-                    Pay directly at reception during your visit
+                    {tr(
+                      "Pay directly at reception during your visit",
+                      "अपनी विजिट के दौरान रिसेप्शन पर सीधे भुगतान करें"
+                    )}
                   </div>
                 </button>
               )}
@@ -499,10 +559,13 @@ export default function PatientBookingClient() {
                 }`}
               >
                 <div className="font-bold text-slate-900 text-sm">
-                  Pay Online Now
+                  {tr("Pay Online Now", "अभी ऑनलाइन भुगतान करें")}
                 </div>
                 <div className="text-xs text-slate-500 mt-1">
-                  Instant confirmation via UPI / Card / NetBanking
+                  {tr(
+                    "Instant confirmation via UPI / Card / NetBanking",
+                    "UPI / कार्ड / नेटबैंकिंग के माध्यम से तुरंत पुष्टि"
+                  )}
                 </div>
               </button>
             </div>
@@ -515,10 +578,16 @@ export default function PatientBookingClient() {
             className="w-full py-3.5 px-6 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-bold text-sm rounded-xl shadow-sm transition cursor-pointer"
           >
             {loading
-              ? "Confirming Appointment..."
+              ? tr("Confirming Appointment...", "अपॉइंटमेंट की पुष्टि हो रही है...")
               : timeSlot
-              ? `Confirm ${isEmergency ? "Emergency " : ""}Booking (${timeSlot})`
-              : "Select an Open Slot to Continue"}
+              ? tr(
+                  `Confirm ${isEmergency ? "Emergency " : ""}Booking (${timeSlot})`,
+                  `${isEmergency ? "आपातकालीन " : ""}बुकिंग की पुष्टि करें (${timeSlot})`
+                )
+              : tr(
+                  "Select an Open Slot to Continue",
+                  "आगे बढ़ने के लिए एक उपलब्ध स्लॉट चुनें"
+                )}
           </button>
         </form>
       </div>

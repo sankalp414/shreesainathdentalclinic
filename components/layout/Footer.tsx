@@ -163,7 +163,7 @@ export function Footer({
             </div>
             <h3 className="font-serif text-2xl sm:text-3xl font-normal text-white">
               {lang === "hi"
-                ? "डॉ. अनन्या देशमुख (MDS) के साथ अपना परामर्श बुक करें"
+                ? "डॉ. नीतू राजपूत (BDS) के साथ अपना परामर्श बुक करें"
                 : "Ready for a calmer, unhurried dental visit?"}
             </h3>
           </div>

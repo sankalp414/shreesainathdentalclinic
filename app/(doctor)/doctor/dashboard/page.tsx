@@ -266,6 +266,7 @@ import { getBlogs } from "@/app/actions/clinic-cms";
 import { getClinicScheduleConfig } from "@/app/actions/clinic-schedule";
 import { getCurrentUserRole } from "@/app/actions/auth-role";
 import { getAllReviewsForDoctor } from "@/app/actions/reviews";
+import { getServerLanguage } from "@/lib/server-language";
 import DoctorDashboardTabsClient from "@/components/doctor/DoctorDashboardTabsClient";
 
 const { users, patients, appointments } = schema;
@@ -278,7 +279,10 @@ async function DoctorDashboardContent({ searchParams }: DashboardProps) {
   await connection();
   await ensureDatabaseSchema();
 
-  const { isSignedIn, role, email } = await getCurrentUserRole();
+  const [{ isSignedIn, role, email }, { tr }] = await Promise.all([
+    getCurrentUserRole(),
+    getServerLanguage(),
+  ]);
 
   if (!isSignedIn) {
     redirect("/sign-in");
@@ -293,20 +297,25 @@ async function DoctorDashboardContent({ searchParams }: DashboardProps) {
           </div>
           <div className="space-y-2">
             <span className="inline-block text-[11px] font-extrabold text-red-600 uppercase tracking-wider bg-red-50 px-3 py-1 rounded-full border border-red-200/60">
-              Restricted Clinical Portal
+              {tr("Restricted Clinical Portal", "प्रतिबंधित क्लिनिकल पोर्टल")}
             </span>
             <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-              Doctor Command Center Only
+              {tr("Doctor Command Center Only", "केवल डॉक्टर कमांड सेंटर")}
             </h1>
             <p className="text-xs text-slate-500 leading-relaxed">
-              Signed in as <span className="font-bold text-slate-700">{email}</span>. Redirecting you to your Patient Portal.
+              {tr("Signed in as", "के रूप में साइन इन किया गया")}{" "}
+              <span className="font-bold text-slate-700">{email}</span>.{" "}
+              {tr(
+                "Redirecting you to your Patient Portal.",
+                "आपको आपके पेशेंट पोर्टल पर भेजा जा रहा है।"
+              )}
             </p>
           </div>
           <Link
             href="/patient/dashboard"
             className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold shadow-md shadow-blue-500/20 transition duration-150"
           >
-            Go to My Patient Portal →
+            {tr("Go to My Patient Portal →", "मेरे पेशेंट पोर्टल पर जाएं →")}
           </Link>
         </div>
       </div>
@@ -363,7 +372,7 @@ async function DoctorDashboardContent({ searchParams }: DashboardProps) {
       fullName:
         matchedUser?.fullName ||
         matchedUser?.email?.split("@")[0] ||
-        `Registered Patient #${idx + 1}`,
+        `${tr("Registered Patient", "पंजीकृत मरीज")} #${idx + 1}`,
       email: matchedUser?.email || "",
       phone: p.phone || matchedUser?.phone || "",
       odontogramData: p.odontogramData || {},
@@ -382,7 +391,7 @@ async function DoctorDashboardContent({ searchParams }: DashboardProps) {
       patientName:
         apt.patientName ||
         matchedPatient?.fullName ||
-        "Verified Patient",
+        tr("Verified Patient", "सत्यापित मरीज"),
     };
   });
 

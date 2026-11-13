@@ -1,8 +1,13 @@
+"use client";
+
+import { useLanguage } from "@/components/LanguageContext";
+
 export default function DoctorRevenueAnalytics({
   appointmentsList,
 }: {
   appointmentsList: Array<any>;
 }) {
+  const { tr } = useLanguage();
   const completedVisits = appointmentsList.filter(
     (a) => a.status === "COMPLETED"
   );
@@ -17,37 +22,40 @@ export default function DoctorRevenueAnalytics({
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
       <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-1">
         <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-          Estimated Clinic Revenue
+          {tr("Estimated Clinic Revenue", "अनुमानित क्लिनिक राजस्व")}
         </span>
         <div className="text-3xl font-extrabold text-blue-600">
           ₹{estimatedRevenue.toLocaleString("en-IN")}
         </div>
         <p className="text-[11px] text-slate-400">
-          Based on {completedVisits.length} completed treatments &amp; consults.
+          {tr(
+            `Based on ${completedVisits.length} completed treatments & consults.`,
+            `${completedVisits.length} पूर्ण उपचार और परामर्श पर आधारित।`
+          )}
         </p>
       </div>
 
       <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-1">
         <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-          Completed Treatments
+          {tr("Completed Treatments", "पूर्ण उपचार")}
         </span>
         <div className="text-3xl font-extrabold text-emerald-600">
           {completedVisits.length}
         </div>
         <p className="text-[11px] text-slate-400">
-          Successfully treated &amp; reviewed.
+          {tr("Successfully treated & reviewed.", "सफलतापूर्वक उपचारित और समीक्षा किए गए।")}
         </p>
       </div>
 
       <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-1">
         <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-          Total Bookings Recorded
+          {tr("Total Bookings Recorded", "कुल दर्ज बुकिंग")}
         </span>
         <div className="text-3xl font-extrabold text-slate-900">
           {appointmentsList.length}
         </div>
         <p className="text-[11px] text-slate-400">
-          Across in-clinic and video consultation queues.
+          {tr("Across in-clinic and video consultation queues.", "क्लिनिक और वीडियो परामर्श कतारों में।")}
         </p>
       </div>
     </div>

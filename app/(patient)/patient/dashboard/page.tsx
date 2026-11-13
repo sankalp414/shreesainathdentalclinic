@@ -418,6 +418,7 @@ import * as schema from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { ensureDatabaseSchema } from "@/lib/ensure-db-schema";
 import { getCurrentUserRole } from "@/app/actions/auth-role";
+import { getServerLanguage } from "@/lib/server-language";
 import {
   InteractiveOdontogram,
   ClinicalChatBox,
@@ -454,8 +455,8 @@ function getMeetUrl(apt: any): string {
   )}-${cleanCode.slice(7, 10)}`;
 }
 
-function formatAppointmentDate(rawDate: any): string {
-  if (!rawDate) return "Scheduled Visit";
+function formatAppointmentDate(rawDate: any, fallbackLabel = "Scheduled Visit"): string {
+  if (!rawDate) return fallbackLabel;
   const d = new Date(rawDate);
   if (isNaN(d.getTime())) return String(rawDate);
   return d.toLocaleDateString("en-IN", {
@@ -470,7 +471,10 @@ async function PatientDashboardContent() {
   await connection();
   await ensureDatabaseSchema();
 
-  const { isSignedIn, role } = await getCurrentUserRole();
+  const [{ isSignedIn, role }, { tr }] = await Promise.all([
+    getCurrentUserRole(),
+    getServerLanguage(),
+  ]);
 
   if (!isSignedIn) {
     redirect("/sign-in");
@@ -486,7 +490,7 @@ async function PatientDashboardContent() {
     clerkUser?.emailAddresses?.[0]?.emailAddress?.toLowerCase().trim() || "";
   const fullName =
     `${clerkUser?.firstName ?? ""} ${clerkUser?.lastName ?? ""}`.trim() ||
-    "Valued Patient";
+    tr("Valued Patient", "सम्मानित मरीज");
 
   let [dbUser] = await db
     .select()
@@ -602,11 +606,15 @@ async function PatientDashboardContent() {
               </svg>
             </div>
             <div>
-              <p className="text-xs font-semibold text-slate-500">Total Visits</p>
+              <p className="text-xs font-semibold text-slate-500">
+                {tr("Total Visits", "कुल विजिट")}
+              </p>
               <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">
                 {allAppointments.length < 10 ? `0${allAppointments.length}` : allAppointments.length}
               </h3>
-              <p className="text-[11px] font-medium text-slate-400">Recorded history</p>
+              <p className="text-[11px] font-medium text-slate-400">
+                {tr("Recorded history", "दर्ज इतिहास")}
+              </p>
             </div>
           </div>
 
@@ -618,11 +626,15 @@ async function PatientDashboardContent() {
               </svg>
             </div>
             <div>
-              <p className="text-xs font-semibold text-slate-500">Appointments</p>
+              <p className="text-xs font-semibold text-slate-500">
+                {tr("Appointments", "अपॉइंटमेंट्स")}
+              </p>
               <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">
                 {upcomingAppointments.length < 10 ? `0${upcomingAppointments.length}` : upcomingAppointments.length}
               </h3>
-              <p className="text-[11px] font-medium text-slate-400">Active &amp; scheduled</p>
+              <p className="text-[11px] font-medium text-slate-400">
+                {tr("Active & scheduled", "सक्रिय और निर्धारित")}
+              </p>
             </div>
           </div>
 
@@ -634,11 +646,15 @@ async function PatientDashboardContent() {
               </svg>
             </div>
             <div>
-              <p className="text-xs font-semibold text-slate-500">Completed Visits</p>
+              <p className="text-xs font-semibold text-slate-500">
+                {tr("Completed Visits", "पूर्ण विजिट")}
+              </p>
               <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">
                 {completedAppointments.length < 10 ? `0${completedAppointments.length}` : completedAppointments.length}
               </h3>
-              <p className="text-[11px] font-medium text-slate-400">Treatment finished</p>
+              <p className="text-[11px] font-medium text-slate-400">
+                {tr("Treatment finished", "उपचार पूर्ण")}
+              </p>
             </div>
           </div>
 
@@ -650,7 +666,9 @@ async function PatientDashboardContent() {
               </svg>
             </div>
             <div className="overflow-hidden">
-              <p className="text-xs font-semibold text-slate-500">Patient Code</p>
+              <p className="text-xs font-semibold text-slate-500">
+                {tr("Patient Code", "मरीज कोड")}
+              </p>
               <h3 className="text-lg sm:text-xl font-extrabold text-slate-800 tracking-tight truncate">
                 {patientProfile.patientCode}
               </h3>
@@ -705,7 +723,7 @@ async function PatientDashboardContent() {
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
-                <span>Appointments</span>
+                <span>{tr("Appointments", "अपॉइंटमेंट्स")}</span>
               </label>
 
               <label
@@ -716,7 +734,7 @@ async function PatientDashboardContent() {
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <span>32-Tooth Odontogram</span>
+                <span>{tr("32-Tooth Odontogram", "32-दांत ओडोंटोग्राम")}</span>
               </label>
 
               <label
@@ -727,7 +745,7 @@ async function PatientDashboardContent() {
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
-                <span>Doctor Chat</span>
+                <span>{tr("Doctor Chat", "डॉक्टर चैट")}</span>
               </label>
 
               <label
@@ -738,7 +756,9 @@ async function PatientDashboardContent() {
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
-                <span>Prescriptions &amp; History ({pastAppointments.length})</span>
+                <span>
+                  {tr("Prescriptions & History", "प्रिस्क्रिप्शन और इतिहास")} ({pastAppointments.length})
+                </span>
               </label>
             </div>
 
@@ -746,7 +766,7 @@ async function PatientDashboardContent() {
               href="/patient/book"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-xs hover:shadow-md transition"
             >
-              <span>+ Book Consultation</span>
+              <span>{tr("+ Book Consultation", "+ परामर्श बुक करें")}</span>
             </Link>
           </div>
 
@@ -765,17 +785,20 @@ async function PatientDashboardContent() {
                     <div className="flex items-center justify-between">
                       <div>
                         <h2 className="text-xl font-extrabold text-slate-800">
-                          Active Consultations
+                          {tr("Active Consultations", "सक्रिय परामर्श")}
                         </h2>
                         <p className="text-xs text-slate-400 mt-0.5">
-                          Overview of upcoming clinic visits and online video meetings
+                          {tr(
+                            "Overview of upcoming clinic visits and online video meetings",
+                            "आगामी क्लिनिक विजिट और ऑनलाइन वीडियो मीटिंग का अवलोकन"
+                          )}
                         </p>
                       </div>
                       <Link
                         href="/patient/book"
                         className="text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1"
                       >
-                        <span>Schedule new</span>
+                        <span>{tr("Schedule new", "नया बुक करें")}</span>
                         <span>&rarr;</span>
                       </Link>
                     </div>
@@ -784,7 +807,9 @@ async function PatientDashboardContent() {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                       <div className="space-y-1.5">
                         <div className="flex justify-between text-xs font-bold">
-                          <span className="text-slate-600">In-Clinic Visits</span>
+                          <span className="text-slate-600">
+                            {tr("In-Clinic Visits", "क्लिनिक विजिट")}
+                          </span>
                           <span className="text-slate-900">{inClinicAppointmentsCount}/{upcomingAppointments.length || 0}</span>
                         </div>
                         <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
@@ -801,7 +826,9 @@ async function PatientDashboardContent() {
 
                       <div className="space-y-1.5">
                         <div className="flex justify-between text-xs font-bold">
-                          <span className="text-slate-600">Video Calls</span>
+                          <span className="text-slate-600">
+                            {tr("Video Calls", "वीडियो कॉल")}
+                          </span>
                           <span className="text-slate-900">{videoAppointmentsCount}/{upcomingAppointments.length || 0}</span>
                         </div>
                         <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
@@ -818,7 +845,9 @@ async function PatientDashboardContent() {
 
                       <div className="space-y-1.5">
                         <div className="flex justify-between text-xs font-bold">
-                          <span className="text-slate-600">Completed</span>
+                          <span className="text-slate-600">
+                            {tr("Completed", "पूर्ण")}
+                          </span>
                           <span className="text-slate-900">{completedAppointments.length}/{allAppointments.length || 0}</span>
                         </div>
                         <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
@@ -844,16 +873,22 @@ async function PatientDashboardContent() {
                         </svg>
                       </div>
                       <p className="text-sm font-bold text-slate-700">
-                        No upcoming visits scheduled right now.
+                        {tr(
+                          "No upcoming visits scheduled right now.",
+                          "अभी कोई आगामी विजिट निर्धारित नहीं है।"
+                        )}
                       </p>
                       <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                        Book a dental consultation with Dr. Nitu Rajpoot either in-clinic or through online video consultation.
+                        {tr(
+                          "Book a dental consultation with Dr. Nitu Rajpoot either in-clinic or through online video consultation.",
+                          "डॉ. नीतू राजपूत के साथ क्लिनिक में या ऑनलाइन वीडियो परामर्श के माध्यम से डेंटल अपॉइंटमेंट बुक करें।"
+                        )}
                       </p>
                       <Link
                         href="/patient/book"
                         className="inline-block mt-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 shadow-xs transition"
                       >
-                        + Book Consultation Now
+                        {tr("+ Book Consultation Now", "+ अभी परामर्श बुक करें")}
                       </Link>
                     </div>
                   ) : (
@@ -875,7 +910,9 @@ async function PatientDashboardContent() {
                                   : "bg-blue-100 text-blue-700"
                               }`}
                             >
-                              {isVid ? "Video Call" : "In Clinic"}
+                              {isVid
+                                ? tr("Video Call", "वीडियो कॉल")
+                                : tr("In Clinic", "क्लिनिक में")}
                             </span>
 
                             {/* Circle Avatar (matching the circular patient avatars in dash.png) */}
@@ -887,19 +924,22 @@ async function PatientDashboardContent() {
 
                             {/* Details */}
                             <h4 className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 transition truncate max-w-full">
-                              {apt.reason || "Dental Checkup"}
+                              {apt.reason || tr("Dental Checkup", "डेंटल चेकअप")}
                             </h4>
                             <p className="text-[11px] font-semibold text-slate-500 mt-0.5">
-                              Ref: {apt.bookingReference || "Direct"}
+                              {tr("Ref:", "संदर्भ:")} {apt.bookingReference || tr("Direct", "डायरेक्ट")}
                             </p>
 
                             {/* Time & Date */}
                             <div className="mt-3 pt-3 border-t border-slate-100 w-full space-y-1">
                               <span className="text-xs font-extrabold text-blue-600 block">
-                                {apt.startTime || "Scheduled"}
+                                {apt.startTime || tr("Scheduled", "निर्धारित")}
                               </span>
                               <span className="text-[10px] font-medium text-slate-400 block truncate">
-                                {formatAppointmentDate(apt.appointmentDate || apt.createdAt)}
+                                {formatAppointmentDate(
+                                  apt.appointmentDate || apt.createdAt,
+                                  tr("Scheduled Visit", "निर्धारित विजिट")
+                                )}
                               </span>
                             </div>
 
@@ -911,11 +951,11 @@ async function PatientDashboardContent() {
                                 rel="noopener noreferrer"
                                 className="mt-3 w-full py-2 px-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-[11px] font-extrabold shadow-xs transition flex items-center justify-center gap-1.5"
                               >
-                                <span>🎥 Join Video</span>
+                                <span>{tr("🎥 Join Video", "🎥 वीडियो से जुड़ें")}</span>
                               </a>
                             ) : (
                               <span className="mt-3 px-3 py-1 rounded-lg bg-slate-50 text-slate-600 text-[10px] font-bold border border-slate-200/60">
-                                {apt.status || "Confirmed"}
+                                {apt.status || tr("Confirmed", "पुष्टि की गई")}
                               </span>
                             )}
                           </div>
@@ -930,34 +970,50 @@ async function PatientDashboardContent() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-lg font-extrabold text-slate-800">
-                        Prescription &amp; Visit Log
+                        {tr("Prescription & Visit Log", "प्रिस्क्रिप्शन और विजिट लॉग")}
                       </h3>
                       <p className="text-xs text-slate-400 mt-0.5">
-                        Recent dental treatments and doctor prescriptions
+                        {tr(
+                          "Recent dental treatments and doctor prescriptions",
+                          "हाल के दंत उपचार और डॉक्टर के प्रिस्क्रिप्शन"
+                        )}
                       </p>
                     </div>
                     <label
                       htmlFor="tab-records"
                       className="cursor-pointer text-xs font-bold text-blue-600 hover:underline"
                     >
-                      View all ({pastAppointments.length}) &rarr;
+                      {tr("View all", "सभी देखें")} ({pastAppointments.length}) &rarr;
                     </label>
                   </div>
 
                   {pastAppointments.length === 0 ? (
                     <div className="py-8 text-center text-xs text-slate-400">
-                      No treatment history or prescriptions logged yet.
+                      {tr(
+                        "No treatment history or prescriptions logged yet.",
+                        "अभी तक कोई उपचार इतिहास या प्रिस्क्रिप्शन दर्ज नहीं किया गया है।"
+                      )}
                     </div>
                   ) : (
                     <div className="overflow-x-auto">
                       <table className="w-full text-left border-collapse">
                         <thead>
                           <tr className="border-b border-slate-100 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
-                            <th className="pb-3 pr-4">Reason / Service</th>
-                            <th className="pb-3 px-4">Visit Type</th>
-                            <th className="pb-3 px-4">Date &amp; Time</th>
-                            <th className="pb-3 px-4">Status</th>
-                            <th className="pb-3 pl-4">Notes</th>
+                            <th className="pb-3 pr-4">
+                              {tr("Reason / Service", "कारण / सेवा")}
+                            </th>
+                            <th className="pb-3 px-4">
+                              {tr("Visit Type", "विजिट का प्रकार")}
+                            </th>
+                            <th className="pb-3 px-4">
+                              {tr("Date & Time", "तारीख और समय")}
+                            </th>
+                            <th className="pb-3 px-4">
+                              {tr("Status", "स्थिति")}
+                            </th>
+                            <th className="pb-3 pl-4">
+                              {tr("Notes", "नोट्स")}
+                            </th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 text-xs font-medium text-slate-700">
@@ -966,9 +1022,9 @@ async function PatientDashboardContent() {
                             return (
                               <tr key={String(apt.id)} className="hover:bg-slate-50/70 transition">
                                 <td className="py-3.5 pr-4 font-bold text-slate-900">
-                                  {apt.reason || "General Dental Care"}
+                                  {apt.reason || tr("General Dental Care", "सामान्य दंत देखभाल")}
                                   <span className="block text-[10px] font-normal text-slate-400">
-                                    Ref: {apt.bookingReference}
+                                    {tr("Ref:", "संदर्भ:")} {apt.bookingReference}
                                   </span>
                                 </td>
                                 <td className="py-3.5 px-4">
@@ -979,22 +1035,28 @@ async function PatientDashboardContent() {
                                         : "bg-blue-50 text-blue-700 border border-blue-200/50"
                                     }`}
                                   >
-                                    {isVid ? "Video Call" : "In-Clinic"}
+                                    {isVid
+                                      ? tr("Video Call", "वीडियो कॉल")
+                                      : tr("In-Clinic", "क्लिनिक में")}
                                   </span>
                                 </td>
                                 <td className="py-3.5 px-4 text-slate-600 whitespace-nowrap">
-                                  {formatAppointmentDate(apt.appointmentDate || apt.createdAt)}
+                                  {formatAppointmentDate(
+                                    apt.appointmentDate || apt.createdAt,
+                                    tr("Scheduled Visit", "निर्धारित विजिट")
+                                  )}
                                   <span className="block text-[10px] text-slate-400">
-                                    {apt.startTime || "Regular"}
+                                    {apt.startTime || tr("Regular", "नियमित")}
                                   </span>
                                 </td>
                                 <td className="py-3.5 px-4">
                                   <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200/60">
-                                    {apt.status || "Completed"}
+                                    {apt.status || tr("Completed", "पूर्ण")}
                                   </span>
                                 </td>
                                 <td className="py-3.5 pl-4 max-w-xs truncate text-slate-500">
-                                  {apt.prescriptionNotes || "Treatment routine completed"}
+                                  {apt.prescriptionNotes ||
+                                    tr("Treatment routine completed", "उपचार प्रक्रिया पूर्ण")}
                                 </td>
                               </tr>
                             );
@@ -1014,16 +1076,19 @@ async function PatientDashboardContent() {
                 <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                     <h3 className="text-base font-extrabold text-slate-800">
-                      Schedule
+                      {tr("Schedule", "समय-सारणी")}
                     </h3>
                     <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg">
-                      Timeline
+                      {tr("Timeline", "टाइमलाइन")}
                     </span>
                   </div>
 
                   {upcomingAppointments.length === 0 ? (
                     <p className="text-xs text-slate-400 py-3 text-center">
-                      No events on your schedule today.
+                      {tr(
+                        "No events on your schedule today.",
+                        "आज आपकी समय-सारणी में कोई अपॉइंटमेंट नहीं है।"
+                      )}
                     </p>
                   ) : (
                     <div className="space-y-3.5">
@@ -1042,14 +1107,19 @@ async function PatientDashboardContent() {
                             className={`p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/60 border-l-4 ${borderClass} space-y-1`}
                           >
                             <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block">
-                              {isVid ? "Google Meet Consultation" : "In-Clinic Visit"}
+                              {isVid
+                                ? tr("Google Meet Consultation", "गूगल मीट परामर्श")
+                                : tr("In-Clinic Visit", "क्लिनिक विजिट")}
                             </span>
                             <h4 className="text-xs font-bold text-slate-800">
-                              {apt.reason || "Dental Consultation"}
+                              {apt.reason || tr("Dental Consultation", "डेंटल परामर्श")}
                             </h4>
                             <p className="text-[11px] font-semibold text-blue-600">
-                              {apt.startTime || "Scheduled Time"} &bull;{" "}
-                              {formatAppointmentDate(apt.appointmentDate || apt.createdAt)}
+                              {apt.startTime || tr("Scheduled Time", "निर्धारित समय")} &bull;{" "}
+                              {formatAppointmentDate(
+                                apt.appointmentDate || apt.createdAt,
+                                tr("Scheduled Visit", "निर्धारित विजिट")
+                              )}
                             </p>
                           </div>
                         );
@@ -1062,7 +1132,7 @@ async function PatientDashboardContent() {
                 <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                     <h3 className="text-base font-extrabold text-slate-800">
-                      Reminders &amp; Care
+                      {tr("Reminders & Care", "अनुस्मारक और देखभाल")}
                     </h3>
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                   </div>
@@ -1074,7 +1144,12 @@ async function PatientDashboardContent() {
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
-                      <span>Arrive 10 minutes prior for in-clinic dental visits</span>
+                      <span>
+                        {tr(
+                          "Arrive 10 minutes prior for in-clinic dental visits",
+                          "क्लिनिक विजिट के लिए 10 मिनट पहले पहुंचें"
+                        )}
+                      </span>
                     </div>
 
                     <div className="flex items-start gap-2.5">
@@ -1083,7 +1158,12 @@ async function PatientDashboardContent() {
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
-                      <span>Check microphone &amp; camera for Google Meet sessions</span>
+                      <span>
+                        {tr(
+                          "Check microphone & camera for Google Meet sessions",
+                          "गूगल मीट सेशन के लिए माइक्रोफ़ोन और कैमरा जांचें"
+                        )}
+                      </span>
                     </div>
 
                     <div className="flex items-start gap-2.5">
@@ -1092,7 +1172,12 @@ async function PatientDashboardContent() {
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
-                      <span>View Dr. Nitu&apos;s updated 32-Tooth Digital Odontogram</span>
+                      <span>
+                        {tr(
+                          "View Dr. Nitu's updated 32-Tooth Digital Odontogram",
+                          "डॉ. नीतू द्वारा अपडेट किया गया 32-दांत डिजिटल ओडोंटोग्राम देखें"
+                        )}
+                      </span>
                     </div>
 
                     <div className="flex items-start gap-2.5">
@@ -1101,7 +1186,12 @@ async function PatientDashboardContent() {
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
-                      <span>Adhere to post-op medication schedule and oral hygiene</span>
+                      <span>
+                        {tr(
+                          "Adhere to post-op medication schedule and oral hygiene",
+                          "उपचार के बाद दवा के समय और दंत स्वच्छता का पालन करें"
+                        )}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -1114,21 +1204,27 @@ async function PatientDashboardContent() {
                     </div>
                     <div>
                       <h4 className="text-sm font-extrabold leading-tight">
-                        Dr. Nitu Rajpoot, BDS
+                        {tr("Dr. Nitu Rajpoot, BDS", "डॉ. नीतू राजपूत, बीडीएस")}
                       </h4>
                       <p className="text-[11px] text-blue-100">
-                        Chief Dental Surgeon &amp; Specialist
+                        {tr(
+                          "Chief Dental Surgeon & Specialist",
+                          "मुख्य दंत चिकित्सक और विशेषज्ञ"
+                        )}
                       </p>
                     </div>
                   </div>
                   <p className="text-xs text-blue-50 leading-relaxed">
-                    Have questions about your treatment or need to report sensitivity? Use direct clinical chat for quick advice.
+                    {tr(
+                      "Have questions about your treatment or need to report sensitivity? Use direct clinical chat for quick advice.",
+                      "क्या आपके उपचार के बारे में कोई सवाल हैं या झनझनाहट की जानकारी देनी है? त्वरित सलाह के लिए डायरेक्ट क्लिनिकल चैट का उपयोग करें।"
+                    )}
                   </p>
                   <label
                     htmlFor="tab-chat"
                     className="cursor-pointer block text-center py-2.5 px-4 rounded-xl bg-white hover:bg-blue-50 text-blue-700 font-extrabold text-xs shadow-xs transition"
                   >
-                    Open Clinical Chat &rarr;
+                    {tr("Open Clinical Chat", "क्लिनिकल चैट खोलें")} &rarr;
                   </label>
                 </div>
 
@@ -1141,13 +1237,16 @@ async function PatientDashboardContent() {
             <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-4">
               <div className="border-b border-slate-100 pb-4">
                 <span className="text-[11px] font-extrabold text-blue-600 uppercase tracking-wider">
-                  Interactive Dental Anatomy
+                  {tr("Interactive Dental Anatomy", "इंटरैक्टिव डेंटल एनाटॉमी")}
                 </span>
                 <h2 className="text-xl font-extrabold text-slate-900 mt-1">
-                  32-Tooth Digital Odontogram
+                  {tr("32-Tooth Digital Odontogram", "32-दांत डिजिटल ओडोंटोग्राम")}
                 </h2>
                 <p className="text-xs text-slate-500">
-                  Inspect your personalized digital tooth chart, clinical observations, and treatment history mapped by tooth number.
+                  {tr(
+                    "Inspect your personalized digital tooth chart, clinical observations, and treatment history mapped by tooth number.",
+                    "दांत संख्या के अनुसार अपने व्यक्तिगत डिजिटल टूथ चार्ट, क्लिनिकल अवलोकन और उपचार इतिहास का निरीक्षण करें।"
+                  )}
                 </p>
               </div>
 
@@ -1165,13 +1264,16 @@ async function PatientDashboardContent() {
             <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-4">
               <div className="border-b border-slate-100 pb-4">
                 <span className="text-[11px] font-extrabold text-blue-600 uppercase tracking-wider">
-                  Direct Doctor Messaging
+                  {tr("Direct Doctor Messaging", "डायरेक्ट डॉक्टर मैसेजिंग")}
                 </span>
                 <h2 className="text-xl font-extrabold text-slate-900 mt-1">
-                  Clinical Consultation Chat
+                  {tr("Clinical Consultation Chat", "क्लिनिकल परामर्श चैट")}
                 </h2>
                 <p className="text-xs text-slate-500">
-                  Direct encrypted line with Dr. Nitu Rajpoot, BDS for follow-ups and care inquiries.
+                  {tr(
+                    "Direct encrypted line with Dr. Nitu Rajpoot, BDS for follow-ups and care inquiries.",
+                    "फॉलो-अप और देखभाल संबंधी पूछताछ के लिए डॉ. नीतू राजपूत, बीडीएस के साथ सीधा संवाद।"
+                  )}
                 </p>
               </div>
 
@@ -1179,7 +1281,10 @@ async function PatientDashboardContent() {
                 patientId={patientProfile.id}
                 currentUserRole="PATIENT"
                 currentUserName={fullName}
-                title="Direct Clinical Chat with Dr. Nitu Rajpoot, BDS"
+                title={tr(
+                  "Direct Clinical Chat with Dr. Nitu Rajpoot, BDS",
+                  "डॉ. नीतू राजपूत, बीडीएस के साथ डायरेक्ट क्लिनिकल चैट"
+                )}
               />
             </div>
           </div>
@@ -1190,27 +1295,40 @@ async function PatientDashboardContent() {
               <div className="border-b border-slate-100 pb-4 flex flex-wrap items-center justify-between gap-4">
                 <div>
                   <span className="text-[11px] font-extrabold text-emerald-600 uppercase tracking-wider">
-                    Treatment Archives
+                    {tr("Treatment Archives", "उपचार अभिलेखागार")}
                   </span>
                   <h2 className="text-xl font-extrabold text-slate-900 mt-1">
-                    Completed Visits &amp; Doctor Prescriptions ({pastAppointments.length})
+                    {tr(
+                      "Completed Visits & Doctor Prescriptions",
+                      "पूर्ण विजिट और डॉक्टर के प्रिस्क्रिप्शन"
+                    )}{" "}
+                    ({pastAppointments.length})
                   </h2>
                   <p className="text-xs text-slate-500">
-                    Comprehensive digital records of all attended visits and prescribed regimens.
+                    {tr(
+                      "Comprehensive digital records of all attended visits and prescribed regimens.",
+                      "सभी पूर्ण विजिट और निर्धारित दवाओं का व्यापक डिजिटल रिकॉर्ड।"
+                    )}
                   </p>
                 </div>
                 <span className="px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-700 text-xs font-extrabold">
-                  {pastAppointments.length} Total Records
+                  {pastAppointments.length} {tr("Total Records", "कुल रिकॉर्ड")}
                 </span>
               </div>
 
               {pastAppointments.length === 0 ? (
                 <div className="p-10 rounded-2xl bg-slate-50 border border-dashed border-slate-200 text-center space-y-2">
                   <p className="text-xs font-bold text-slate-600">
-                    No past visits or prescriptions found.
+                    {tr(
+                      "No past visits or prescriptions found.",
+                      "कोई पिछली विजिट या प्रिस्क्रिप्शन नहीं मिला।"
+                    )}
                   </p>
                   <p className="text-[11px] text-slate-400">
-                    When Dr. Nitu completes your appointments and records prescriptions, they will be archived here.
+                    {tr(
+                      "When Dr. Nitu completes your appointments and records prescriptions, they will be archived here.",
+                      "जब डॉ. नीतू आपके अपॉइंटमेंट पूरे करेंगी और प्रिस्क्रिप्शन दर्ज करेंगी, तो वे यहाँ दिखाई देंगे।"
+                    )}
                   </p>
                 </div>
               ) : (
@@ -1234,33 +1352,40 @@ async function PatientDashboardContent() {
                                   : "bg-blue-100 text-blue-700"
                               }`}
                             >
-                              {isVid ? "🎥 Video Call" : "🏥 In-Clinic"}
+                              {isVid
+                                ? tr("🎥 Video Call", "🎥 वीडियो कॉल")
+                                : tr("🏥 In-Clinic", "🏥 क्लिनिक में")}
                             </span>
                           </div>
 
                           <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">
-                            {apt.status || "Completed"}
+                            {apt.status || tr("Completed", "पूर्ण")}
                           </span>
                         </div>
 
                         <div className="text-xs font-bold text-slate-800">
                           {formatAppointmentDate(
-                            apt.appointmentDate || apt.createdAt
+                            apt.appointmentDate || apt.createdAt,
+                            tr("Scheduled Visit", "निर्धारित विजिट")
                           )}{" "}
-                          at{" "}
+                          {tr("at", "को")}{" "}
                           <span className="text-blue-600">
-                            {apt.startTime || "Scheduled Time"}
+                            {apt.startTime || tr("Scheduled Time", "निर्धारित समय")}
                           </span>{" "}
                           &mdash;{" "}
                           <span className="text-slate-600 font-medium">
-                            {apt.reason || "Dental Consultation"}
+                            {apt.reason || tr("Dental Consultation", "डेंटल परामर्श")}
                           </span>
                         </div>
 
                         {apt.prescriptionNotes ? (
                           <div className="p-3.5 rounded-xl bg-white border border-blue-100 text-xs text-slate-700 shadow-2xs space-y-1">
                             <span className="font-extrabold text-blue-600 block text-[11px]">
-                              💊 Prescription &amp; Clinical Notes:
+                              💊{" "}
+                              {tr(
+                                "Prescription & Clinical Notes:",
+                                "प्रिस्क्रिप्शन और क्लिनिकल नोट्स:"
+                              )}
                             </span>
                             <p className="leading-relaxed whitespace-pre-line">
                               {apt.prescriptionNotes}
@@ -1268,7 +1393,10 @@ async function PatientDashboardContent() {
                           </div>
                         ) : (
                           <p className="text-[11px] text-slate-400 italic">
-                            No additional prescription notes recorded.
+                            {tr(
+                              "No additional prescription notes recorded.",
+                              "कोई अतिरिक्त प्रिस्क्रिप्शन नोट्स दर्ज नहीं किए गए।"
+                            )}
                           </p>
                         )}
                       </div>

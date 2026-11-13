@@ -3,16 +3,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-
-const DAYS = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
+import { useLanguage } from "@/components/LanguageContext";
 
 export function AvailabilityManager({
   schedules,
@@ -22,8 +13,19 @@ export function AvailabilityManager({
   blocks: any[];
 }) {
   const router = useRouter();
+  const { tr } = useLanguage();
   const [blockedDate, setBlockedDate] = useState("");
   const [reason, setReason] = useState("Clinic Holiday");
+
+  const DAYS = [
+    tr("Sunday", "रविवार"),
+    tr("Monday", "सोमवार"),
+    tr("Tuesday", "मंगलवार"),
+    tr("Wednesday", "बुधवार"),
+    tr("Thursday", "गुरुवार"),
+    tr("Friday", "शुक्रवार"),
+    tr("Saturday", "शनिवार"),
+  ];
 
   const addHoliday = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +47,7 @@ export function AvailabilityManager({
     <div className="space-y-8 text-xs">
       <div className="rounded-3xl border border-brand-secondary bg-white p-6 shadow-card space-y-4">
         <h2 className="text-base font-bold text-brand-primary">
-          Weekly Consultation Timings
+          {tr("Weekly Consultation Timings", "साप्ताहिक परामर्श समय")}
         </h2>
         <div className="divide-y divide-brand-secondary">
           {schedules.map((s) => (
@@ -57,14 +59,21 @@ export function AvailabilityManager({
                 {DAYS[s.dayOfWeek]}
               </span>
               <span>
-                Hours: <strong>{s.startTime.slice(0, 5)}</strong> –{" "}
+                {tr("Hours:", "समय:")}{" "}
+                <strong>{s.startTime.slice(0, 5)}</strong> –{" "}
                 <strong>{s.endTime.slice(0, 5)}</strong>
               </span>
               <span>
-                Break: <strong>{s.breakStartTime?.slice(0, 5) || "None"}</strong>{" "}
+                {tr("Break:", "ब्रेक:")}{" "}
+                <strong>
+                  {s.breakStartTime?.slice(0, 5) || tr("None", "कोई नहीं")}
+                </strong>{" "}
                 – <strong>{s.breakEndTime?.slice(0, 5) || ""}</strong>
               </span>
-              <span>Slot: {s.slotDurationMinutes}m</span>
+              <span>
+                {tr("Slot:", "स्लॉट:")} {s.slotDurationMinutes}
+                {tr("m", " मि.")}
+              </span>
             </div>
           ))}
         </div>
@@ -75,7 +84,10 @@ export function AvailabilityManager({
         className="rounded-3xl border border-brand-secondary bg-white p-6 shadow-card space-y-4"
       >
         <h2 className="text-base font-bold text-brand-primary">
-          Block Date / Add Clinic Holiday
+          {tr(
+            "Block Date / Add Clinic Holiday",
+            "तारीख ब्लॉक करें / क्लिनिक अवकाश जोड़ें"
+          )}
         </h2>
         <div className="grid gap-4 md:grid-cols-3">
           <input
@@ -87,14 +99,17 @@ export function AvailabilityManager({
           <input
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            placeholder="Reason for holiday/block"
+            placeholder={tr(
+              "Reason for holiday/block",
+              "अवकाश / ब्लॉक का कारण"
+            )}
             className="rounded-xl border border-brand-secondary px-3 py-2"
           />
           <button
             type="submit"
             className="rounded-xl bg-brand-primary px-4 py-2 font-bold text-white"
           >
-            Block Full Day
+            {tr("Block Full Day", "पूरा दिन ब्लॉक करें")}
           </button>
         </div>
 
@@ -107,7 +122,11 @@ export function AvailabilityManager({
               <span className="font-bold text-brand-primary">
                 {b.blockedDate}
               </span>
-              <span>{b.reason}</span>
+              <span>
+                {b.reason === "Clinic Holiday"
+                  ? tr("Clinic Holiday", "क्लिनिक अवकाश")
+                  : b.reason}
+              </span>
             </div>
           ))}
         </div>
