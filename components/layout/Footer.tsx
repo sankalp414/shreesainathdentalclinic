@@ -65,7 +65,7 @@ export function Footer({
     "Shop no 7, Om Plaza, Bajrang Chowk, Rajkishore Nagar, Bilaspur, Chhattisgarh 495006";
 
   const displayPhone = phone || "+91 6261474753";
-  const displayEmail = email || "care@shreesainathdental.in";
+  const displayEmail = email || "Shreesainathdentalclinic.@gmail.com";
 
   // Priority: 1. Live Doctor Dashboard Server Action -> 2. Passed Prop -> 3. Fallback
   const displayHours =
