@@ -8,24 +8,6 @@
 }
 
 
-/* @theme inline {
-  /* Shree Sainath Dental Clinic Brand Palette */
-  --color-brand-primary: #123B5D;
-  --color-brand-secondary: #EAF4FA;
-  --color-brand-accent: #39A9A5;
-  --color-brand-bg: #FFFFFF;
-  --color-brand-warm: #F8F7F3;
-  --color-brand-text: #263746;
-
-  /* Typography mapped to next/font CSS variables *
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-playfair), ui-serif, Georgia, serif;
-
-  /* Custom Clinical Card & Elevated Shadows *
-  --shadow-card: 0 4px 20px -2px rgba(18, 59, 93, 0.06);
-  --shadow-elevated: 0 12px 32px -4px rgba(18, 59, 93, 0.12);
-} */
-
 :root {
   /* Shree Sainath Dental Clinic Brand Palette */
   --color-brand-primary: #123B5D;
