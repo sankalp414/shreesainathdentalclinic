@@ -19,7 +19,6 @@
 body {
   background-color: var(--color-brand-bg);
   color: #1e293b;
-  font-family: system-ui, -apple-system, sans-serif;
 }
 
 @layer base {
