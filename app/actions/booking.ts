@@ -396,7 +396,7 @@ export async function createAppointment(formData: {
         if ("fullName" in docCols) docPayload.fullName = "Dr. Nitu Rajpoot, BDS";
         if ("name" in docCols) docPayload.name = "Dr. Nitu Rajpoot, BDS";
         if ("email" in docCols) docPayload.email = "dr.ananya@shreesainathdental.com";
-        if ("phone" in docCols) docPayload.phone = "+919876543210";
+        if ("phone" in docCols) docPayload.phone = "+916261474753";
         if ("registrationNumber" in docCols) docPayload.registrationNumber = "DCI-MH-48291";
         if ("licenseNumber" in docCols) docPayload.licenseNumber = "DCI-MH-48291";
         if ("specialization" in docCols)

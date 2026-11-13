@@ -80,7 +80,7 @@ export default function AboutPage() {
                 <Video className="h-4 w-4" /> Video Consultation
               </Link>
               <a
-                href="tel:+919876543210"
+                href="tel:+916261474753"
                 className="inline-flex items-center gap-2 rounded-full border border-white/15 px-6 py-4 text-sm font-medium text-white/90 hover:bg-white/10 transition-colors"
               >
                 <Phone className="h-4 w-4 text-[#a8dadc]" /> +91 98765 43210

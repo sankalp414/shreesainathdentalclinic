@@ -230,7 +230,7 @@ async function HomeContent() {
             )}
 
             <a
-              href="tel:+919876543210"
+              href="tel:+916261474753"
               className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-3.5 text-sm font-semibold text-white backdrop-blur-md hover:bg-white/20 transition-all"
             >
               <Phone className="size-4" />

@@ -186,7 +186,7 @@ export default function TreatmentsPage() {
               Book a visit <ArrowRight className="w-4 h-4" />
             </Link>
             <a
-              href="tel:+919876543210"
+              href="tel:+916261474753"
               className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-white/10 backdrop-blur-md text-white border border-white/25 text-sm font-semibold hover:bg-white/20 transition-colors"
             >
               <Phone className="w-4 h-4 text-[#cce8e2]" /> Call the clinic
@@ -631,7 +631,7 @@ export default function TreatmentsPage() {
               Request an appointment
             </Link>
             <a
-              href="tel:+919876543210"
+              href="tel:+916261474753"
               className="inline-flex items-center gap-2 px-6 py-4 rounded-full bg-white/15 hover:bg-white/25 text-white text-sm font-semibold transition-colors"
             >
               <Phone className="w-4 h-4" /> Call Clinic

@@ -80,7 +80,7 @@ async function BlogDirectoryContent() {
               Book a visit <ArrowRight className="size-4" />
             </Link>
             <a
-              href="tel:+919876543210"
+              href="tel:+916261474753"
               className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 text-white px-7 py-3.5 text-sm font-bold backdrop-blur-md hover:bg-white/20 hover:-translate-y-0.5 transition-all"
             >
               <Phone className="size-4" /> Call the clinic

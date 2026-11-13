@@ -9,8 +9,8 @@
 // //   address: 'Suite 402, Metro Health Plaza, MG Road',
 // //   city: 'Bengaluru, Karnataka',
 // //   phone: '+91 98765 43210',
-// //   whatsappSupport: '+919876543210',
-// //   doctorWhatsapp: '+919876543210',
+// //   whatsappSupport: '+916261474753',
+// //   doctorWhatsapp: '+916261474753',
 // //   email: 'care@apexdental.com',
 // //   workingHours: 'Mon - Sat: 8:30 AM – 7:00 PM | Sun: Emergency Only',
 // //   emergencyNumber: '+91 98765 99911',
@@ -27,7 +27,7 @@
 //   if (cleaned.length === 10) {
 //     return `91${cleaned}`;
 //   }
-//   return cleaned.length > 0 ? cleaned : '919876543210';
+//   return cleaned.length > 0 ? cleaned : '916261474753';
 // }
 
 // /**
